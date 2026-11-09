@@ -1,0 +1,801 @@
+<!doctype html><html lang="ja" data-theme="orion"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TENPO OS｜サンプル店舗</title>
+<style>
+/* TENPO OS — generated from tokens.json */
+:root, [data-theme="sumi"] {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --surface-2: #eae9e6;
+  --ink: #222222;
+  --ink-2: #555555;
+  --border: #dcd8cf;
+  --primary: #0f766e;
+  --primary-text: #0f766e;
+  --on-primary: #ffffff;
+  --primary-soft: #dbe7e3;
+  --accent: #b4532a;
+  --accent-text: #b4532a;
+  --on-accent: #ffffff;
+  --accent-soft: #efe2db;
+  --focus: #0f766e;
+  --ok: #1b7f4d;
+  --ok-soft: #d8e5dc;
+  --warn: #b45309;
+  --warn-soft: #eedfd2;
+  --danger: #b3261e;
+  --danger-soft: #edd9d5;
+  --info: #1d4ed8;
+  --info-soft: #d8deef;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+}
+[data-theme="lebois"] {
+  --bg: #f4efe5;
+  --surface: #fbf8f1;
+  --surface-2: #e8e3d9;
+  --ink: #2e2418;
+  --ink-2: #6b5f4e;
+  --border: #dfd6c4;
+  --primary: #55663a;
+  --primary-text: #55663a;
+  --on-primary: #ffffff;
+  --primary-soft: #e1dfd0;
+  --accent: #c96f5a;
+  --accent-text: #ad4f39;
+  --on-accent: #111111;
+  --accent-soft: #efe0d4;
+  --focus: #55663a;
+  --ok: #197748;
+  --ok-soft: #d5decf;
+  --warn: #aa4f09;
+  --warn-soft: #ead9c6;
+  --danger: #b3261e;
+  --danger-soft: #ebd3c9;
+  --info: #1d4ed8;
+  --info-soft: #d6d8e3;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+}
+[data-theme="orion"] {
+  --bg: #faf6ee;
+  --surface: #ffffff;
+  --surface-2: #eee9e1;
+  --ink: #2c2419;
+  --ink-2: #6b5a40;
+  --border: #d9d1bd;
+  --primary: #2c4f39;
+  --primary-text: #2c4f39;
+  --on-primary: #ffffff;
+  --primary-soft: #e1e2d8;
+  --accent: #93332a;
+  --accent-text: #93332a;
+  --on-accent: #ffffff;
+  --accent-soft: #eedfd6;
+  --focus: #2c4f39;
+  --ok: #1b7f4d;
+  --ok-soft: #dbe5d7;
+  --warn: #b45309;
+  --warn-soft: #f0dfce;
+  --danger: #b3261e;
+  --danger-soft: #f0d9d1;
+  --info: #1d4ed8;
+  --info-soft: #dbdeeb;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+}
+[data-theme="ai"] {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface-2: #e8eaee;
+  --ink: #1a2433;
+  --ink-2: #4f5d70;
+  --border: #d5dbe4;
+  --primary: #1e3a8a;
+  --primary-text: #1e3a8a;
+  --on-primary: #ffffff;
+  --primary-soft: #dbe0ed;
+  --accent: #b45309;
+  --accent-text: #b45309;
+  --on-accent: #ffffff;
+  --accent-soft: #ede3dd;
+  --focus: #1e3a8a;
+  --ok: #1b7f4d;
+  --ok-soft: #d6e6e2;
+  --warn: #b45309;
+  --warn-soft: #ece0d8;
+  --danger: #b3261e;
+  --danger-soft: #ecdadb;
+  --info: #1d4ed8;
+  --info-soft: #d7dff5;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+}
+[data-theme="umi"] {
+  --bg: #f6f3ee;
+  --surface: #ffffff;
+  --surface-2: #e9e7e3;
+  --ink: #1f2a33;
+  --ink-2: #5a6673;
+  --border: #dcd6cc;
+  --primary: #2a6f8f;
+  --primary-text: #2a6f8f;
+  --on-primary: #ffffff;
+  --primary-soft: #dee3e3;
+  --accent: #b28446;
+  --accent-text: #8d6937;
+  --on-accent: #111111;
+  --accent-soft: #eee6da;
+  --focus: #2a6f8f;
+  --ok: #1b7f4d;
+  --ok-soft: #d7e3d7;
+  --warn: #b45309;
+  --warn-soft: #edddce;
+  --danger: #b3261e;
+  --danger-soft: #edd6d1;
+  --info: #1d4ed8;
+  --info-soft: #d8dceb;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+}
+[data-theme="azuki"] {
+  --bg: #faf5f3;
+  --surface: #ffffff;
+  --surface-2: #eee8e7;
+  --ink: #3a2026;
+  --ink-2: #6e5157;
+  --border: #e3d6d6;
+  --primary: #7b2d3b;
+  --primary-text: #7b2d3b;
+  --on-primary: #ffffff;
+  --primary-soft: #ebdddd;
+  --accent: #5d7a4a;
+  --accent-text: #587446;
+  --on-accent: #ffffff;
+  --accent-soft: #e7e6df;
+  --focus: #7b2d3b;
+  --ok: #1b7f4d;
+  --ok-soft: #dbe4dc;
+  --warn: #b45309;
+  --warn-soft: #f0ded2;
+  --danger: #b3261e;
+  --danger-soft: #f0d8d5;
+  --info: #1d4ed8;
+  --info-soft: #dbdeef;
+  --chart-1: #2a78d6;
+  --chart-2: #eb6834;
+  --chart-3: #1baf7a;
+  --chart-4: #eda100;
+  --chart-5: #e87ba4;
+}
+[data-theme="yoru"] {
+  --bg: #15211e;
+  --surface: #1c2a26;
+  --surface-2: #2b3632;
+  --ink: #f3efe6;
+  --ink-2: #b8c2bc;
+  --border: #2e3d38;
+  --primary: #74c4a4;
+  --primary-text: #74c4a4;
+  --on-primary: #111111;
+  --primary-soft: #20352e;
+  --accent: #dba362;
+  --accent-text: #dba362;
+  --on-accent: #111111;
+  --accent-soft: #2d3126;
+  --focus: #74c4a4;
+  --ok: #6fcf97;
+  --ok-soft: #22392f;
+  --warn: #f0b35b;
+  --warn-soft: #343527;
+  --danger: #f28b82;
+  --danger-soft: #34302c;
+  --info: #8ab4f8;
+  --info-soft: #25363d;
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
+}
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-num: "Hiragino Sans", "Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --tap: 44px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+  --shadow-sheet: 0 -2px 12px rgba(0,0,0,0.12);
+  --icon-stroke: 2px;
+  --icon-size: 24px;
+}
+.title { font-family: var(--font-sans); font-size: 22px; line-height: 30px; font-weight: 700; }
+.heading { font-family: var(--font-sans); font-size: 17px; line-height: 24px; font-weight: 700; }
+.body { font-family: var(--font-sans); font-size: 16px; line-height: 26px; font-weight: 400; }
+.small { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 400; }
+.label { font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 600; }
+.button { font-family: var(--font-sans); font-size: 16px; line-height: 24px; font-weight: 600; }
+.num-xl { font-family: var(--font-num); font-size: 40px; line-height: 44px; font-weight: 700; }
+.num-lg { font-family: var(--font-num); font-size: 24px; line-height: 30px; font-weight: 700; }
+.num { font-family: var(--font-num); font-size: 16px; line-height: 24px; font-weight: 500; }
+
+/* TENPO OS 画面の骨組み（layout.css）
+   tokens.css の後に読む。画面はこの部品だけで組む。独自の px・独自の幅は書かない。
+   崩れない3原則：(1) 幅は親から（min-width:0・minmax(0,1fr)） (2) 文字は1行なら省略・複数行なら折り返し (3) 高さは中身で決めない所（行・ボタン・札）は最小値を持つ */
+
+*, *::before, *::after { box-sizing: border-box; min-width: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-sans); font-size: 16px; line-height: 26px;
+  overflow-wrap: anywhere; line-break: strict;
+  -webkit-font-smoothing: antialiased;
+}
+img, svg, video { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.num, .num-lg, .num-xl, .tabular { font-variant-numeric: tabular-nums; }
+
+/* ---- 画面の外枠：上の帯・中身・下のタブ ---- */
+.app { min-height: 100dvh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; container: app / inline-size; }
+.app-head {
+  position: sticky; top: 0; z-index: 10; background: var(--bg);
+  padding: calc(var(--space-2) + env(safe-area-inset-top)) var(--space-4) var(--space-2);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-3);
+  min-height: 56px; border-bottom: 1px solid var(--border);
+}
+.app-head .title { font-size: 22px; line-height: 30px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-head .store { font-size: 13px; line-height: 18px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.app-body { padding: var(--space-4) var(--space-4) calc(var(--space-8)); max-width: 640px; width: 100%; margin: 0 auto; }
+.app-tabs {
+  position: sticky; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--border);
+  padding: var(--space-1) var(--space-2) calc(var(--space-1) + env(safe-area-inset-bottom));
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+}
+.tab { display: grid; justify-items: center; gap: 2px; padding: var(--space-1) 0; min-height: var(--tap); color: var(--ink-2); font-size: 11px; line-height: 14px; text-decoration: none; position: relative; }
+.tab[aria-current] { color: var(--primary-text); font-weight: 600; }
+.tab span { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tab .count { position: absolute; top: 0; left: calc(50% + 6px); }
+
+/* 2列（iPad・PC）：同じ画面を2列にするだけ。画面の幅ではなく .app 自身の幅で決める（コンテナクエリ） */
+@container app (min-width: 768px) {
+  .app-body { max-width: 1120px; }
+  .cols-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); align-items: start; }
+}
+
+/* ---- 積む・並べる ---- */
+.stack { display: grid; gap: var(--space-3); }
+.stack-lg { display: grid; gap: var(--space-6); }
+.row { display: flex; align-items: center; gap: var(--space-2); }
+.row > .grow { flex: 1 1 0; min-width: 0; }
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+.tiles-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+/* 3つ並びは 430px 以上だけ。狭いときは2列にし、3つ目は横いっぱい（24px の数字が6桁入る幅を守る） */
+@container app (max-width: 429px) { .tiles-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tiles-3 > :nth-child(3):last-child { grid-column: span 2; } }
+
+/* ---- 節 ---- */
+.section-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: var(--space-3); margin: 0 0 var(--space-2); }
+.section-head h2 { margin: 0; font-size: 17px; line-height: 24px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.section-head .more { font-size: 13px; line-height: 18px; color: var(--primary-text); white-space: nowrap; }
+
+/* ---- カード ---- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-4); }
+.card.sunk { background: var(--surface-2); border-color: transparent; }
+
+/* 数字の札（半分の幅に置く）。高さは固定、数字は yen(n,'card') でまとめる */
+.stat { display: grid; grid-template-rows: 18px 30px 18px; gap: 2px; min-height: 96px; }
+.stat .label { font-size: 13px; line-height: 18px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat .value { font-family: var(--font-num); font-size: 24px; line-height: 30px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat .sub { font-size: 13px; line-height: 18px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 画面いっぱいの数字。yen(n,'hero') */
+.hero { display: grid; gap: var(--space-1); }
+.hero .value { font-family: var(--font-num); font-size: 40px; line-height: 44px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@container app (max-width: 359px) { .hero .value { font-size: 32px; line-height: 36px; } }
+
+/* ---- 一覧の行：左アイコン・題と補足・右の値か札 ---- */
+.list { display: grid; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.item {
+  display: grid; grid-template-columns: 20px minmax(0, 1fr) fit-content(40%); align-items: center; gap: var(--space-3);
+  min-height: 56px; padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border); color: inherit; text-decoration: none;
+}
+.item:first-child { border-top: 0; }
+.item .icon { width: 20px; height: 20px; color: var(--ink-2); }
+.item .main { display: grid; gap: 2px; }
+.item .t { font-size: 16px; line-height: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item .t.wrap { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.item .s { font-size: 13px; line-height: 18px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item .right { justify-self: end; max-width: 100%; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.item.no-icon { grid-template-columns: minmax(0, 1fr) fit-content(40%); }
+
+/* ---- 札（状態） ---- */
+.badge { display: inline-block; vertical-align: middle; height: 22px; padding: 0 var(--space-2); border-radius: var(--radius-sm); font-size: 12px; line-height: 22px; font-weight: 600; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.badge svg { width: 14px; height: 14px; vertical-align: -3px; margin-right: 2px; }
+.badge.ok { background: var(--ok-soft); color: var(--ok); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); }
+.badge.danger { background: var(--danger-soft); color: var(--danger); }
+.badge.info { background: var(--info-soft); color: var(--info); }
+.badge.plain { background: var(--surface-2); color: var(--ink-2); }
+.count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: var(--radius-full); background: var(--danger); color: var(--bg); font-size: 11px; line-height: 1; font-weight: 700; }
+
+/* ---- ボタン ---- */
+.btn {
+  display: inline-block; text-align: center;
+  min-height: var(--tap); padding: 9px var(--space-4); border-radius: var(--radius-md); border: 1px solid var(--border);
+  background: var(--surface); color: var(--ink); font-size: 16px; line-height: 24px; font-weight: 600; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+}
+.btn svg { width: 20px; height: 20px; vertical-align: -5px; margin-right: var(--space-1); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn.danger { background: var(--danger); border-color: var(--danger); color: var(--bg); }
+.btn.quiet { border-color: transparent; background: transparent; color: var(--primary-text); }
+.btn.block { width: 100%; }
+.btn.sq { padding-left: 0; padding-right: 0; min-width: var(--tap); }   /* 記号1つのボタン（− ＋ ×） */
+.btn:focus-visible, .tab:focus-visible, .item:focus-visible, .field :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* ボタンは横に2つまで。3つ以上は自動で縦に積む */
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: var(--space-2); }
+.actions.stack, .actions:has(> :nth-child(3)) { grid-template-columns: minmax(0, 1fr); }
+
+/* ---- 入力：ラベルは上、1列だけ ---- */
+.field { display: grid; gap: var(--space-1); }
+.field label { font-size: 13px; line-height: 18px; color: var(--ink-2); }
+.field input, .field select, .field textarea {
+  width: 100%; min-height: var(--tap); padding: 0 var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); font-size: 16px;
+}
+.field textarea { min-height: 88px; padding: var(--space-2) var(--space-3); line-height: 24px; resize: vertical; }
+.field .help { font-size: 13px; line-height: 18px; color: var(--ink-2); }
+.field .err { font-size: 13px; line-height: 18px; color: var(--danger); }
+.field.money input { font-family: var(--font-num); text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ---- 表：横にはみ出す分は表だけが横に動く。最初の列を固定、数字は右寄せ ---- */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+table.t { border-collapse: collapse; width: 100%; }
+table.t.wide { min-width: 480px; }   /* 列が5つ以上の表に。箱の中だけ横に動く */
+table.t th, table.t td { padding: var(--space-2) var(--space-3); border-top: 1px solid var(--border); text-align: left; white-space: nowrap; font-size: 14px; line-height: 20px; }
+table.t th { background: var(--surface-2); color: var(--ink-2); font-weight: 600; border-top: 0; }
+table.t th:first-child, table.t td:first-child { position: sticky; left: 0; background: var(--surface); max-width: 160px; overflow: hidden; text-overflow: ellipsis; }
+table.t th:first-child { background: var(--surface-2); }
+table.t .n { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--font-num); }
+
+/* ---- 空・読み込み・エラー ---- */
+.empty { padding: var(--space-6) var(--space-4); text-align: center; color: var(--ink-2); font-size: 14px; line-height: 20px; }
+.skeleton { background: var(--surface-2); border-radius: var(--radius-sm); min-height: 20px; }
+.banner { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--space-2); align-items: start; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); font-size: 14px; line-height: 20px; }
+.banner.danger { background: var(--danger-soft); color: var(--ink); } .banner.danger svg { color: var(--danger); }
+.banner.warn { background: var(--warn-soft); } .banner.warn svg { color: var(--warn); }
+.banner.info { background: var(--info-soft); } .banner.info svg { color: var(--info); }
+
+/* ---- 画面下から出るシート ---- */
+.sheet-bg { position: fixed; inset: 0; z-index: 30; background: rgba(0,0,0,.4); display: grid; align-items: end; }
+.sheet {
+  background: var(--surface); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: var(--shadow-sheet);
+  max-height: 85dvh; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; width: 100%; max-width: 640px; margin: 0 auto;
+}
+.sheet .head { padding: var(--space-4) var(--space-4) var(--space-2); font-size: 17px; line-height: 24px; font-weight: 700; }
+.sheet .body { overflow: auto; padding: 0 var(--space-4) var(--space-4); }
+.sheet .foot { padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }
+
+/* ---- 文字の決まり ---- */
+.ellipsis { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.muted { color: var(--ink-2); }
+.small { font-size: 13px; line-height: 18px; }
+
+/* ---- 密な表のための追加 ---- */
+table.t.dense th, table.t.dense td { padding: var(--space-1) var(--space-2); font-size: 13px; line-height: 18px; }
+table.t td.cell { text-align: center; min-width: 64px; }
+table.t td.cell.short { background: var(--warn-soft); color: var(--warn); font-weight: 600; }
+table.t td.cell.off { color: var(--ink-2); }
+table.t tr.total td { font-weight: 700; border-top: 2px solid var(--border); }
+table.t td.neg, table.t th.neg { color: var(--danger); }
+/* 横に並ぶ選択肢（曜日・絞り込み）。箱だけ横に動く */
+.chips { display: flex; gap: var(--space-2); overflow-x: auto; padding-bottom: 2px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; display: inline-grid; place-items: center; min-height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-full); border: 1px solid var(--border); background: var(--surface); font-size: 14px; line-height: 20px; white-space: nowrap; color: inherit; text-decoration: none; }
+/* 入力として押す選択肢（曜日・はい／いいえ・十分／少／無）は 44px。絞り込みの chip は 36px のまま */
+.chip.tap { min-height: var(--tap); }
+.chip[aria-current] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 600; }
+/* 棒（表の中の簡単な比較）。色は chart-1、文字は ink */
+.bar { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2); align-items: center; }
+.bar i { display: block; height: 8px; border-radius: 4px; background: var(--chart-1); }
+/* 横に2つ並ぶ小さな値（ラベル：値） */
+.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-2); font-size: 14px; line-height: 20px; min-height: 28px; align-items: center; }
+.kv .k { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kv .v { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kv.total { font-weight: 700; border-top: 1px solid var(--border); padding-top: var(--space-1); }
+
+</style>
+<style>
+  /* この画面だけの追加は「部品」ではなく置き方だけ（幅・色・px は書かない） */
+  .pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); }
+  .pad .btn { font-size: 22px; }
+  .dots { display: flex; gap: var(--space-3); justify-content: center; min-height: 24px; }
+  .dots i { width: 14px; height: 14px; border-radius: var(--radius-full); border: 1px solid var(--border); background: var(--surface); }
+  .dots i.on { background: var(--primary); border-color: var(--primary); }
+  .step { display: grid; grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap); gap: var(--space-2); align-items: center; }
+  .step input { text-align: right; }
+  .q-no { font-size: 13px; line-height: 18px; color: var(--ink-2); }
+  .q-t { font-size: 20px; line-height: 28px; font-weight: 700; }
+  .pre { white-space: pre-wrap; font-size: 14px; line-height: 22px; max-height: 40dvh; overflow: auto; background: var(--surface-2); padding: var(--space-3); border-radius: var(--radius-sm); }
+  .hide { display: none !important; }
+  .toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 40; max-width: calc(100% - 32px); padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); background: var(--ink); color: var(--bg); font-size: 14px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style></head>
+<body>
+<div class="app" id="app"></div>
+<script type="module">
+// TENPO OS 金額・数の表記（画面側の共通の関数）。README の「金額の表記」の決まりをそのまま実装。
+// 使い方： yen(86400) → "86,400円" ／ yen(86400, 'card') → "8.6万円" ／ yen(1234567, 'axis') → "123万"
+// 置き場所（place）ごとに「このまま出せる最大の桁」を決め、超えたら万・億でまとめる。
+// 正確さが要る場面（exact）は決してまとめない。
+
+const LIMIT = {
+  exact: Infinity, // 会計・締め・支払・経費・給与：必ず全桁
+  hero: 8,         // 画面いっぱいの大きい数字（num-xl）：12,345,678円 まで
+  row: 7,          // 一覧の行の右端（num）：1,234,567円 まで
+  card: 6,         // 半分の幅のカード（num-lg）：999,999円 まで
+  tile3: 5,        // 3つ並びの札（num-lg）：99,999円 まで。超えたら 24万円
+  axis: 0,         // グラフの軸：常に万でまとめる（単位は軸の題に）
+};
+
+function group(n) {
+  return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// 万・億でまとめる。1万〜9.9万は小数1桁、10万以上は整数の万、1億以上は小数1桁の億。
+function compact(n) {
+  const neg = n < 0; const a = Math.abs(n);
+  let s;
+  if (a < 10000) s = group(a);
+  else if (a < 100000) s = trim1((a / 10000)) + '万';
+  else if (a < 100000000) s = group(Math.round(a / 10000)) + '万';
+  else s = trim1(a / 100000000) + '億';
+  return (neg ? '-' : '') + s;
+}
+function trim1(x) { const s = (Math.floor(x * 10) / 10).toFixed(1); return s.endsWith('.0') ? s.slice(0, -2) : s; }
+
+// 金額。unit=false で「円」を外す（列の見出しに円があるとき）。
+function yen(n, place = 'exact', unit = true) {
+  if (n === null || n === undefined || Number.isNaN(n)) return '—';
+  const limit = LIMIT[place] ?? Infinity;
+  const digits = String(Math.abs(Math.trunc(n))).length;
+  const neg = n < 0;
+  let s;
+  if (digits <= limit) s = (neg ? '-' : '') + group(Math.abs(Math.trunc(n)));
+  else s = compact(Math.trunc(n));
+  if (place === 'axis') return s; // 軸は単位なし（題に「万円」と書く）
+  return unit ? s + '円' : s;
+}
+
+// まとめたかどうか（まとめたときは押すと正確な数字を出す）
+function isCompact(n, place = 'exact') {
+  if (n === null || n === undefined) return false;
+  const limit = LIMIT[place] ?? Infinity;
+  return String(Math.abs(Math.trunc(n))).length > limit;
+}
+
+// 個数・食数など金額以外の数。単位は呼び手が付ける（57食）。
+function num(n) {
+  if (n === null || n === undefined || Number.isNaN(n)) return '—';
+  return (n < 0 ? '-' : '') + group(Math.abs(n));
+}
+
+// 割合。小数1桁、100% 以上は整数。
+function pct(x) {
+  if (x === null || x === undefined || Number.isNaN(x)) return '—';
+  const v = x * 100;
+  return (Math.abs(v) >= 100 ? Math.round(v) : Math.round(v * 10) / 10) + '%';
+}
+
+// 印刷物（会計の帳票）ではマイナスを ▲ にする。
+function yenPrint(n) {
+  if (n === null || n === undefined) return '—';
+  return (n < 0 ? '▲' : '') + group(Math.abs(Math.trunc(n))) + '円';
+}
+
+
+
+
+/* ===== 接続先（?api=&key=&store= で差し替え可。localStorage に覚える） ===== */
+const Q = new URLSearchParams(location.search);
+const CFG = {
+  api: Q.get('api') || localStorage.getItem('tenpo.api') || 'https://bzftpxtnlubibhmobtmm.supabase.co',
+  key: Q.get('key') || localStorage.getItem('tenpo.key') || 'sb_publishable_D-E5nVxOex1DdQktK8C6tQ_gIeGP7Gi',   // 公開してよい鍵（publishable）。秘密ではない
+  store: Q.get('store') || localStorage.getItem('tenpo.store') || '7e000000-0000-4000-8000-0000000000c2',
+};
+for (const k of ['api','key','store']) if (Q.get(k)) localStorage.setItem('tenpo.' + k, Q.get(k));
+let TOKEN = sessionStorage.getItem('tenpo.token') || null;
+let ME = null, ERR = {}, SETTINGS = [];
+const STORE_NAME = () => ME?.store?.name || 'サンプル店舗';
+
+/* ===== 床を呼ぶ ===== */
+async function rpc(fn, args = {}, bearer = null) {
+  const r = await fetch(`${CFG.api}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key, 'Content-Profile': 'api', 'Accept-Profile': 'api', ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}) }, body: JSON.stringify(args) });
+  const text = await r.text(); let body = null; try { body = text ? JSON.parse(text) : null; } catch { body = text; }
+  if (!r.ok) { const code = body?.message || body?.error || `http_${r.status}`; const e = new Error(code); e.code = code; e.hint = body?.hint || body?.details; throw e; }
+  return body;
+}
+const call = (fn, args = {}) => rpc(fn, { p_token: TOKEN, ...args });
+function msg(e) { const m = ERR[e.code]; if (m) return m.ja + (m.hint ? '。' + m.hint : ''); if (e.code === 'login_required') return 'ログインが切れました'; return `うまくいきませんでした（${e.code}）`; }
+
+/* ===== 部品 ===== */
+const I = {
+  back: '<path d="m15 18-6-6 6-6"/>', box: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>', set: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1"/>',
+  pot: '<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M8 6h8"/>', truck: '<path d="M10 17h4V5H2v12h3"/><path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5v8h1"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  warn: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4m0 4h.01"/>', ok: '<path d="M20 6 9 17l-5-5"/>', me: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/>', out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
+};
+const ic = (k, s = 20, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const badge = (kind, text) => `<span class="badge ${kind}">${esc(text)}</span>`;
+const head = (title, right = '') => `<header class="app-head"><div><div class="title">${esc(title)}</div><div class="store">${esc(STORE_NAME())}</div></div>${right}</header>`;
+const TABS = [['settings', 'set', '店のこと'], ['stock', 'box', '在庫'], ['prep', 'pot', '仕込みと発注'], ['me', 'me', 'わたし']];
+const tabs = (cur) => `<nav class="app-tabs">${TABS.filter(([k]) => k !== 'settings' && k !== 'prep' || (ME?.rank ?? 0) >= 3).map(([k, i, l]) => `<a class="tab" href="#${k}" ${cur === k ? 'aria-current="page"' : ''}>${ic(i, 22)}<span>${l}</span></a>`).join('')}</nav>`;
+const banner = (kind, text) => `<div class="banner ${kind}">${ic(kind === 'danger' ? 'warn' : kind === 'warn' ? 'warn' : 'info')}<div>${esc(text)}</div></div>`;
+let toastT; function toast(t) { let el = document.querySelector('.toast'); if (!el) { el = document.createElement('div'); el.className = 'toast'; document.body.append(el); } el.textContent = t; el.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.add('hide'), 2600); }
+function stepper(id, val, unit, step = 1) {
+  return `<div class="step" data-step="${id}"><button class="btn sq" type="button" data-d="-${step}" aria-label="減らす">−</button><div class="field"><input class="num" inputmode="decimal" value="${esc(val ?? '')}" aria-label="数"></div><button class="btn sq" type="button" data-d="${step}" aria-label="増やす">＋</button></div>${unit ? `<div class="small muted">${esc(unit)}</div>` : ''}`;
+}
+function wireSteppers(root) {
+  root.querySelectorAll('.step [data-d]').forEach((b) => b.addEventListener('click', () => { const inp = b.parentElement.querySelector('input'); const v = Number(String(inp.value).replace(/[^\d.\-]/g, '')) || 0; const d = Number(b.dataset.d); inp.value = String(Math.max(0, Math.round((v + d) * 1000) / 1000)); inp.dispatchEvent(new Event('input')); }));
+}
+function sheet(title, bodyHtml, footHtml = '') {
+  const bg = document.createElement('div'); bg.className = 'sheet-bg';
+  bg.innerHTML = `<div class="sheet" role="dialog" aria-label="${esc(title)}"><div class="head">${esc(title)}</div><div class="body">${bodyHtml}</div><div class="foot">${footHtml || '<button class="btn block" data-close>閉じる</button>'}</div></div>`;
+  bg.addEventListener('click', (e) => { if (e.target === bg || e.target.closest('[data-close]')) bg.remove(); });
+  document.body.append(bg); return bg;
+}
+const tomorrow = () => { const d = new Date(Date.now() + 9 * 3600e3); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10); };
+const fmtD = (s) => s ? `${Number(s.slice(5, 7))}/${Number(s.slice(8, 10))}（${'日月火水木金土'[new Date(s + 'T00:00:00').getDay()]}）` : '—';
+
+/* ===== 画面：ログイン ===== */
+async function screenLogin(root, note = '') {
+  let names = [];
+  try { names = await rpc('login_names', { p_store: CFG.store }); } catch (e) { root.innerHTML = `${head('ログイン')}<main class="app-body stack">${banner('danger', `店の一覧が読めません（${e.code}）。接続先を確かめてください`)}<div class="small muted">${esc(CFG.api)}</div></main>`; return; }
+  let person = null, pin = '', mode = 'pin';
+  const draw = () => {
+    root.innerHTML = `${head('ログイン')}<main class="app-body stack-lg">
+      ${note ? banner('info', note) : ''}
+      <div class="chips"><a class="chip tap" href="#" data-mode="pin" ${mode === 'pin' ? 'aria-current="true"' : ''}>4桁番号（スタッフ）</a><a class="chip tap" href="#" data-mode="account" ${mode === 'account' ? 'aria-current="true"' : ''}>アカウント（店長・オーナー）</a></div>
+      ${mode === 'pin' ? `
+      <section><div class="section-head"><h2>名前</h2></div><div class="chips">${names.map((n) => `<a class="chip tap" href="#" data-p="${n.person_id}" ${person === n.person_id ? 'aria-current="true"' : ''}>${esc(n.display_name)}</a>`).join('') || '<div class="empty">この店にはまだ人がいません</div>'}</div></section>
+      <section class="stack"><div class="section-head"><h2>4桁番号</h2></div><div class="dots">${[0, 1, 2, 3].map((i) => `<i class="${pin.length > i ? 'on' : ''}"></i>`).join('')}</div>
+        <div class="pad">${['1', '2', '3', '4', '5', '6', '7', '8', '9', '消す', '0', '戻す'].map((k) => `<button class="btn" type="button" data-k="${k}">${k}</button>`).join('')}</div>
+        <div class="small muted">4桁番号では「スタッフ」の操作まで（在庫チェック）。店のことや発注はアカウントで入ってください</div></section>`
+      : `<section class="stack"><div class="field"><label for="em">メール</label><input id="em" type="email" autocomplete="username" inputmode="email"></div><div class="field"><label for="pw">パスワード</label><input id="pw" type="password" autocomplete="current-password"></div>
+        <div class="actions"><button class="btn primary" id="go">ログイン</button></div>
+        <div class="small muted">tenpo-tokyo のアカウント（メール＋パスワード）で本人を確かめ、この店の札を受け取ります。アカウントと「人」の結び付けはオーナーが先に行います</div></section>`}
+      <div id="err"></div></main>`;
+    root.querySelectorAll('[data-mode]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); mode = a.dataset.mode; draw(); }));
+    root.querySelectorAll('[data-p]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); person = a.dataset.p; pin = ''; draw(); }));
+    root.querySelectorAll('[data-k]').forEach((b) => b.addEventListener('click', async () => {
+      const k = b.dataset.k; if (k === '消す') pin = ''; else if (k === '戻す') pin = pin.slice(0, -1); else if (pin.length < 4) pin += k;
+      if (pin.length === 4 && person) { try { const tok = await rpc('pin_login', { p_store: CFG.store, p_person: person, p_pin: pin }); if (!tok) { pin = ''; draw(); root.querySelector('#err').innerHTML = banner('danger', '番号が違います'); return; } return afterLogin(tok); } catch (e) { pin = ''; draw(); root.querySelector('#err').innerHTML = banner('danger', msg(e)); return; } }
+      draw();
+    }));
+    root.querySelector('#go')?.addEventListener('click', async () => {
+      const em = root.querySelector('#em').value.trim(), pw = root.querySelector('#pw').value; if (!em || !pw) return;
+      try {
+        const r = await fetch(`${CFG.api}/auth/v1/token?grant_type=password`, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.key }, body: JSON.stringify({ email: em, password: pw }) });
+        const j = await r.json(); if (!r.ok) throw Object.assign(new Error(j.error_description || j.msg || 'auth'), { code: j.error_code || j.error || 'auth_failed' });
+        const tok = await rpc('account_login', { p_store: CFG.store, p_ua: navigator.userAgent.slice(0, 120) }, j.access_token);
+        return afterLogin(tok);
+      } catch (e) { root.querySelector('#err').innerHTML = banner('danger', e.code === 'forbidden' ? 'このアカウントはまだ「人」と結び付いていません。オーナーに頼んでください' : e.code === 'invalid_credentials' || e.code === 'invalid_grant' ? 'メールかパスワードが違います' : msg(e)); }
+    });
+  };
+  draw();
+}
+async function afterLogin(tok) { TOKEN = tok; sessionStorage.setItem('tenpo.token', tok); await boot(); }
+async function boot() {
+  const root = document.getElementById('app');
+  if (!TOKEN) return screenLogin(root);
+  try { ME = await call('my_abilities'); ERR = await call('error_messages'); } catch (e) { TOKEN = null; sessionStorage.removeItem('tenpo.token'); return screenLogin(root, 'ログインが切れました。もう一度'); }
+  route();
+}
+function route() {
+  const root = document.getElementById('app'); if (!TOKEN) return screenLogin(root); let h = (location.hash || '#stock').slice(1);
+  if ((h === 'settings' || h === 'prep') && (ME?.rank ?? 0) < 3) h = 'stock';
+  ({ settings: screenSettings, stock: screenStock, prep: screenPrep, me: screenMe }[h] || screenStock)(root).catch((e) => { root.innerHTML = `${head('エラー')}<main class="app-body">${banner('danger', msg(e))}</main>${tabs(h)}`; });
+}
+window.addEventListener('hashchange', route);
+
+/* ===== 画面1：店のこと（質問に答える） ===== */
+const DOW = ['日', '月', '火', '水', '木', '金', '土'];
+const QUESTIONS = [
+  { key: 'hours.regular', t: '営業時間と定休日は？', r: (v) => `<div class="stack"><div class="actions"><div class="field"><label>開店</label><input id="q-open" type="time" value="${esc(v.open || '11:00')}"></div><div class="field"><label>閉店</label><input id="q-close" type="time" value="${esc(v.close || '14:00')}"></div></div><div class="field"><label>定休日（押した曜日が休み）</label><div class="chips">${DOW.map((d, i) => `<a class="chip tap" href="#" data-dow="${i}" ${(v.closed_dow || []).includes(i) ? 'aria-current="true"' : ''}>${d}</a>`).join('')}</div></div></div>`,
+    c: (el) => ({ open: el.querySelector('#q-open').value, close: el.querySelector('#q-close').value, closed_dow: [...el.querySelectorAll('[data-dow][aria-current]')].map((a) => Number(a.dataset.dow)) }) },
+  { key: 'hours.holiday_closed', t: '祝日は休みますか？', r: (v) => yesno(v === true), c: (el) => el.querySelector('[data-yn][aria-current]')?.dataset.yn === 'y' },
+  { key: 'store.seats', t: '席はいくつ？', r: (v) => stepper('seats', v || 0, '席'), c: (el) => Number(el.querySelector('.step input').value) || 0 },
+  { key: 'store.kind', t: 'どんな業種ですか？', r: (v) => chips([['food', '飲食'], ['salon', 'サロン'], ['retail', '物販'], ['lodging', '宿'], ['other', 'その他']], v || 'food'), c: (el) => el.querySelector('[data-c][aria-current]')?.dataset.c || 'food' },
+  { key: 'store.promise', t: '店の約束（スタッフに毎日見せる一言）', r: (v) => `<div class="field"><textarea id="q-text">${esc(v || '')}</textarea><div class="help">例：古いけれど、清潔。下町だけれど、丁寧。</div></div>`, c: (el) => el.querySelector('#q-text').value.trim() },
+  { key: 'inventory.count_days', t: '棚卸し（数を数える）は何日ごと？', r: (v) => stepper('cd', v ?? 14, '日ごと'), c: (el) => Number(el.querySelector('.step input').value) || 14 },
+  { key: 'supply.arrive_after_service', t: '納品は営業のあとに届きますか？', r: (v) => yesno(v !== false, 'あと（その日の分は前の在庫で賄う）', '前（その日の分に使える）'), c: (el) => el.querySelector('[data-yn][aria-current]')?.dataset.yn === 'y' },
+  { key: 'supply.safety_days', t: '在庫は何日分の余裕を持ちますか？', r: (v) => stepper('sd', v ?? 0, '日分（0＝ぎりぎり）'), c: (el) => Number(el.querySelector('.step input').value) || 0 },
+  { key: 'supply.cycle_days', t: '納品曜日の決まっていない仕入先は何日ごとに頼みますか？', r: (v) => stepper('cy', v ?? 7, '日ごと'), c: (el) => Number(el.querySelector('.step input').value) || 7 },
+  { key: 'supply.order_signature', t: '発注書の最後に入れる署名は？', r: (v) => `<div class="field"><textarea id="q-text">${esc(v || '')}</textarea><div class="help">店名・担当・電話など。空でもかまいません</div></div>`, c: (el) => el.querySelector('#q-text').value.trim() },
+];
+const yesno = (yes, ly = 'はい', ln = 'いいえ') => `<div class="actions"><a class="chip tap" href="#" data-yn="y" ${yes ? 'aria-current="true"' : ''}>${esc(ly)}</a><a class="chip tap" href="#" data-yn="n" ${!yes ? 'aria-current="true"' : ''}>${esc(ln)}</a></div>`;
+const chips = (opts, cur) => `<div class="chips">${opts.map(([k, l]) => `<a class="chip tap" href="#" data-c="${k}" ${cur === k ? 'aria-current="true"' : ''}>${esc(l)}</a>`).join('')}</div>`;
+function wireChips(el) {
+  el.querySelectorAll('[data-dow]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); a.toggleAttribute('aria-current'); }));
+  el.querySelectorAll('[data-yn],[data-c]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); const attr = a.dataset.yn !== undefined ? 'data-yn' : 'data-c'; el.querySelectorAll(`[${attr}]`).forEach((x) => x.removeAttribute('aria-current')); a.setAttribute('aria-current', 'true'); }));
+}
+async function screenSettings(root) {
+  SETTINGS = await call('settings');
+  const byKey = Object.fromEntries(SETTINGS.map((s) => [s.key, s]));
+  const total = QUESTIONS.length + 2; let i = Number(sessionStorage.getItem('tenpo.q') || 0);
+  const draw = async () => {
+    sessionStorage.setItem('tenpo.q', i);
+    let body = '';
+    if (i < QUESTIONS.length) {
+      const q = QUESTIONS[i], s = byKey[q.key] || {}; const can = s.can_edit !== false && s.key;
+      body = `<div class="card stack"><div class="q-no">${i + 1} / ${total}</div><div class="q-t">${esc(q.t)}</div>${can ? q.r(s.value) : `${q.r(s.value)}${banner('info', 'この項目はオーナーだけが変えられます（見るだけ）')}`}<div class="small muted">${esc(s.label || '')}</div></div>`;
+    } else if (i === QUESTIONS.length) {
+      const sups = await call('suppliers');
+      body = `<div class="card stack"><div class="q-no">${i + 1} / ${total}</div><div class="q-t">仕入先ごとの納品曜日と締切</div><div class="small muted">発注の提案は「次の納品日に間に合うか」で決まります。曜日が無い仕入先は ${esc(String(byKey['supply.cycle_days']?.value ?? 7))}日ごと</div>
+        ${sups.map((s) => `<div class="card sunk stack" data-sup="${esc(s.name)}"><div class="row"><div class="grow ellipsis"><b>${esc(s.name)}</b> <span class="small muted">${esc(s.cat || '')} ・ 品目 ${s.items}</span></div></div>
+          <div class="field"><label>納品曜日</label><div class="chips">${DOW.map((d, k) => `<a class="chip tap" href="#" data-dow="${k}" ${supDows(s).includes(k) ? 'aria-current="true"' : ''}>${d}</a>`).join('')}</div></div>
+          <div class="actions"><div class="field"><label>締切は何日前</label><input class="num" data-f="cutoff_days" inputmode="numeric" value="${esc(s.cutoff_days ?? '')}" placeholder="1"></div><div class="field"><label>締切の時刻</label><input type="time" data-f="cutoff_time" value="${esc(s.cutoff_time || '')}"></div></div>
+          <div class="small muted">今の記録：${esc([s.delivery_days, s.cutoff, s.lead].filter(Boolean).join(' ・ ') || 'なし')}</div></div>`).join('') || '<div class="empty">仕入先がまだありません</div>'}</div>`;
+    } else {
+      const st = await call('pin_status').catch(() => []);
+      body = `<div class="card stack"><div class="q-no">${i + 1} / ${total}</div><div class="q-t">スタッフの4桁番号</div><div class="small muted">番号が無い人はログインできません。店長はスタッフの番号を、オーナーは誰の番号でも決められます</div>
+        <div class="list">${st.map((p) => `<a class="item no-icon" href="#" data-pin="${p.person_id}" data-setpin="${p.person_id}" data-name="${esc(p.name)}"><div class="main"><div class="t">${esc(p.name)}</div><div class="s">${esc(roleJa(p.role))}${p.locked ? ' ・ ロック中' : ''} ・ 押して番号を決める</div></div><div class="right">${p.has_pin ? badge('ok', '設定済') : badge('warn', '未設定')}</div></a>`).join('') || '<div class="empty">人がいません</div>'}</div></div>`;
+    }
+    root.innerHTML = `${head('店のこと')}<main class="app-body stack">${body}<div id="err"></div><div class="actions"><button class="btn" id="prev" ${i === 0 ? 'disabled' : ''}>戻る</button><button class="btn primary" id="next">${i === total - 1 ? '終わる' : '保存して次へ'}</button></div></main>${tabs('settings')}`;
+    wireChips(root); wireSteppers(root);
+    root.querySelector('#prev').addEventListener('click', () => { i = Math.max(0, i - 1); draw(); });
+    root.querySelector('#next').addEventListener('click', async () => {
+      try {
+        if (i < QUESTIONS.length) { const q = QUESTIONS[i], s = byKey[q.key]; if (s?.can_edit !== false) { const v = q.c(root); await call('setting_set', { p_key: q.key, p_value: v }); s.value = v; } }
+        else if (i === QUESTIONS.length) {
+          for (const card of root.querySelectorAll('[data-sup]')) {
+            const f = { delivery_dows: [...card.querySelectorAll('[data-dow][aria-current]')].map((a) => Number(a.dataset.dow)) };
+            const cd = card.querySelector('[data-f="cutoff_days"]').value.trim(); if (cd !== '') f.cutoff_days = Number(cd);
+            const ct = card.querySelector('[data-f="cutoff_time"]').value; if (ct) f.cutoff_time = ct;
+            await call('supplier_put', { p_name: card.dataset.sup, p_fields: f });
+          }
+        }
+        if (i === total - 1) { toast('店のことを保存しました'); sessionStorage.setItem('tenpo.q', 0); location.hash = '#stock'; return; }
+        i += 1; draw();
+      } catch (e) { root.querySelector('#err').innerHTML = banner('danger', msg(e)); }
+    });
+    root.querySelectorAll('[data-setpin]').forEach((b) => b.addEventListener('click', (ev) => { ev.preventDefault();
+      const sh = sheet(`${b.dataset.name} の4桁番号`, `<div class="stack"><div class="field"><label for="np">新しい番号（4桁）</label><input id="np" inputmode="numeric" maxlength="4" autocomplete="off"></div>${b.dataset.setpin === ME.person.id ? '<div class="field"><label for="cp">今の番号（決めてある場合）</label><input id="cp" inputmode="numeric" maxlength="4" autocomplete="off"></div>' : ''}<div class="small muted">同じ数字4つと 1234 は使えません。番号は記録に残りません</div><div id="perr"></div></div>`, '<div class="actions"><button class="btn" data-close>やめる</button><button class="btn primary" id="pgo">決める</button></div>');
+      sh.querySelector('#pgo').addEventListener('click', async () => { try { await call('pin_set', { p_person: b.dataset.setpin, p_pin: sh.querySelector('#np').value, p_current: sh.querySelector('#cp')?.value || null }); sh.remove(); toast('番号を決めました'); draw(); } catch (e) { sh.querySelector('#perr').innerHTML = banner('danger', msg(e)); } });
+    }));
+  };
+  await draw();
+}
+const roleJa = (r) => ({ owner: 'オーナー', manager: '店長', staff: 'スタッフ', viewer: '見るだけ' }[r] || r);
+function supDows(s) { if (Array.isArray(s.delivery_dows) && s.delivery_dows.length) return s.delivery_dows; const t = s.delivery_days || ''; return DOW.map((d, i) => t.includes(d) ? i : -1).filter((i) => i >= 0); }
+
+/* ===== 画面2：閉店後の在庫チェック ===== */
+async function screenStock(root) {
+  const items = await call('inv_items');
+  const isCount = (it) => (it.owner || '').includes('シェフ') || (it.owner || '').includes('厨房') || ['食材', '食品', '麺', '調味料'].some((k) => (it.cat || '').includes(k));
+  const groups = {}; for (const it of items) { const g = isCount(it) ? '食材（数を入れる）' : '備品・資材・飲料（十分／少／無）'; (groups[g] ||= []).push(it); }
+  const entries = {};
+  root.innerHTML = `${head('閉店後の在庫チェック')}<main class="app-body stack-lg">
+    ${banner('info', `${items.length}品目。食材は数、備品は 十分／少／無 で。入れた分だけ保存されます`)}
+    ${Object.entries(groups).map(([g, list]) => `<section><div class="section-head"><h2>${esc(g)}</h2><span class="small muted">${list.length}</span></div><div class="list">${list.map((it) => `<div class="item no-icon" data-item="${it.id}"><div class="main"><div class="t">${esc(it.name)}</div><div class="s">${esc(it.supplier || '仕入先なし')} ・ 最低 ${it.min ?? '—'}${esc(it.unit || '')} ・ 前回 ${it.stock ?? '—'}${it.last_count ? ' ・ ' + fmtD(it.last_count) : ''}</div>${isCount(it) ? stepper(it.id, '', it.unit) : `<div class="chips">${['十分', '少', '無'].map((s) => `<a class="chip tap" href="#" data-state="${s}">${s}</a>`).join('')}</div>`}</div><div class="right">${it.low ? badge('warn', '少ない') : ''}</div></div>`).join('')}</div></section>`).join('') || '<div class="empty">品目がありません</div>'}
+    <div id="err"></div><div class="actions"><button class="btn primary block" id="save">保存する</button></div></main>${tabs('stock')}`;
+  wireSteppers(root);
+  root.querySelectorAll('[data-item]').forEach((row) => {
+    const id = row.dataset.item;
+    row.querySelector('.step input')?.addEventListener('input', (e) => { const v = e.target.value.trim(); if (v === '') delete entries[id]; else entries[id] = { item_id: id, qty: Number(v) }; });
+    row.querySelectorAll('[data-state]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); row.querySelectorAll('[data-state]').forEach((x) => x.removeAttribute('aria-current')); a.setAttribute('aria-current', 'true'); entries[id] = { item_id: id, state: a.dataset.state }; }));
+  });
+  root.querySelector('#save').addEventListener('click', async () => {
+    const list = Object.values(entries); if (!list.length) { root.querySelector('#err').innerHTML = banner('warn', '何も入っていません'); return; }
+    try { const r = await call('inv_count', { p_entries: list, p_memo: '閉店後チェック' }); toast(`${r.saved}件 保存しました`); if (r.diffs?.length) sheet('計算と違った品目', `<div class="list">${r.diffs.map((d) => `<div class="item no-icon"><div class="main"><div class="t">${esc(d.name)}</div><div class="s">計算では ${d.expected} ・ 数えたら ${d.counted}</div></div></div>`).join('')}</div>`); else if ((ME?.rank ?? 0) >= 3) location.hash = '#prep'; else screenStock(root); }
+    catch (e) { root.querySelector('#err').innerHTML = banner('danger', msg(e)); }
+  });
+}
+
+/* ===== 画面3：明日の仕込みと発注 ===== */
+async function screenPrep(root) {
+  const products = (await call('products')).filter((p) => p.price > 0 && p.active !== false);
+  const saved = JSON.parse(localStorage.getItem('tenpo.forecast') || '{}');
+  root.innerHTML = `${head('明日の仕込みと発注')}<main class="app-body stack-lg">
+    <section class="stack"><div class="section-head"><h2>明日 ${fmtD(tomorrow())} の見込み</h2><span class="small muted">食数</span></div>
+      <div class="list">${products.map((p) => `<div class="item no-icon" data-prod="${p.id}"><div class="main"><div class="t">${esc(p.name)}</div><div class="s">${yen(p.price, 'row')}</div>${stepper(p.id, saved[p.id] ?? (p.togo ? 0 : 10), '食', 5)}</div><div class="right"></div></div>`).join('')}</div>
+      <div class="actions"><button class="btn primary" id="calc">要る量を出す</button></div></section>
+    <section id="need"></section>
+    <section id="prep"></section>
+    <section id="order"><div class="section-head"><h2>発注の提案</h2><button class="btn quiet" id="plan">出す</button></div><div id="plan-body" class="stack"></div></section>
+    <section id="pos"></section>
+    <div id="err"></div></main>${tabs('prep')}`;
+  wireSteppers(root);
+  const err = (e) => { root.querySelector('#err').innerHTML = banner('danger', msg(e)); };
+  root.querySelector('#calc').addEventListener('click', async () => {
+    try {
+      const fc = {}; root.querySelectorAll('[data-prod]').forEach((r) => { fc[r.dataset.prod] = Number(r.querySelector('.step input').value) || 0; }); localStorage.setItem('tenpo.forecast', JSON.stringify(fc));
+      const agg = {}; const inv = Object.fromEntries((await call('inv_items')).map((i) => [i.id, i]));
+      for (const [pid, qty] of Object.entries(fc)) { if (!qty) continue; const ex = await call('stock_expand', { p_product: pid, p_qty: qty }); for (const e of ex) { const k = e.item_id || e.material; const it = e.item_id ? inv[e.item_id] : null; const a = (agg[k] ||= { material: e.material, unit: e.unit, qty: 0, need: e.stock_qty == null ? null : 0, item_id: e.item_id, stock: it?.stock ?? null, stock_unit: it?.unit || '' }); a.qty += Number(e.qty) || 0; if (a.need != null) a.need += Number(e.stock_qty) || 0; } }
+      const rows = Object.values(agg).sort((a, b) => (a.item_id ? 0 : 1) - (b.item_id ? 0 : 1) || a.material.localeCompare(b.material, 'ja'));
+      const total = Object.values(fc).reduce((a, b) => a + b, 0);
+      root.querySelector('#need').innerHTML = `<div class="section-head"><h2>明日に要るもの（${total}食）</h2></div><div class="table-wrap"><table class="t"><thead><tr><th>材料</th><th class="n">要る</th><th class="n">在庫</th><th>判定</th></tr></thead><tbody>${rows.map((r) => { const short = r.item_id && r.stock != null && r.need != null && Number(r.stock) < r.need; return `<tr><td>${esc(r.material)}</td><td class="n">${fmtQ(r.qty)} ${esc(r.unit)}${r.need != null && r.stock_unit && r.stock_unit !== r.unit ? `<br><span class="small muted">＝${fmtQ(r.need)} ${esc(r.stock_unit)}</span>` : ''}</td><td class="n">${r.item_id ? (r.stock == null ? '未確認' : fmtQ(r.stock) + ' ' + esc(r.stock_unit)) : '—'}</td><td>${!r.item_id ? badge('plain', '品目なし') : r.need == null ? badge('warn', '単位未設定') : r.stock == null ? badge('warn', '未確認') : short ? badge('danger', '不足') : badge('ok', '足りる')}</td></tr>`; }).join('')}</tbody></table></div><div class="small muted">「品目なし」はレシピの材料名と在庫の品目名が合っていないもの。「単位未設定」はレシピの単位（g）と在庫の単位（kg・袋）の換算が入っていないもの。在庫の数は閉店後チェックの値</div>`;
+      // 仕込み：レシピを辿り、途中に出てくる「値段0の商品」（ソース1回など）の量を数える。麺は乾麺の合計から
+      const allP = await call('products'); const byName = Object.fromEntries(allP.map((p) => [p.name, p])); const bomCache = {};
+      const bomOf = async (pid) => bomCache[pid] || (bomCache[pid] = await call('product_bom', { p_product: pid }));
+      const inter = {};
+      const walk = async (pid, qty, depth) => { if (depth > 6) return; for (const m of await bomOf(pid)) { const sub = byName[m.material]; if (sub) { if (!(sub.price > 0)) { const a = (inter[sub.name] ||= { qty: 0, unit: m.unit }); a.qty += Number(m.qty) * qty; } await walk(sub.id, Number(m.qty) * qty, depth + 1); } } };
+      for (const [pid, qty] of Object.entries(fc)) if (qty) await walk(pid, qty, 0);
+      const men = rows.find((r) => /乾麺/.test(r.material));
+      const plans = []; if (men) plans.push({ name: '麺を茹でる', qty: Math.round(men.qty / 10) / 100, unit: men.unit === 'g' ? 'kg（乾麺）' : men.unit });
+      for (const [name, a] of Object.entries(inter)) if (!/卓上/.test(name)) plans.push({ name: `${name.replace(/1回$/, '')}を仕込む`, qty: Math.ceil(a.qty * 100) / 100, unit: a.unit });
+      root.querySelector('#prep').innerHTML = `<div class="section-head"><h2>明日の仕込み</h2></div><div class="list">${plans.map((p, k) => `<div class="item no-icon"><div class="main"><div class="t">${esc(p.name)}</div><div class="s">${fmtQ(p.qty)} ${esc(p.unit)}</div></div><div class="right"></div></div>`).join('') || '<div class="empty">麺・ソースの材料が見つかりません</div>'}</div>${plans.length ? '<div class="actions"><button class="btn" id="prep-save">明日の予定に入れる</button></div>' : ''}<div id="prep-list"></div>`;
+      root.querySelector('#prep-save')?.addEventListener('click', async () => { try { for (const p of plans) await call('prep_plan_put', { p_ymd: tomorrow(), p_name: p.name, p_qty: p.qty, p_unit: p.unit }); toast('仕込みの予定を入れました'); showPrepList(); } catch (e) { err(e); } });
+      showPrepList();
+    } catch (e) { err(e); }
+  });
+  async function showPrepList() { const l = await call('prep_list', { p_ymd: tomorrow() }); const el = root.querySelector('#prep-list'); if (el) el.innerHTML = l.length ? `<div class="small muted" style="margin-top:8px">入っている予定：${l.map((p) => `${esc(p.name)} ${fmtQ(p.qty)}${esc(p.unit || '')}（${esc(p.status)}）`).join(' ・ ')}</div>` : ''; }
+  root.querySelector('#plan').addEventListener('click', loadPlan);
+  async function loadPlan() {
+    const body = root.querySelector('#plan-body'); body.innerHTML = '<div class="skeleton"></div>';
+    try {
+      const plan = await call('order_plan', { p_all: true, p_detail: true });
+      const groups = plan.groups || [];
+      body.innerHTML = groups.map((g, gi) => `<div class="card stack" data-g="${gi}"><div class="row"><div class="grow"><b>${esc(g.supplier || '仕入先なし')}</b><div class="small muted">納品 ${fmtD(g.deliver_on)}${g.cutoff_at ? ` ・ 締切 ${g.cutoff_today ? '今日' : fmtD(g.cutoff_at.slice(0, 10))}${g.hours_left != null ? `（あと${Math.max(0, Math.round(g.hours_left))}時間）` : ''}` : ' ・ 締切なし'}${g.supplier_known ? '' : ' ・ 仕入先の登録なし'}</div></div>${g.cutoff_today ? badge('warn', '締切今日') : ''}</div>
+        <div class="list">${(g.lines || []).map((l) => `<div class="item no-icon" data-line="${l.item_id}"><div class="main"><div class="t">${esc(l.name)}</div><div class="s">${esc(l.why || '')}</div>${Number(l.suggested_qty) > 0 ? stepper(l.item_id, l.suggested_qty, l.unit) : `<div class="small muted">今は足りています（在庫 ${fmtQ(l.stock)}${esc(l.unit || '')}）</div>`}</div><div class="right">${(l.flags || []).includes('old_count') ? badge('warn', '数え古い') : ''}</div></div>`).join('') || '<div class="empty">提案なし</div>'}</div>
+        ${(Array.isArray(g.skipped) ? g.skipped.length : g.skipped) ? `<div class="small muted">出せなかった品目 ${Array.isArray(g.skipped) ? g.skipped.map((x) => x.name).join('・') : g.skipped + '件'}（納品日・数・最低在庫のどれかが無い）</div>` : ''}
+        ${(g.lines || []).some((l) => Number(l.suggested_qty) > 0) ? `<div class="actions"><button class="btn primary" data-po="${gi}">発注書を作る</button></div>` : ''}</div>`).join('') || '<div class="empty">提案できる品目がありません。在庫チェックと仕入先の納品曜日を入れてください</div>';
+      wireSteppers(body);
+      body.querySelectorAll('[data-po]').forEach((b) => b.addEventListener('click', async () => {
+        const g = groups[Number(b.dataset.po)]; const card = b.closest('[data-g]');
+        const lines = [...card.querySelectorAll('[data-line]')].map((r) => ({ item_id: r.dataset.line, qty: Number(r.querySelector('.step input')?.value || 0) })).filter((l) => l.qty > 0);
+        if (!lines.length) return;
+        try { const id = await call('po_create', { p_supplier: g.supplier, p_lines: lines, p_client_id: crypto.randomUUID() }); await showPo(id); loadPos(); loadPlan(); } catch (e) { err(e); }
+      }));
+      loadPos();
+    } catch (e) { body.innerHTML = ''; err(e); }
+  }
+  async function showPo(id) {
+    const d = await call('po_doc', { p_po: id }); const po = await call('po_get', { p_po: id });
+    const sh = sheet(`発注書 ${esc(po.label || '')}`, `<div class="stack"><div class="kv"><span class="k">宛先</span><span class="v">${esc(d.to || '（メール未登録）')}</span></div><div class="kv"><span class="k">件名</span><span class="v ellipsis">${esc(d.subject)}</span></div><div class="pre">${esc(d.body)}</div><div class="small muted">CSV：${esc(d.filename)}（${(d.csv || '').split('\n').length - 1}行）</div><div id="poerr"></div></div>`,
+      `<div class="actions"><button class="btn" id="copy">本文をコピー</button><button class="btn primary" id="sent">送ったことにする</button></div>`);
+    sh.querySelector('#copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(`${d.subject}\n\n${d.body}`); toast('コピーしました'); } catch { toast('コピーできませんでした'); } });
+    sh.querySelector('#sent').addEventListener('click', async () => { try { await call('po_mark_ordered', { p_po: id, p_via: 'mail' }); sh.remove(); toast('発注済みにしました'); loadPos(); } catch (e) { sh.querySelector('#poerr').innerHTML = banner('danger', msg(e)); } });
+  }
+  async function loadPos() {
+    const list = await call('pos', { p_open_only: true });
+    root.querySelector('#pos').innerHTML = `<div class="section-head"><h2>発注書</h2><span class="small muted">${list.length}</span></div><div class="list">${list.map((p) => `<a class="item" href="#" data-open="${p.id}">${ic('truck', 20, 'icon')}<div class="main"><div class="t">${esc(p.label)} ${esc(p.supplier)}</div><div class="s">納品 ${fmtD(p.deliver_on)} ・ ${Array.isArray(p.lines) ? p.lines.length : ''}品目 ・ ${esc(p.by || '')}</div></div><div class="right">${badge(p.status === 'draft' ? 'info' : p.status === 'ordered' ? 'ok' : 'plain', { draft: '下書き', ordered: '発注済', partial: '一部納品', received: '納品済' }[p.status] || p.status)}</div></a>`).join('') || '<div class="empty">まだありません</div>'}</div>`;
+    root.querySelectorAll('[data-open]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); showPo(a.dataset.open).catch(err); }));
+  }
+  loadPos().catch(() => {});
+}
+const fmtQ = (q) => q == null ? '—' : num(Math.round(Number(q) * 100) / 100);
+
+/* ===== 画面4：わたし ===== */
+async function screenMe(root) {
+  root.innerHTML = `${head('わたし')}<main class="app-body stack-lg">
+    <div class="card stack"><div class="kv"><span class="k">名前</span><span class="v">${esc(ME.person.name)}</span></div><div class="kv"><span class="k">役割</span><span class="v">${esc(roleJa(ME.role))}</span></div><div class="kv"><span class="k">店</span><span class="v">${esc(ME.store.name)}</span></div></div>
+    ${banner('info', 'これはサンプル店舗です。本物のオリオンの売上・勤怠には何も書きません。物の台帳（品目・レシピ・仕入先）は 11/9 時点の写しです')}
+    <div class="actions"><button class="btn" id="theme">暗い画面 ⇄ 明るい画面</button><button class="btn" id="logout">${ic('out')}ログアウト</button></div>
+    <div class="small muted">接続先：${esc(CFG.api)}</div></main>${tabs('me')}`;
+  root.querySelector('#logout').addEventListener('click', () => { TOKEN = null; ME = null; sessionStorage.removeItem('tenpo.token'); history.replaceState(null, '', location.pathname + location.search); boot(); });
+  root.querySelector('#theme').addEventListener('click', () => { const h = document.documentElement; const cur = h.dataset.theme; h.dataset.theme = cur === 'yoru' ? (localStorage.getItem('tenpo.theme0') || 'orion') : (localStorage.setItem('tenpo.theme0', cur), 'yoru'); localStorage.setItem('tenpo.theme', h.dataset.theme); });
+}
+if (localStorage.getItem('tenpo.theme')) document.documentElement.dataset.theme = localStorage.getItem('tenpo.theme');
+boot();
+</script>
+</body></html>
