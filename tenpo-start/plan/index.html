@@ -483,15 +483,14 @@ function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m
  up();if(!s._mlog){s._mlog=1;log('開業資金の一覧を開いた')}}
 const myId=()=>{if(!S._id){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';S._id='TS-'+Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');save()}return S._id};
 function askSheet(topic,id){const s=st(),p=P[cur],k=s.k||{},r=calc(),[rd,rn]=roadCount();s.sv=s.sv||{};
- const rows=[['相談したいこと',topic],['お店',`${k.name?k.name+'・':''}${p.answers[0][3]===UND?'':p.answers[0][3]+'の'}${p.biz}`],['月の売上の見通し',man(r.sales)],[cur==='b'?'家賃を払う前に残る額':'家賃に回せる額',man(metric())],['まだ仮の数字',tmpN()+'つ'],['開店までの進み',`${rd}/${rn}件`]];
+ const rows=[['相談したいこと',topic],['お店',`${p.answers[0][3]===UND?'':p.answers[0][3]+'の'}${p.biz}`],['月の売上の見通し',man(r.sales)],[cur==='b'?'家賃を払う前に残る額':'家賃に回せる額',man(metric())],['まだ仮の数字',tmpN()+'つ'],['開店までの進み',`${rd}/${rn}件`]];
  if(id)rows.push(['いっしょに渡す文',`${SERV[id].t}（${bCount(id)[0]}項目）`]);
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
- <div class="field"><label>お名前（ニックネームでも大丈夫です）</label><input id="askn" class="aski" value="${esc(S._name||'')}" placeholder="例：松尾"></div>
- <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
- <button class="btn dark" id="askgo">この内容で、LINEで相談する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。</p>`);
- document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim(),nm=document.getElementById('askn').value.trim();if(!nm){toast('お名前を入れてください');return}S._name=nm;
-  const nth=(s.asks||[]).length+1,who=[['お名前',nm],['相談番号',`${myId()}（${nth}回目）`]].concat(k.area?[['エリア',k.area]]:[],k.when&&k.when!==UND?[['開きたい時期',k.when]]:[]);
+  <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
+ <button class="btn dark" id="askgo">この内容で、LINEで相談する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。事務局には、あなたのLINEの名前で届きます。</p>`);
+ document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
+  const nth=(s.asks||[]).length+1,who=[['相談番号',`${myId()}（${nth}回目）`]].concat(k.name?[['店名',k.name]]:[]).concat(k.area?[['エリア',k.area]]:[],k.when&&k.when!==UND?[['開きたい時期',k.when]]:[]);
   const txt=`【TENPO/START 事務局への相談】\n${who.concat(rows).map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}${id?`\n\n――――\n${mailText(id)}`:''}`;
   const url=LINE_ID?`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`:`https://line.me/R/share?text=${encodeURIComponent(txt)}`;
   try{navigator.clipboard.writeText(txt)}catch(e){}
