@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "1.0.0",
+  "interviewId": "EXAMPLE-CAFE-001",
+  "createdAt": "2026-11-21T09:00:00+09:00",
+  "updatedAt": "2026-11-21T09:00:00+09:00",
+  "answers": {
+    "businessType": {
+      "value": "cafe",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "experience": {
+      "value": "first",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "purpose": {
+      "value": "近所の人が昼食や午後の休憩に立ち寄る",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "mainProduct": {
+      "value": "コーヒーと温かいサンドイッチ",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "capacity": {
+      "value": 12,
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "averageSpendYen": {
+      "value": 1100,
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "peakStaff": {
+      "value": 2,
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "propertyStage": {
+      "value": "idea",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "priorities": {
+      "value": {
+        "mustKeep": "夕方に営業を終えること",
+        "canAdjust": "メニュー数と手作りの範囲"
+      },
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "openingTarget": {
+      "value": null,
+      "status": "undecided",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "area": {
+      "value": "住宅街。エリアは未定",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "businessHours": {
+      "value": "10時〜17時",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "daysOffPerWeek": {
+      "value": 1,
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "operators": {
+      "value": "店主1人を基本、昼だけ補助",
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "helperHoursPerDay": {
+      "value": 3,
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "desiredMonthlyTakeHomeYen": {
+      "value": 250000,
+      "status": "provisional",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "workingHours": {
+      "value": null,
+      "status": "undecided",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    },
+    "ownFundsYen": {
+      "value": null,
+      "status": "declined",
+      "source": "user",
+      "updatedAt": "2026-11-21T09:00:00+09:00"
+    }
+  },
+  "archived": [],
+  "ui": {
+    "questionId": "priorities"
+  },
+  "consultation": {
+    "number": null,
+    "preparedCount": 0,
+    "sentCount": null
+  }
+}
