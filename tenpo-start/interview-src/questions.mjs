@@ -53,6 +53,17 @@ export const OPTIONAL = [
  number('helperHoursPerDay','補助を頼む時間は、1日何時間で考えていますか','時間',3,0,{integer:false,max:24,branch:'helper'}),
  number('ownFundsYen','自分で用意できるお金は、いくらですか','円',2000000,0,{private:true}),
  number('desiredMonthlyTakeHomeYen','毎月、手元に残したい額はいくらですか','円',250000,0,{private:true}),
+ // ---- ここから5問は Claude が追加（2026/11/21、松尾さんの指示）。計画の「仮」を本人の答えに替えるための任意の質問。
+ text('shopName','店名は決まっていますか。仮の名前でも書けます','まだ仮で「◯◯珈琲」',{maxLength:60}),
+ text('motive','お店を始めたいと思った理由を、ひとことで残してください','近所に、1人でも落ち着ける場所をつくりたい'),
+ number('guestsPerDay','1日に、何人くらいに来てほしいですか','人',36,1,{branch:'hasModel',
+  takeawayLabel:'1日に、何組くらいの会計を見込みますか',takeawayUnit:'組',takeawayExample:30,
+  salonLabel:'1日に、何人くらいの予約を見込みますか',salonExample:4,
+  help:'まだ分からなければ「まだ決めていない」で進めます。書いた数は、計画の中で仮の見込みとして使います。'}),
+ number('candidateRentYen','気になっている物件の家賃は、月いくらですか（共益費込み）','円',180000,0,{branch:'hasProperty',
+  help:'候補がいくつかある時は、いちばん気になっている1つで書きます。'}),
+ select('borrowPlan','開業のために、お金を借りる予定はありますか',[
+  ['yes','借りる予定'],['maybe','借りるかもしれない'],['no','借りない予定']]),
  text('worry','今、いちばん気になっていることは何ですか','何から手をつければよいか迷っている'),
  text('existingEvidence','今の店で確かめたことがあれば、残してください','客単価1,100円。直近4週間の記録。新しい場所でも同じかは未定',{branch:'experienced'})
 ];
@@ -75,6 +86,8 @@ export function isActive(q,state){const model=modelOf(state),b=valueOf(state,'bu
   case 'notTakeaway':return ['seated','salon'].includes(model);
   case 'helper':return model!=='salon' && valueOf(state,'peakStaff')>1;
   case 'experienced':return ['opened','operating'].includes(valueOf(state,'experience'));
+  case 'hasModel':return model!==null;
+  case 'hasProperty':return ['viewing','contracted','existing'].includes(valueOf(state,'propertyStage'));
   default:return true;
  }
 }
