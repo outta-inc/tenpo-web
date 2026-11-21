@@ -255,6 +255,8 @@ textarea[data-ivi]{width:100%;box-sizing:border-box;border:1.5px solid var(--lin
 .ivs{display:flex;gap:6px;margin-top:10px}.ivs button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px;font-size:12.5px;color:var(--sub)}.ivs button.on{border-color:var(--green);color:var(--green);font-weight:700;background:var(--lime2)}
 .ivv,.ivy{font-size:12px;color:var(--sub);margin:8px 0 0;line-height:1.6}.ivy:empty{display:none}.iverr{font-size:12.5px;color:var(--bad);margin:8px 0 0;line-height:1.6}.iverr:empty{display:none}
 .ivb{background:var(--badbg);color:var(--bad);border-radius:12px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:10px}.lkk{font-size:12px;color:var(--sub);text-decoration:underline;white-space:nowrap;margin-left:6px}
+.toast.act{pointer-events:auto;white-space:normal;display:flex;gap:10px;align-items:center;width:max-content;max-width:88vw;border-radius:16px;line-height:1.5}.toast button{background:none;border:0;color:#fff;font:inherit;font-weight:700;text-decoration:underline;padding:6px 2px;white-space:nowrap}.ri .dn{display:block;font-size:11.5px;color:var(--sub);font-weight:400;margin-top:2px}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 </style>
 </head>
 <body>
@@ -604,11 +606,11 @@ function renderA(){const s=st(),r=calc(),f=r.f;const est=s.f.turns.src==='est';
  <div class="big">${man(r.sales)}<small>／月</small></div>
  <div class="eq">${chip('seats')}<span class="op">×</span>${chip('price')}<span class="op">×</span>${chip('turns')}<span class="op">×</span>${chip('days')}</div>${obsBox('turns')}${legend(est)}</div>`+rentCard(r);
  let place;
- if(r.limit>=50000){const ts=f.seats/f.perTsubo;place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><p class="lead">計画から出した上限です。エリアを比べるときに使います。</p><ul class="rows">
+ if(r.limit>=50000){const ts=f.seats/f.perTsubo;place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">計画から出した上限です。エリアを比べるときに使います。</p><ul class="rows">
  <li><span>家賃（共益費込み）の上限</span><b>${man(r.limit)}</b></li><li><span>${f.seats}席に要る広さ ${chip('perTsubo','')}</span><b>${Math.round(ts*10)/10}坪前後</b></li>
  <li><span>その広さでの坪単価の上限</span><b>${yen(Math.floor(r.limit/ts/100)*100)}</b></li></ul>
  <p class="small" style="margin-top:8px">検討中のエリアの募集を見て、この広さでこの月額に収まる物件があるかを確かめます。なければ、エリアか席数のどちらかを変える判断になります。</p></div>`}
- else place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><p class="lead">家賃に回せる額が${r.cap>0?'月'+man(r.limit)+'で':'出ていないので'}、まだ上限として使えません。先に「計画」で、席数・客単価・人の入れ方のどれを変えるかを決めます。</p></div>`;
+ else place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">家賃に回せる額が${r.cap>0?'月'+man(r.limit)+'で':'出ていないので'}、まだ上限として使えません。先に「計画」で、席数・客単価・人の入れ方のどれを変えるかを決めます。</p></div>`;
  place+=candNote();
  return{land:'plan',hero,plan,check:uncCard(),place}}
 
@@ -622,7 +624,7 @@ function renderT(){const s=st(),r=calc(),f=r.f;const est=s.f.peak.src==='est';co
  <div class="eq"><span class="op">（</span>${chip('peak','朝1時間')}<span class="op">×</span>${chip('peakH','ピーク')}<span class="op">＋</span>${chip('off','それ以外')}<span class="op">）×</span>${chip('price')}<span class="op">×</span>${chip('days')}</div>
  ${over?`<div class="verdict stop"><b>1人で出せるのは1時間${r.capH}件まで。</b>朝${f.peak}件の注文が来ても、${f.peak-r.capH}件は取りこぼす計算にしています。</div>`:`<p class="small" style="margin-top:10px">ピーク時は ${chip('team')} で、${chip('make','1人1時間')} まで出せます。朝${f.peak}件なら間に合います。</p>`}
  ${obsBox('peak')}${legend(est)}</div>`+rentCard(r);
- const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><p class="lead">通行量でエリアを比べるときに使います。</p><ul class="rows">
+ const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">通行量でエリアを比べるときに使います。</p><ul class="rows">
  <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li>
  <li><span>朝に要る人通り ${chip('stop','買う割合')}</span><b>1時間 ${Math.ceil(f.peak/(f.stop/100)).toLocaleString()}人</b></li></ul>
  <p class="small" style="margin-top:8px">朝1時間に${f.peak}件売るには、前を通る人の${f.stop}%が買うとして、これだけの人通りが要ります。候補の場所で10分数えれば比べられます。</p></div>`+candNote();
@@ -691,7 +693,7 @@ function renderC(){const s=st(),r=calc(),f=r.f;const est=s.f.util.src==='est';
  <button class="btn ghost sm" data-act="staff" data-n="${f.staff===1?2:1}">担当を${f.staff===1?2:1}人にして見る</button></div>
  <div class="card"><h2>${ic('chart')}月の売上の見通し</h2><div class="big">${man(r.sales)}<small>／月（1日${Math.round(r.perDay*10)/10}人）</small></div>
  <div class="eq">${cchip(r.cap1+'枠','1日')}<span class="op">×</span>${chip('util')}<span class="op">×</span>${chip('price')}<span class="op">×</span>${chip('days')}</div>${obsBox('util')}${legend(est)}</div>`+rentCard(r);
- const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><p class="lead">計画から出した上限です。</p><ul class="rows">
+ const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">計画から出した上限です。</p><ul class="rows">
  <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li><li><span>置きたいベッド <span class="tag ans">①の回答</span></span><b>${f.beds}台</b></li></ul>
  ${r.limit>0?'':'<p class="small" style="margin-top:8px">家賃に回せる額がまだ出ていません。先に「計画」で条件を見直します。</p>'}</div>`+candNote();
  return{land:'plan',hero,plan,check:uncCard(),place}}
@@ -840,13 +842,13 @@ function roadCount(){const s=st();s.road=s.road||{};const all=roadData().flatMap
 function roadTab(){const s=st();s.road=s.road||{};const open=s.open?new Date(s.open+'T00:00:00'):null;const R=roadData();
  const act=i=>i.need[0]!=='no',isDone=i=>i.auto||s.road[i.id];const [dn,n]=roadCount();
  let h=`<div class="card"><div class="kpi"><div class="kn">${dn}<small>/${n}</small></div><div class="kb"><b>済んだこと</b>${pbar(dn,n)}</div></div>
- <p class="small">順番は目安です。済んでいるものから印を付けてください。項目を押すと、窓口と詳しい説明が開きます。</p>
+ <p class="small">順番は目安です。左の丸を押すと「済み」になり、日付つきで「ここまでの歩み」に残ります。もう一度押すと戻せます。項目を押すと、窓口と詳しい説明が開きます。</p>
  ${open?`<span class="pill">${ic('flag',14)}開店の目標 ${fmtDate(open)}</span>`:`<button class="btn ghost sm" data-kk="open" data-kt="date">${ic('flag',14)} 開店日を入れると、期限が日付になります</button>`}</div>`;
  R.forEach((p,pi)=>{const a=p.items.filter(act),d=a.filter(isDone).length;
   h+=`<div class="card"><div class="ph"><span class="pn ${d===a.length?'full':''}">${d===a.length?'✓':pi+1}</span><div><h2>${p.t}</h2><span class="small">${p.when}</span></div><span class="kc">${d}/${a.length}</span></div>${pbar(d,a.length,'sm')}`;
   p.items.forEach(i=>{const dd=isDone(i),no=!act(i);let dl=i.dl;if(typeof dl==='number'){if(open){const x=new Date(open);x.setDate(x.getDate()+dl);dl=`${fmtDate(x)}まで`}else dl=dl<0?`開店の${-dl}日前まで`:`開店から${dl}日以内`}
    const nd=i.need[0]==='ask'?'<span class="pill ask">要確認</span>':no?'<span class="pill">いまは不要</span>':'';
-   h+=`<div class="ri ${no?'off':''}"><button class="st ${dd?'ok':''}" ${i.auto?'':`data-road="${i.id}"`} aria-label="済み">${dd?'✓':''}</button><details class="tx"><summary><b>${i.t}</b><span class="pills">${dl?`<span class="pill dl">${ic('clock',13)}${dl}</span>`:''}${nd}${i.sv?'<span class="pill sv">依頼の文あり</span>':''}</span></summary>
+   h+=`<div class="ri ${no?'off':''}"><button class="st ${dd?'ok':''}" ${i.auto?'':`data-road="${i.id}"`} aria-label="${dd?'済み。押すと戻す':'済みにする'}">${dd?'✓':''}</button><details class="tx"><summary><b>${i.t}${dd?`<span class="dn">${i.auto?'答えた内容から、済み':(typeof s.road[i.id]==='string'?md(s.road[i.id])+'に':'')+'済み'}</span>`:''}</b><span class="pills">${dl?`<span class="pill dl">${ic('clock',13)}${dl}</span>`:''}${nd}${i.sv?'<span class="pill sv">依頼の文あり</span>':''}</span></summary>
    <div class="nt"><div class="wl">${ic('who',14)}${i.who}</div>${i.need[1]?`<div class="wl">${ic('info',14)}${i.need[1]}</div>`:''}${i.note||''}${i.src.length?` <span class="sr">出典 ${i.src.map(q=>`<a href="${SRCS[q-1][1]}" target="_blank" rel="noopener">${q}</a>`).join('・')}</span>`:''}</div>
    ${i.tab?`<button class="btn ghost sm" data-tab="${i.tab}">「${TTL[i.tab][0]}」を開く</button>`:''}${i.sv?svBtn(i.sv):''}</details></div>`});h+='</div>'});
  h+=`<div class="card"><details><summary><b>出典（${SRCS.length}件）</b></summary><ol class="srcl">${SRCS.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ol></details></div>`;
@@ -870,7 +872,7 @@ function renderD(){const s=st(),r=calc(),f=r.f;const est=s.f.turns.src==='est';c
    [k.area?'ok':'unk','いまのお店との距離',k.area?esc(k.area):'エリアが未定','近すぎると客を取り合い、遠すぎると管理しにくくなります。','https://www.inshokuten.com/foodist/article/4864/']]
   .map(([st2,t,v,n,u])=>`<div class="ri"><span class="st ${st2}" style="border-radius:50%">${{ok:'✓',ng:'!',unk:'?'}[st2]}</span><div class="tx"><b>${t}</b><div class="meta"><span class="pill ${st2==='ok'?'':'ask'}">${v}</span></div><div class="nt">${n} <a class="sr" href="${u}" target="_blank" rel="noopener">出典</a></div></div></div>`).join('')}</div>`;
  const ts=f.seats/f.perTsubo;
- const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><ul class="rows">
+ const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><ul class="rows">
  <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li><li><span>${f.seats}席に要る広さ ${chip('perTsubo','')}</span><b>${Math.round(ts*10)/10}坪前後</b></li>
  <li><span>比べる相手</span><b>いまのお店の前の人通り</b></li></ul><p class="small" style="margin-top:8px">候補の場所と、いまのお店の前を同じ時間帯に数えると、回転数の見当がつきます。</p></div>`+candNote();
  return{land:'plan',hero,plan,check:uncCard(),place}}
@@ -1068,7 +1070,7 @@ function header(sub,title){const p=P[cur];return `<header class="top"><img class
 function tabbar(tab,n){return `<nav class="tabbar">${TABS.map(([k,l])=>`<button data-tab="${k}" class="${k===tab?'on':''}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg><span>${l}</span>${k==='check'&&n?`<em>${n}</em>`:''}</button>`).join('')}</nav>`}
 function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:renderC,d:renderD}[cur]();v.check=cur==='b'?v.check+measCard():measCard()+v.check;v.road=roadTab();v.files=filesTab();const tab=s.tab||'shop';
  const n=v.nCheck??Math.min(4,sensitivity().length);let body;
- if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry&&s.worry.length<=12?`気になっている「${esc(s.worry)}」のことから、一緒に見ていきます。`:s.worry?'気になっていることから、一緒に見ていきます。':''}順番どおりでなくて、分かっている所からでかまいません。`,'','',`<div class="alt"><button data-tl="guide:">このアプリでできること</button></div>`):'')+backCard()+tdCard()+shopTab(v);else if(tab==='plan')body=planTop(v);else if(tab==='check'&&cur!=='b')body=checkTop();else body=tabFace(tab,v)+v[tab];
+ if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry&&s.worry.length<=12?`気になっている「${esc(s.worry)}」のことから、一緒に見ていきます。`:s.worry?'気になっていることから、一緒に見ていきます。':''}順番どおりでなくて、分かっている所からでかまいません。`,'','',`<div class="alt"><button data-tl="guide:">このアプリでできること</button></div>`):'')+backCard()+tdCard()+shopTab(v);else if(tab==='plan')body=planTop(v);else if(tab==='check'&&cur!=='b')body=checkTop();else if(tab==='road')body=tdCard()+toolsCard()+v.road;else body=tabFace(tab,v)+v[tab];
  return header(dLabel(s.day),tab==='shop'?'':TTL[tab][0])+`<div class="wrap">${body}${PUB?accCard(tab):''}</div>`+tabbar(tab,n)}
 
 /* ===== シート ===== */
@@ -1692,7 +1694,7 @@ function tdEdit(id,isNew){const s=st(),x=isNew?{id:'',t:'',who:'自分',due:'',s
 function tdToggle(id){const s=st(),x=tdAll().find(y=>y.id===id);if(!x)return;
  if(x.contact){const c=s.ct.find(y=>y.id===x.cid);c.logs=c.logs||[];c.logs.push({d:iso(tdNow()),t:`返事が来た：${c.wait}`});c.wait='';log(`${esc(c.n)}から返事が来た`)}
  else if(x.mine){const o=s.td.find(y=>y.id===x.mid);o.st=o.st==='done'?'todo':'done';if(o.st==='done')log(`「${esc(o.t)}」を済みにした`)}
- else{if(tdAll().find(y=>y.id===id).st==='done'&&!s.road[x.rid]){toast('答えた内容から、済みになっています');return}s.road[x.rid]=!s.road[x.rid];if(s.road[x.rid])log(`「${esc(x.t)}」を済みにした`)}
+ else{if(tdAll().find(y=>y.id===id).st==='done'&&!s.road[x.rid]){toast('答えた内容から、済みになっています');return}if(s.road[x.rid])delete s.road[x.rid];else{s.road[x.rid]=iso(tdNow());log(`「${esc(x.t)}」を済みにした`)}}
  save();render();if($i('sheet').classList.contains('on'))tdSheet(s._tdv||'all')}
 /* ---- 開店までの道具 ---- */
 const QC=[['naiso','内装・設備の工事'],['kiki','厨房機器・家具・レジ'],['bukken','物件を借りるお金'],['junbi','開店前の仕入れ・備品・告知']];
@@ -1775,7 +1777,7 @@ function toolsCard(){const s=st(),n=k=>(s[k]||[]).length;const R=[['pay','yen','
  return `<div class="card"><div class="kh">${ic('files',20)}<h2>開店までの道具</h2></div>${R.map(r=>`<button class="nrow" data-tl="tool:${r[0]}"><span class="nic">${ic(r[1],18)}</span><span class="nt2"><b>${r[2]}</b><small>${r[3]}</small></span>${r[4]?`<span class="tag doc">${r[4]}</span>`:''}<em>›</em></button>`).join('')}</div>`}
 const TOOL={pay:paySheet,qt:qtSheet,ct:ctSheet,pp:ppSheet,buy:buySheet,pre:preSheet,os:osSheet};
 /* ---- できること ---- */
-function guideSheet(){const has=PUB?!!S._u:true;const G=[['shop','お店','5項目のメモ、やること、開店までの道具。開いたら、まずここ。'],['plan','計画','月の売上と、家賃に回せる額。仮の数字は、押して変えられます。'],['check','確かめる','今日の1つ。店の前で数える道具で、仮の数字を自分の数字に替えます。'],['road','開店まで','手続き・窓口・期限。保健所や消防、GoogleとInstagramの準備も。'],['files','フォルダ','写真と書類を、1か所に。']];
+function guideSheet(){const has=PUB?!!S._u:true;const G=[['shop','お店','5項目のメモ、やること、開店までの道具。開いたら、まずここ。'],['plan','計画','月の売上と、家賃に回せる額。仮の数字は、押して変えられます。'],['check','確かめる','今日の1つ。店の前で数える道具で、仮の数字を自分の数字に替えます。'],['road','開店まで','やること、開店までの道具（物件の比較・支払いの予定表など）、手続きの窓口と期限。'],['files','フォルダ','写真と書類を、1か所に。']];
  openSheet(`<h3>TENPO/STARTでできること</h3><p class="shl">お店を開くまでの準備を、1つの場所で進められます。無料です。分からない所は、いつでも事務局に相談できます。</p>
  <div class="grp">流れ</div><ol class="gl"><li><b>質問に答える</b><span>分かることだけで大丈夫。未定のまま進めます。</span></li><li><b>5項目のメモと計画を見る</b><span>答えから、あなたのお店の下書きができます。</span></li><li><b>やることを1つずつ進める</b><span>開店の目標日から、期限の目安が付きます。</span></li><li><b>登録すると、続きから開ける</b><span>別の端末でも同じ計画を開けます。登録しなくても使えます。</span></li></ol>
  <div class="grp">下のメニュー</div>${G.map(g=>`<button class="nrow" ${has?`data-tab="${g[0]}" data-act2="close"`:''}><span class="nic">${ic(g[0]==='road'?'flag':g[0],18)}</span><span class="nt2"><b>${g[1]}</b><small>${g[2]}</small></span>${has?'<em>›</em>':''}</button>`).join('')}
@@ -1808,10 +1810,17 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tl]');if(b
   if(a==='buygot'){const x=s.buy.find(y=>y.id===v);x.got=!x.got;save();render();buySheet();return}if(a==='buydel'){s.buy=s.buy.filter(x=>x.id!==v);save();render();buySheet();return}
   if(a==='preck'){s.pre.ck[v]=!s.pre.ck[v];save();preSheet();return}if(a==='prefx'){s.pre.fix[+v].d=!s.pre.fix[+v].d;save();preSheet();return}}
  const c=e.target.closest('[data-act2=close]');if(c)closeSheet()});
-let tt;function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1800)}
+let tt;function toast(t){const e=document.getElementById('toast');e.classList.remove('act');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1800)}
+function toastUndo(t,fn){const e=document.getElementById('toast');e.textContent='';const sp=document.createElement('span');sp.textContent=t;const b=document.createElement('button');b.type='button';b.textContent='元に戻す';b.onclick=ev=>{ev.stopPropagation();clearTimeout(tt);e.classList.remove('on','act');fn()};e.append(sp,b);e.classList.add('on','act');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on','act'),6000)}
+/* 開店までの項目を済みにする・戻す。済みにした日を残し、ここまでの歩みに書く */
+function roadMark(id){const s=st(),r=s.road=s.road||{},all=()=>roadData().flatMap(p=>p.items),it=all().find(i=>i.id===id);if(!it||it.auto)return;
+ if(r[id]){delete r[id];save();render();toast('「まだ」に戻しました');return}
+ r[id]=iso(tdNow());log(`「${esc(it.t)}」を済みにした`);save();render();
+ const c=roadCount(),nx=all().find(i=>i.need[0]!=='no'&&!i.auto&&!r[i.id]);
+ toastUndo(`済みにしました（${c[0]}/${c[1]}）。${nx?'次は「'+nx.t+'」':'ひととおり済みました'}`,()=>{delete r[id];const ev=s.events;if(ev.length&&ev[ev.length-1].text.endsWith('を済みにした'))ev.pop();save();render()})}
 function selectMsg(){const el=document.getElementById('msgbox'),r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast('選択しました。コピーしてください')}
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b){if(e.target.id==='mask')closeSheet();return}
- if(b.dataset.road){const r=st().road=st().road||{};r[b.dataset.road]=!r[b.dataset.road];render();return}
+ if(b.dataset.road){roadMark(b.dataset.road);return}
  if(b.dataset.brk){const id=b.dataset.bid;kClick(b.dataset.brk,b.dataset.kt||'x');st()._ret=id;return}
  if(b.dataset.blk){blockSheet(+b.dataset.blk);return}if(b.dataset.ph){phSheet(+b.dataset.ph);return}
  if(b.dataset.up){UPF=b.dataset.up;document.getElementById('upimg').click();return}if(b.dataset.updoc){UPF=b.dataset.updoc;document.getElementById('updoc').click();return}
