@@ -262,6 +262,35 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .dtb{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--line);border-radius:10px;padding:12px;background:#fff;min-height:48px;box-sizing:border-box}.dtv{font-size:16px;font-weight:700}.dtv.no{font-weight:400;color:var(--sub)}.dth{font-size:13px;font-weight:700;text-decoration:underline;white-space:nowrap}
 .field .dtb input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0}
 .dtq{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.dtq button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:13px;color:inherit}.dtq button.on{border-color:#185534;background:#185534;color:#fff}
+
+/* ===== 下から上がる画面（2026-11-22 見直し）：つまみ・動かない題・閉じる印・余白と文字の大きさをそろえる ===== */
+.mask.on{animation:mkIn .18s ease-out}@keyframes mkIn{from{opacity:0}to{opacity:1}}
+.sheet{max-height:90dvh;border-radius:22px 22px 0 0;padding:0;box-shadow:0 -8px 30px rgba(20,25,22,.18)}
+.sheet.on.in{animation:shUp .24s cubic-bezier(.2,.8,.2,1)}@keyframes shUp{from{transform:translate(-50%,36px);opacity:.4}to{transform:translate(-50%,0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet.on.in,.mask.on{animation:none}}
+.shh{position:sticky;top:0;z-index:5;background:#fff;padding:24px 66px 12px 20px;border-radius:22px 22px 0 0;touch-action:none}
+.shh::before{content:"";position:absolute;left:50%;top:9px;width:40px;height:4px;margin-left:-20px;border-radius:99px;background:#d9d5c8}
+.shh.sc{box-shadow:0 1px 0 var(--line)}
+.sheet .shh h3{margin:0;padding:0;font-size:18px;line-height:1.45;display:flex;align-items:center;gap:8px}.sheet .shh h3 svg{flex:none}
+.sheet .x{position:absolute;right:14px;top:17px;width:40px;height:40px;border-radius:999px;background:#f1efe8;border:0;display:grid;place-items:center;color:var(--ink);padding:0}
+.shb{padding:0 20px calc(20px + env(safe-area-inset-bottom))}.shb>:first-child{margin-top:0}
+.sheet .shl,.shb>p.small:first-child{font-size:14px;line-height:1.75;color:var(--sub);margin:0}
+.sheet .small{font-size:12.5px;line-height:1.7}
+.sheet .btn{min-height:50px;border-radius:14px;font-size:15px;padding:13px 14px;margin-top:12px}
+.sheet .btn.sm{min-height:40px;font-size:13.5px;padding:8px 14px;border-radius:12px;margin-top:8px}
+.sheet .lk{font-size:13px;padding:14px 0 4px}
+.sheet .field{margin-top:16px}.sheet .field label{font-size:13px;margin-bottom:6px}
+.sheet .kpi{background:var(--lime2);border-radius:14px;padding:14px 16px;margin:6px 0 4px}.sheet .kn{font-size:30px}.sheet .kb{font-size:13.5px}.sheet .kb b{display:block;margin-bottom:2px}
+.sheet .kr{padding:14px 0;gap:14px;min-height:52px;font-size:15px;color:var(--ink)}
+.sheet .kl{flex:0 0 auto;max-width:46%;font-size:14px}
+.sheet .kv{flex:1;border:0;border-radius:0;padding:0;font-size:15px;font-weight:700;text-align:right;color:var(--ink)}
+.sheet .kr::after{content:none}.sheet .kr[data-brk]::after,.sheet .kr[data-kk]::after{content:"›";margin-left:2px}
+.sheet .kr:not([data-brk]):not([data-kk]){cursor:default}
+.sheet .kadd{margin-left:auto;border:0;padding:0;font-size:14px}
+.sheet .msg{font-size:13.5px;border-radius:12px;padding:12px 14px}
+.sheet .dt summary{font-size:13.5px;padding:10px 0 2px}
+.sheet .seg button{min-height:40px;padding:8px 14px;font-size:13.5px}
+.sheet .verdict{font-size:14px;border-radius:14px}
 </style>
 </head>
 <body>
@@ -872,7 +901,7 @@ function renderD(){const s=st(),r=calc(),f=r.f;const est=s.f.turns.src==='est';c
  <tr><td>月の売上</td><td>133万円</td><td class="cur"><b>${man(r.sales)}</b></td></tr><tr><td>家賃</td><td>18万円</td><td class="cur">${r.limit>0?man(r.limit)+'まで':'—'}</td></tr></tbody></table>${legend(est)}</div>`+rentCard(r)+
  `<div class="card"><h2>${ic('flag')}2店舗目の前に見ること</h2>
  ${[['ng','店を任せられる人','まだいない','2店舗目は、いまのお店から手を離しても回る体制が前提とされます。','https://biz.moneyforward.com/restaurant/basic/2000/'],
-   [k.own!=null?'ok':'unk','自己資金',k.own!=null?man(k.own):'カルテに未入力','出店費用の半分ほどを自己資金で出しても支障がないかが、目安の1つとされます。','https://www.inshokuten.com/bukken/media/427'],
+   [k.own!=null?'ok':'unk','自己資金',k.own!=null?man(k.own):'まだ入れていない','出店費用の半分ほどを自己資金で出しても支障がないかが、目安の1つとされます。','https://www.inshokuten.com/bukken/media/427'],
    ['ok','同じ業態か','同じ（ランチ中心）','同じ形のほうが、軌道に乗るまでの時間は短くてすむとされます。','https://www.inshokuten.com/foodist/article/4864/'],
    [k.area?'ok':'unk','いまのお店との距離',k.area?esc(k.area):'エリアが未定','近すぎると客を取り合い、遠すぎると管理しにくくなります。','https://www.inshokuten.com/foodist/article/4864/']]
   .map(([st2,t,v,n,u])=>`<div class="ri"><span class="st ${st2}" style="border-radius:50%">${{ok:'✓',ng:'!',unk:'?'}[st2]}</span><div class="tx"><b>${t}</b><div class="meta"><span class="pill ${st2==='ok'?'':'ask'}">${v}</span></div><div class="nt">${n} <a class="sr" href="${u}" target="_blank" rel="noopener">出典</a></div></div></div>`).join('')}</div>`;
@@ -964,7 +993,7 @@ function brief(id){const s=st(),k=s.k||{},p=P[cur],sup=s.sup,food=cur!=='c';
  if(id==='saiyo')return[['店名',k.name,'name'],...biz,['場所',place,'area'],['営業時間',k.hours,'hours'],['休み',k.holiday,'holiday'],['時給',f.wage?yen(f.wage)+'〜':null],['開店の目標',op,'open']];
  if(id==='web')return[['店名',k.name,'name'],...biz,['場所',place,'area'],['営業時間',k.hours,'hours'],['休み',k.holiday,'holiday'],['雰囲気',k.mood,'mood'],['開店の目標',op,'open']];
  if(id==='zeiri')return[...biz,['客単価',a(5)],['月の売上の見通し',man(r.sales)],['開店の目標',op,'open'],['これまでの経験',k.career,'career'],['借りたい額',mn(k.borrow),'borrow']];
- const [kf,kn]=karteCount(),[rd,rn]=roadCount();return[['カルテ',`${kf}/${kn}項目`],['計画の数字',man(r.sales)+'／月'],['開店までの進み',`${rd}/${rn}件`],['開店の目標',op,'open'],['営業時間',k.hours,'hours']]}
+ const [kf,kn]=karteCount(),[rd,rn]=roadCount();return[['お店の内容',`${kf}/${kn}項目`],['計画の数字',man(r.sales)+'／月'],['開店までの進み',`${rd}/${rn}件`],['開店の目標',op,'open'],['営業時間',k.hours,'hours']]}
 const bCount=id=>{const b=brief(id);return[b.filter(x=>x[1]).length,b.length]};
 function mailText(id){const s=st(),k=s.k||{},b=brief(id);const pc=f=>(s.ph||[]).filter(x=>x.f===f).length,pl=[['bukken','物件・内見'],['ref','参考にしたいお店'],['menu','メニュー・料理']].filter(([f])=>pc(f)).map(([f,l])=>`${l}${pc(f)}枚`).join('、');
  const L=b.map(([l,v])=>`・${l}：${v||'未定'}`).join('\n')+((id==='naiso'||id==='design')&&pl?`\n・写真：${pl}（このあとお送りします）`:'');const nm=k.name?`「${k.name}」`:'お店';
@@ -1079,7 +1108,15 @@ function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:rend
  return header(dLabel(s.day),tab==='shop'?'':TTL[tab][0])+`<div class="wrap">${body}${PUB?accCard(tab):''}</div>`+tabbar(tab,n)}
 
 /* ===== シート ===== */
-function openSheet(html){document.body.classList.add('lock');html=pubText(html);const sh=document.getElementById('sheet');sh.innerHTML=`<button class="x" data-act="close">×</button>`+html;sh.classList.add('on');document.getElementById('mask').classList.add('on');sh.scrollTop=0}
+/* 下から上がる画面：題は上に残り、中身だけが動く。同じ題のまま開き直した時は、読んでいた位置を保つ。題のあたりを下へ引くと閉じる */
+function openSheet(html){document.body.classList.add('lock');html=pubText(html);const sh=document.getElementById('sheet'),m=html.match(/^\s*(<h3>[\s\S]*?<\/h3>)/),was=sh.classList.contains('on'),t=m?m[1].replace(/<[^>]+>/g,''):'',keep=was&&sh.dataset.t===t?sh.scrollTop:0;
+ sh.innerHTML=`<div class="shh">${m?m[1]:'<h3></h3>'}<button class="x" data-act="close" aria-label="閉じる"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="shb">${m?html.slice(m[0].length):html}</div>`;
+ sh.dataset.t=t;sh.style.transform='';sh.style.transition='';sh.classList.toggle('in',!was);sh.classList.add('on');document.getElementById('mask').classList.add('on');sh.scrollTop=keep;const hd=sh.firstChild;hd.classList.toggle('sc',keep>4);sh.onscroll=()=>hd.classList.toggle('sc',sh.scrollTop>4)}
+(()=>{let y0=null,dy=0;const sh=()=>document.getElementById('sheet');
+ document.addEventListener('touchstart',e=>{if(e.target.closest('.shh')&&!e.target.closest('button')){y0=e.touches[0].clientY;dy=0;sh().style.transition='none'}},{passive:true});
+ document.addEventListener('touchmove',e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh().style.transform=`translate(-50%,${dy}px)`},{passive:true});
+ const end=()=>{if(y0==null)return;y0=null;const el=sh();el.style.transition='transform .18s ease-out';if(dy>90){el.style.transform='translate(-50%,100%)';setTimeout(()=>{closeSheet();el.style.transform='';el.style.transition=''},170)}else el.style.transform='';dy=0};
+ document.addEventListener('touchend',end);document.addEventListener('touchcancel',end)})();
 function closeSheet(){document.body.classList.remove('lock');if(S[cur])delete S[cur]._ret;if(M&&M.t){clearInterval(M.t);M.t=null}document.getElementById('sheet').classList.remove('on');document.getElementById('mask').classList.remove('on')}
 function editSheet(k){const o=P[cur].fields[k],x=st().f[k];const lab=cur==='b'?'家賃を払う前に残る額':'家賃に回せる額（残る額）';
  openSheet(`<h3>${o.label}</h3><p class="small">${srcLabel(k)}${o.note?'（'+o.note+'）':''}</p>${o.why?`<p class="small" style="color:var(--ink)">${o.why}</p>`:''}${o.how&&x.src!=='ans'?`<p class="small"><b>確かめ方：</b>${o.how}</p>`:''}
