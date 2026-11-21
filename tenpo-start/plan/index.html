@@ -1529,7 +1529,7 @@ function ivMemo(){const c=IV.calculationInput(IVS),v=id=>IV.valueOf(IVS,id),pr=v
  ${c.missing.filter(id=>id!=='salesModel'||IV.questionsFor(IVS).some(q=>q.id==='salesModel')).map(id=>`<button class="nrow" data-ivedit="${id}" data-ivret="memo"><span class="nt2"><small>計算に使う答え</small><b>${missL[id]||ivLabel(id)}</b></span><span class="tag unk">＋ 書く</span><em>›</em></button>`).join('')}</div>`}
  <div class="alt"><button data-ivask="1">事務局に相談する</button><button data-ivopen="1">ヒアリングの答えを見る</button></div>
  <p class="ftn" style="text-align:center">事務局への相談は無料です。${S._id?`<br>相談番号 ${S._id}`:''}${accFoot()}</p>${IVFT}</div>`}
-const askN=()=>(IVS&&IVS.consultation.preparedCount)||0;
+const askN=()=>Math.max((IVS&&IVS.consultation.preparedCount)||0,(S._acc&&S._acc.n)||0);
 function ivAsk(){if(askGate())return;const v=id=>IV.valueOf(IVS,id),bl=(IV.BUSINESSES.find(o=>o.value===v('businessType'))||{}).label,nth=askN()+1;
  const rows=[['相談番号',`${myId()}（${nth}回目）`],['相談したいこと','何から手をつければいいか相談したい'],bl&&['お店',bl],v('purpose')&&['来てほしい場面',v('purpose')],v('mainProduct')&&[ivLabel('mainProduct'),v('mainProduct')],v('area')&&['エリア',v('area')],v('openingTarget')&&['開きたい時期',v('openingTarget')],v('worry')&&['気になっていること',v('worry')]].filter(Boolean);
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
@@ -1581,13 +1581,15 @@ function accPayload(){const plan={};for(const[k,v]of Object.entries(S)){if(['_ac
 const accSig=p=>{const t=JSON.stringify(p);let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return h+':'+t.length};
 const accEmpty=()=>!S._u&&!Object.keys(IVS.answers).length;
 const accNice=e=>{const m=(e&&(e.message||e.error_description))||String(e||'');return /provider|Unsupported|not enabled/i.test(m)?'その方法での登録は、まだ準備中です。ほかの方法を選んでください。':/rate limit/i.test(m)?'メールの送りすぎで、少し待つ必要があります。時間をおいてください。':/too_large/.test(m)?'内容が大きすぎて、アカウントに残せませんでした。':/fetch|network/i.test(m)?'通信できませんでした。電波を確かめて、もう一度お試しください。':'うまくいきませんでした。下書きは、この端末に残っています。'};
+/* 相談番号と相談の回数は、アカウントに合わせる（端末ごとに別の番号・どれも1回目、にならないように。2026-11-21） */
+function accSame(no,n){if(no&&/^TS-[A-Z0-9]{6}$/.test(no)){S._id=no;if(IVS&&IVS.consultation)IVS.consultation.number=no}if(n!=null&&S._acc){S._acc.n=Math.max(S._acc.n||0,+n||0);if(IVS&&IVS.consultation)IVS.consultation.preparedCount=Math.max(IVS.consultation.preparedCount||0,S._acc.n)}}
 function accTake(r){const loc={};for(const v of Object.values(S))if(v&&Array.isArray(v.ph))for(const x of v.ph)loc[x.id]=x.d;
  try{localStorage.setItem(KEY+':before-account',JSON.stringify(S))}catch(e){}try{localStorage.setItem(IV.STORAGE_KEY+':before-account',JSON.stringify(IVS))}catch(e){}
  const P2=r.plan&&typeof r.plan==='object'?r.plan:{};for(const v of Object.values(P2))if(v&&Array.isArray(v.ph))v.ph=v.ph.map(x=>({...x,d:loc[x.id]})).filter(x=>x.d);
- S=P2;if(r.interview&&r.interview.answers){IVS=r.interview;ivSave()}S._acc={rev:r.rev,at:Date.now()};S._acc.sig=accSig(accPayload());
+ S=P2;if(r.interview&&r.interview.answers)IVS=r.interview;S._acc={rev:r.rev,at:Date.now()};accSame(r.consult_no,r.consults);ivSave();S._acc.sig=accSig(accPayload());
  try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}location.reload()}
 async function accPut(base,force){const p=accPayload(),w=await accRpc('start_save',{p_interview:p.interview,p_plan:p.plan,p_consult:S._id||null,p_base_rev:base,p_force:!!force});
- if(w&&w.ok){S._acc={rev:w.rev,at:(S._acc&&S._acc.at)||Date.now(),sig:accSig(p)};delete S._accP;ACCMSG=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}return w}
+ if(w&&w.ok){S._acc={rev:w.rev,at:(S._acc&&S._acc.at)||Date.now(),sig:accSig(p),n:(S._acc&&S._acc.n)||0};accSame(w.consult_no,w.consults);ivSave();delete S._accP;ACCMSG=null;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}return w}
 function accConflict(r){const d=r.updated_at?new Date(r.updated_at):null;
  openSheet(`<h3>このアカウントには、すでに計画があります</h3><p class="shl">${d?`最後に変えたのは ${d.getMonth()+1}/${d.getDate()} です。`:''}どちらを続けるか、選んでください。</p>
  <button class="btn dark" id="acc_take">アカウントの計画を開く</button><p class="emp">この端末の下書きは、控えとしてこの端末に残します。</p>
@@ -1598,7 +1600,7 @@ function accConflict(r){const d=r.updated_at?new Date(r.updated_at):null;
  document.getElementById('acc_no').onclick=()=>{delete S._accP;save();closeSheet()}}
 async function accLink(){if(accBusy)return;accBusy=true;try{const r=await accRpc('start_get'),p=accPayload();
   if(!r.exists){const w=await accPut(null,false);if(w&&w.ok){closeSheet();render();toast('登録できました。この計画は、アカウントに残っています')}else if(w&&w.conflict)accConflict(w)}
-  else if(S._acc&&S._acc.rev===r.rev){delete S._accP;accBusy=false;await accSync();return}
+  else if(S._acc&&S._acc.rev===r.rev){accSame(r.consult_no,r.consults);ivSave();save();delete S._accP;accBusy=false;await accSync();return}
   else if(accEmpty()||(S._acc&&r.rev>S._acc.rev&&S._acc.sig===accSig(p)))accTake(r);
   else accConflict(r)}
  catch(e){ACCMSG=accNice(e);if(S._accP){delete S._accP;save();toast(ACCMSG)}}finally{accBusy=false}}
@@ -1629,7 +1631,7 @@ async function accGo(prov){const err=m=>{const e=document.getElementById('acc_er
   if(r.error)throw r.error;
   if(prov==='email')openSheet(`<h3>メールを送りました</h3><p class="shl">${esc(email)} に届いたリンクを、<b>この端末のこのブラウザ</b>で開いてください。開くと、いまの計画がアカウントに結びつきます。</p><p class="emp">届かない時は、迷惑メールのフォルダも見てください。</p><button class="btn ghost" data-act="close">閉じる</button>`)}
  catch(e){delete S._accP;save();err(accNice(e))}}
-async function accConsult(topic,body,nth){if(!PUB||!S._acc||!ACCU)return false;try{await accSync();await accRpc('start_consult_put',{p_topic:topic,p_body:body,p_nth:nth});return true}catch(e){return false}}
+async function accConsult(topic,body,nth){if(!PUB||!S._acc||!ACCU)return false;try{await accSync();const r=await accRpc('start_consult_put',{p_topic:topic,p_body:body,p_nth:nth});if(r&&r.ok){accSame(r.consult_no,r.nth);ivSave();save()}return true}catch(e){return false}}
 function askGate(){if(!PUB||S._acc)return false;openSheet(`<h3>事務局への相談は、登録した方が使えます</h3><p class="shl">登録は無料です。登録すると、ここまでの内容がそのまま事務局に伝わるので、最初から説明し直さなくて済みます。</p><button class="btn dark" data-accopen="1">無料で登録して、相談する</button><button class="btn ghost" data-act="close">あとで</button>`);return true}
 function accOut(){const fin=()=>{delete S._acc;delete S._accP;ACCU=null;ACCMSG=null;save();closeSheet();render();toast('ログアウトしました。内容は、この端末に残っています')};(SB?SB.auth.signOut().catch(()=>{}):Promise.resolve()).then(fin)}
 function accCard(tab){if(S._acc||!S._u||!['shop','plan'].includes(tab))return'';const s=st();if(s.events.length<3&&s.day<1)return'';if(S._accLater!=null&&s.day-S._accLater<3)return'';
