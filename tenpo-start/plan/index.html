@@ -262,6 +262,15 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .dtb{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--line);border-radius:10px;padding:12px;background:#fff;min-height:48px;box-sizing:border-box}.dtv{font-size:16px;font-weight:700}.dtv.no{font-weight:400;color:var(--sub)}.dth{font-size:13px;font-weight:700;text-decoration:underline;white-space:nowrap}
 .field .dtb input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0}
 .dtq{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.dtq button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:13px;color:inherit}.dtq button.on{border-color:#185534;background:#185534;color:#fff}
+.sube{display:block;border:0;background:none;padding:6px 0 0;font:inherit;font-size:12.5px;line-height:1.5;color:var(--sub);text-align:left}.sube u{color:var(--green2);font-weight:700;margin-left:8px;text-underline-offset:3px;white-space:nowrap}
+.ppcard{display:flex;flex-direction:column}.ppcard .ppc{order:9;margin-top:14px}.ppc{background:var(--lime2);border-radius:14px;padding:14px}.ppc>b{font-size:14.5px}.ppc p{font-size:13px;line-height:1.7;color:var(--sub);margin:4px 0 0}.ppc .btn{margin-top:10px;background:#fff}
+.ppcap{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--lime2);border-radius:14px;padding:14px 16px;margin-top:12px;font-size:13.5px}.ppcap b{font-size:20px;white-space:nowrap}.ppcap small{font-size:12px;font-weight:400;color:var(--tmp);margin-left:4px}
+.pst{margin:14px 0 0;padding:0;list-style:none;counter-reset:p}.pst li{counter-increment:p;position:relative;padding:7px 0 7px 36px;font-size:14px;line-height:1.6}.pst li::before{content:counter(p);position:absolute;left:0;top:6px;width:24px;height:24px;border-radius:99px;background:var(--green);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center}
+.pps{font-size:13px;color:var(--sub);margin:14px 0 0;line-height:1.7}
+.ppi{border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-top:10px;background:#fff}.ppi.smp{border-style:dashed;background:#fbfaf6}.pph{display:flex;justify-content:space-between;align-items:center;gap:8px}.pph b{font-size:15.5px}.pph .lk{padding:0}.pph .tag{margin:0}
+.ppn{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:12.5px;color:var(--sub)}.ppn b{display:block;font-size:16px;color:var(--ink)}
+.ppv{margin:10px 0 0;border-radius:10px;padding:9px 12px;font-size:13.5px;font-weight:700;line-height:1.5}.ppv.ok{background:#e6f1e8;color:#2c6a45}.ppv.ng{background:var(--badbg);color:var(--bad)}.ppm{font-size:12.5px;color:var(--sub);line-height:1.7;margin:8px 0 0}
+.sech{display:block;font-size:15px}
 
 /* ===== 下から上がる画面（2026-11-22 見直し）：つまみ・動かない題・閉じる印・余白と文字の大きさをそろえる ===== */
 .mask.on{animation:mkIn .18s ease-out}@keyframes mkIn{from{opacity:0}to{opacity:1}}
@@ -456,6 +465,8 @@ const fmtV=(k,v)=>{const o=P[cur].fields[k];if(o.unit==='円')return yen(v);if(o
 
 /* ===== 部品 ===== */
 function srcLabel(k){const x=st().f[k],o=P[cur].fields[k];if(x.src==='ans'&&x.v!==o.v)return'①の回答から変更';return SRC[x.src]}
+function subEdit(k,pre,post){const x=st().f[k];return `<button class="sube ${x.src}" data-edit="${k}">${pre}${fmtV(k,x.v)}${post}（${srcLabel(k)}）<u>変える</u></button>`}
+function ppCall(){const n=(st().pp||[]).length;return `<div class="ppc"><b>気になる物件が出てきたら</b><p>募集資料の家賃と広さを入れると、この上限の中かどうかが、物件ごとに出ます。${n?`いま${n}件入っています。`:''}</p><button class="btn ghost" data-tl="tool:pp">${n?'物件の比較を開く':'物件を入れて比べる'}</button></div>`}
 function chip(k,label){const x=st().f[k],o=P[cur].fields[k];return `<button class="chip ${x.src}" data-edit="${k}"><span class="v">${fmtV(k,x.v)}</span><span class="t">${label??o.label}${label===''?'':'・'}${srcLabel(k)}</span></button>`}
 const cchip=(v,l)=>`<span class="chip calc"><span class="v">${v}</span><span class="t">${l}・計算</span></span>`;
 const legend=(o)=>`<div class="legend"><span class="a">①の回答</span><span class="m">仮置き（押して変えられる）</span>${P[cur].exist?'<span class="x">いまのお店の実績</span>':''}${o?'<span class="o">実測</span><span class="e">推定</span>':''}</div>`;
@@ -640,11 +651,11 @@ function renderA(){const s=st(),r=calc(),f=r.f;const est=s.f.turns.src==='est';
  <div class="big">${man(r.sales)}<small>／月</small></div>
  <div class="eq">${chip('seats')}<span class="op">×</span>${chip('price')}<span class="op">×</span>${chip('turns')}<span class="op">×</span>${chip('days')}</div>${obsBox('turns')}${legend(est)}</div>`+rentCard(r);
  let place;
- if(r.limit>=50000){const ts=f.seats/f.perTsubo;place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">計画から出した上限です。エリアを比べるときに使います。</p><ul class="rows">
- <li><span>家賃（共益費込み）の上限</span><b>${man(r.limit)}</b></li><li><span>${f.seats}席に要る広さ ${chip('perTsubo','')}</span><b>${Math.round(ts*10)/10}坪前後</b></li>
+ if(r.limit>=50000){const ts=f.seats/f.perTsubo;place=`<div class="card ppcard"><h2>${ic('place')}物件を探すときの物差し</h2>${ppCall()}<p class="lead">計画から出した上限です。エリアを比べるときに使います。</p><ul class="rows">
+ <li><span>家賃（共益費込み）の上限</span><b>${man(r.limit)}</b></li><li><span>${f.seats}席に要る広さ${subEdit('perTsubo','1坪あたり','で計算')}</span><b>${Math.round(ts*10)/10}坪前後</b></li>
  <li><span>その広さでの坪単価の上限</span><b>${yen(Math.floor(r.limit/ts/100)*100)}</b></li></ul>
  <p class="small" style="margin-top:8px">検討中のエリアの募集を見て、この広さでこの月額に収まる物件があるかを確かめます。なければ、エリアか席数のどちらかを変える判断になります。</p></div>`}
- else place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">家賃に回せる額が${r.cap>0?'月'+man(r.limit)+'で':'出ていないので'}、まだ上限として使えません。先に「計画」で、席数・客単価・人の入れ方のどれを変えるかを決めます。</p></div>`;
+ else place=`<div class="card ppcard"><h2>${ic('place')}物件を探すときの物差し</h2>${ppCall()}<p class="lead">家賃に回せる額が${r.cap>0?'月'+man(r.limit)+'で':'出ていないので'}、まだ上限として使えません。先に「計画」で、席数・客単価・人の入れ方のどれを変えるかを決めます。</p></div>`;
  place+=candNote();
  return{land:'plan',hero,plan,check:uncCard(),place}}
 
@@ -658,7 +669,7 @@ function renderT(){const s=st(),r=calc(),f=r.f;const est=s.f.peak.src==='est';co
  <div class="eq"><span class="op">（</span>${chip('peak','朝1時間')}<span class="op">×</span>${chip('peakH','ピーク')}<span class="op">＋</span>${chip('off','それ以外')}<span class="op">）×</span>${chip('price')}<span class="op">×</span>${chip('days')}</div>
  ${over?`<div class="verdict stop"><b>1人で出せるのは1時間${r.capH}件まで。</b>朝${f.peak}件の注文が来ても、${f.peak-r.capH}件は取りこぼす計算にしています。</div>`:`<p class="small" style="margin-top:10px">ピーク時は ${chip('team')} で、${chip('make','1人1時間')} まで出せます。朝${f.peak}件なら間に合います。</p>`}
  ${obsBox('peak')}${legend(est)}</div>`+rentCard(r);
- const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">通行量でエリアを比べるときに使います。</p><ul class="rows">
+ const place=`<div class="card ppcard"><h2>${ic('place')}物件を探すときの物差し</h2>${ppCall()}<p class="lead">通行量でエリアを比べるときに使います。</p><ul class="rows">
  <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li>
  <li><span>朝に要る人通り ${chip('stop','買う割合')}</span><b>1時間 ${Math.ceil(f.peak/(f.stop/100)).toLocaleString()}人</b></li></ul>
  <p class="small" style="margin-top:8px">朝1時間に${f.peak}件売るには、前を通る人の${f.stop}%が買うとして、これだけの人通りが要ります。候補の場所で10分数えれば比べられます。</p></div>`+candNote();
@@ -727,7 +738,7 @@ function renderC(){const s=st(),r=calc(),f=r.f;const est=s.f.util.src==='est';
  <button class="btn ghost sm" data-act="staff" data-n="${f.staff===1?2:1}">担当を${f.staff===1?2:1}人にして見る</button></div>
  <div class="card"><h2>${ic('chart')}月の売上の見通し</h2><div class="big">${man(r.sales)}<small>／月（1日${Math.round(r.perDay*10)/10}人）</small></div>
  <div class="eq">${cchip(r.cap1+'枠','1日')}<span class="op">×</span>${chip('util')}<span class="op">×</span>${chip('price')}<span class="op">×</span>${chip('days')}</div>${obsBox('util')}${legend(est)}</div>`+rentCard(r);
- const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><p class="lead">計画から出した上限です。</p><ul class="rows">
+ const place=`<div class="card ppcard"><h2>${ic('place')}物件を探すときの物差し</h2>${ppCall()}<p class="lead">計画から出した上限です。</p><ul class="rows">
  <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li><li><span>置きたいベッド <span class="tag ans">①の回答</span></span><b>${f.beds}台</b></li></ul>
  ${r.limit>0?'':'<p class="small" style="margin-top:8px">家賃に回せる額がまだ出ていません。先に「計画」で条件を見直します。</p>'}</div>`+candNote();
  return{land:'plan',hero,plan,check:uncCard(),place}}
@@ -906,8 +917,8 @@ function renderD(){const s=st(),r=calc(),f=r.f;const est=s.f.turns.src==='est';c
    [k.area?'ok':'unk','いまのお店との距離',k.area?esc(k.area):'エリアが未定','近すぎると客を取り合い、遠すぎると管理しにくくなります。','https://www.inshokuten.com/foodist/article/4864/']]
   .map(([st2,t,v,n,u])=>`<div class="ri"><span class="st ${st2}" style="border-radius:50%">${{ok:'✓',ng:'!',unk:'?'}[st2]}</span><div class="tx"><b>${t}</b><div class="meta"><span class="pill ${st2==='ok'?'':'ask'}">${v}</span></div><div class="nt">${n} <a class="sr" href="${u}" target="_blank" rel="noopener">出典</a></div></div></div>`).join('')}</div>`;
  const ts=f.seats/f.perTsubo;
- const place=`<div class="card"><h2>${ic('place')}物件を探すときの物差し</h2><div class="alt" style="margin:0 0 8px"><button data-tl="tool:pp">候補の物件を並べて比べる</button></div><ul class="rows">
- <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li><li><span>${f.seats}席に要る広さ ${chip('perTsubo','')}</span><b>${Math.round(ts*10)/10}坪前後</b></li>
+ const place=`<div class="card ppcard"><h2>${ic('place')}物件を探すときの物差し</h2>${ppCall()}<ul class="rows">
+ <li><span>家賃（共益費込み）の上限</span><b>${r.limit>0?man(r.limit):'—'}</b></li><li><span>${f.seats}席に要る広さ${subEdit('perTsubo','1坪あたり','で計算')}</span><b>${Math.round(ts*10)/10}坪前後</b></li>
  <li><span>比べる相手</span><b>いまのお店の前の人通り</b></li></ul><p class="small" style="margin-top:8px">候補の場所と、いまのお店の前を同じ時間帯に数えると、回転数の見当がつきます。</p></div>`+candNote();
  return{land:'plan',hero,plan,check:uncCard(),place}}
 
@@ -1792,6 +1803,23 @@ function ppSheet(){const s=st();s.pp=s.pp||[];const cap=cur==='b'?null:calc().ca
  <details class="addf" ${s.pp.length?'':'open'}><summary>＋ 物件を足す</summary><div class="field"><label>呼び名</label><input id="pp_n" placeholder="例：駅前の1階"></div>
  <div class="f2"><div class="field"><label>家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal"></div><div class="field"><label>広さ（坪）</label><input id="pp_t" type="number" inputmode="decimal"></div></div>
  <div class="field"><label>気づいたこと</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。人通りは夕方が多い。"></textarea></div><button class="btn dark" id="pp_add">足す</button></details>
+ <p class="ftn">家賃だけでなく、保証金・工事の要る範囲・人通りも比べてください。「確かめる」の店の前で数える道具が使えます。</p>`);
+ $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim(),r2=+$i('pp_r').value;if(!n||!(r2>0)){toast('呼び名と家賃を入れてください');return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();ppSheet()}}
+function ppSheet(){const s=st();s.pp=s.pp||[];const cap=cur==='b'?null:calc().cap,pt=s.f.perTsubo?s.f.perTsubo.v:null,seats=s.f.seats?s.f.seats.v:null;
+ const card=(p,demo)=>{const d=cap!=null?cap-p.rent:null,ut=p.tsubo?Math.round(p.rent/p.tsubo/100)*100:null;
+  return `<div class="ppi ${demo?'smp':''}"><div class="pph"><b>${esc(p.n)}</b>${demo?'<span class="tag">見本</span>':`<button class="lk" data-tl="ppdel:${p.id}">消す</button>`}</div>
+  <div class="ppn"><span>家賃<b>${man(p.rent)}</b></span>${p.tsubo?`<span>広さ<b>${p.tsubo}坪</b></span><span>1坪あたり<b>${yen(ut)}</b></span>`:''}</div>
+  ${d==null?'':`<p class="ppv ${d>=0?'ok':'ng'}">${d>=0?`家賃に回せる額より ${man(d)} 低い（中に収まる）`:`家賃に回せる額より ${man(-d)} 高い`}</p>`}
+  ${p.tsubo&&pt&&cur==='a'?`<p class="ppm">席の目安 ${Math.round(p.tsubo*pt)}席（仮）${seats?`・計画は${seats}席`:''}</p>`:''}${p.memo?`<p class="ppm">${esc(p.memo)}</p>`:''}</div>`};
+ const L=[...s.pp].sort((a,b)=>a.rent-b.rent),inN=cap!=null?L.filter(p=>p.rent<=cap).length:null;
+ openSheet(`<h3>物件の比較</h3><p class="shl">募集資料の家賃と広さを入れると、いまの計画に合うかが物件ごとに出ます。</p>
+ ${cap!=null?`<div class="ppcap"><span>いまの計画で、家賃に回せる額</span><b>${man(cap)}<small>仮</small></b></div>`:''}
+ ${L.length?`<p class="pps">${L.length}件を、家賃の低い順に並べています。${inN!=null?`回せる額の中は${inN}件です。`:''}</p>${L.map(p=>card(p)).join('')}`
+   :`<ol class="pst"><li>気になる物件の<b>家賃</b>（共益費込み）と<b>広さ</b>を入れる</li><li>回せる額より高いか低いかが、すぐ出る</li><li>2件、3件と足して、内見に行く物件を選ぶ</li></ol><p class="pps">入れると、こう出ます。</p>${card({n:'駅前の1階',rent:cap!=null?Math.max(30000,Math.round((cap+8000)/1000)*1000):68000,tsubo:8,memo:'居抜き。人通りは夕方が多い。'},1)}`}
+ <div class="sec"><b class="sech">${L.length?'もう1件足す':'1件目を入れる'}</b>
+ <div class="field"><label>呼び名（自分が分かれば何でも）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
+ <div class="f2"><div class="field"><label>家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal" placeholder="例：6.5"></div><div class="field"><label>広さ（坪・分かれば）</label><input id="pp_t" type="number" inputmode="decimal" placeholder="例：8"></div></div>
+ <div class="field"><label>気づいたこと（なくても足せます）</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。"></textarea></div><button class="btn dark" id="pp_add">この物件を足す</button></div>
  <p class="ftn">家賃だけでなく、保証金・工事の要る範囲・人通りも比べてください。「確かめる」の店の前で数える道具が使えます。</p>`);
  $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim(),r2=+$i('pp_r').value;if(!n||!(r2>0)){toast('呼び名と家賃を入れてください');return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();ppSheet()}}
 function buySheet(){const s=st();s.buy=s.buy||[];const tb=s.buy.reduce((a,x)=>a+(x.b||0),0),ta=s.buy.reduce((a,x)=>a+(x.got?(x.a||x.b||0):0),0),left=s.buy.filter(x=>!x.got).length;
