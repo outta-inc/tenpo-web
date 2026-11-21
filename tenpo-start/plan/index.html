@@ -5,6 +5,7 @@
 <meta name="description" content="お店を始める人の、無料の開業支援。答えから最初の計画ができ、次に確かめることが1つずつ分かります。">
 <link rel="icon" type="image/svg+xml" href="./icon.svg">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="canonical" href="https://start.tenpo-os.com/">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="TENPO/START">
 <meta name="mobile-web-app-capable" content="yes">
@@ -248,7 +249,7 @@ body.lock{overflow:hidden}
 <div class="note">試作の操作バー（利用者には出ません）。各人の①の回答は、この試作のために用意した回答例です。</div></div>
 <div class="phone" id="app"></div>
 <div class="mask" id="mask"></div><div class="sheet" id="sheet"></div><div class="toast" id="toast"></div><input type="file" id="upimg" accept="image/*" multiple hidden><input type="file" id="updoc" multiple hidden>
-<script>window.__PUB=true</script>
+<script>if(location.hostname.endsWith('github.io'))location.replace('https://start.tenpo-os.com/');window.__PUB=true</script>
 <script>
 const PUB=!!window.__PUB;let BASE=new Date(2026,10,20);const WD=['日','月','火','水','木','金','土'];
 function dLabel(n){const d=new Date(BASE);d.setDate(d.getDate()+n);return `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`}

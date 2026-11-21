@@ -3,4 +3,4 @@ TENPO OS の画面の置き場（GitHub Pages）。源は outta-inc/tenpo-os の
 
 - orion-sample.html — サンプル店舗（洋食オリオン）：店のこと・閉店後の在庫チェック・明日の仕込みと発注
 
-- tenpo-start/plan/ — TENPO/START：ヒアリング → 計画・確かめる・開店まで（Claude 作。1つの HTML。データは利用者の端末の中だけ。相談は公式LINEへ）
+- tenpo-start/plan/ — TENPO/START：ヒアリング → 計画・確かめる・開店まで（Claude 作。1つの HTML。データは利用者の端末の中だけ。相談は公式LINEへ）。公開の番地は https://start.tenpo-os.com （Cloudflare の Worker「tenpo-start」が、ここのファイルを返す。この GitHub の番地で開くと、そちらへ進む）
