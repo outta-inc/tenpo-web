@@ -32,3 +32,15 @@ Node.jsで `node --test tenpo-start/interview-src/state.test.mjs`。
 既存の計画・写真・相談番号を保持したまま移行する処理、画面と音声の実機確認はClaudeの組込み時に実施します。新しい保存キーは `tenpo-start:interview:v1`。既存 `tenpo-start:plan:v1` を削除しません。
 
 LINEの名前は取得しません。相談番号は認証IDではありません。LINEを開いただけで送信済みと記録せず、preparedCountと送信確認を分けます。
+
+## 公開画面への接続（2026/11/21、Claude）
+
+`tenpo-start/plan/index.html` に接続しました。質問の文・順番・分岐・保存形式は、この `questions.mjs` と `state.mjs` が正です。
+
+- 入れ方：`node tenpo-start/interview-src/embed.mjs tenpo-start/plan/index.html`。HTMLの `/*IV:BEGIN*/`〜`/*IV:END*/` の間だけを書き換えます。質問を変えた時は、テストのあとにこれを実行してください。
+- 画面：1画面1設問。「次へ」「戻る」「まだ決めていない」「今は飛ばす」「答えない」。一覧で「直す」、最後は「この内容を残す」。計算できる時だけ「計画を見る」。
+- 計算へ：`calculationInput` がreadyの時だけ計画を出します。足りない時は5項目のメモと、足りない答えの一覧だけを出し、数字は出しません。
+- 状態の対応：provisional →「ヒアリングの答え」、answered →「あなたの入力」。回転数・営業日数・原価率などは答えから作らず、「仮置き」として根拠を添えて別に置きます。
+- 以前の入力フォームで作った計画（`tenpo-start:plan:v1`）はそのまま開けます。答えは初回に `tenpo-start:interview:v1` へ写します。計画・写真・相談番号・歩みは消しません。
+- 読み込めない保存は `tenpo-start:interview:v1:backup` に写し、画面からコピーできます。
+- 相談：LINEを開く前に、文に入れる全項目を見せます。記録は「相談の文を用意した」。送信は記録しません。
