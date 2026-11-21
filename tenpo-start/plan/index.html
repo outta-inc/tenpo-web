@@ -1671,7 +1671,7 @@ function tdCard(){const s=st(),A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),
  const rows=soon.length?soon.slice(0,5):open.filter(x=>!x.contact).slice(0,3);
  return `<div class="card"><div class="kh">${ic('check',20)}<h2>やること</h2><span class="kc">済み ${A.length-open.length}/${A.length}</span></div>
  <p class="lead">${!s.open?'開店の目標日を入れると、それぞれに期限の目安が付きます。':late?`自分で決めた期限を過ぎた物が${late}件あります。動かせる物は、日付を変えて大丈夫です。`:early?`開店の目標日から見ると、早めに進めたい物が${early}件あります。上から1つずつで大丈夫です。`:soon.length?'今日から1週間の分です。':'この1週間に期限の物はありません。先の物から、1つ進めておけます。'}</p>
- ${!s.open?`<button class="btn ghost sm" data-kk="open" data-kt="x">開店の目標日を入れる</button>`:''}${rows.map(tdRow).join('')}
+ ${!s.open?`<div style="margin:10px 0 14px"><button class="btn ghost sm" data-kk="open" data-kt="x">開店の目標日を入れる</button></div>`:''}${rows.map(tdRow).join('')}
  <div class="alt"><button data-tl="td:all">全部見る（残り${open.length}）</button><button data-tl="tdadd:">＋ やることを足す</button></div>${wait?`<button class="lk" data-tl="td:wait">返事を待っていること ${wait}件</button>`:''}</div>`}
 function tdSheet(v){const A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),open=A.filter(x=>x.st!=='done').sort(byDue),done=A.filter(x=>x.st==='done');
  const L=v==='week'?open.filter(x=>x.due&&x.due<=wk):v==='wait'?open.filter(x=>x.st==='wait'||!/自分/.test(x.who)):open;
