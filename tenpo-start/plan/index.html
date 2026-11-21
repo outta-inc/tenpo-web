@@ -5,6 +5,7 @@
 <meta name="description" content="お店を始める人の、無料の開業支援。答えから最初の計画ができ、次に確かめることが1つずつ分かります。">
 <link rel="icon" type="image/svg+xml" href="./icon.svg">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="canonical" href="https://start.tenpo-os.com/">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="TENPO/START">
 <meta name="mobile-web-app-capable" content="yes">
@@ -241,6 +242,14 @@ body.pub{background:var(--bg)}body.pub .top{top:0}
 .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
 body.lock{overflow:hidden}
 .fade{animation:f .35s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ivp{font-size:12px;color:var(--sub);font-weight:700}.ivh{font-size:19px;line-height:1.5;margin:6px 0 4px}
+.ivo{display:flex;flex-direction:column;gap:8px;margin-top:12px}.ivo button{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:13px 14px;font-size:15px;text-align:left;color:var(--ink)}.ivo button.on{border-color:var(--green);background:var(--lime2);font-weight:700}
+.ivn{display:flex;align-items:center;gap:8px;margin-top:12px}.ivn input{flex:1;min-width:0;border:1.5px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:18px;box-sizing:border-box;background:#fff}.ivn i{font-style:normal;font-weight:700;font-size:15px}
+textarea[data-ivi]{width:100%;box-sizing:border-box;border:1.5px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:16px;margin-top:12px;background:#fff;line-height:1.6}
+.ivl{display:block;font-size:13px;font-weight:700;margin-top:14px}.ivl+textarea{margin-top:6px}
+.ivs{display:flex;gap:6px;margin-top:10px}.ivs button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px;font-size:12.5px;color:var(--sub)}.ivs button.on{border-color:var(--green);color:var(--green);font-weight:700;background:var(--lime2)}
+.ivv,.ivy{font-size:12px;color:var(--sub);margin:8px 0 0;line-height:1.6}.ivy:empty{display:none}.iverr{font-size:12.5px;color:var(--bad);margin:8px 0 0;line-height:1.6}.iverr:empty{display:none}
+.ivb{background:var(--badbg);color:var(--bad);border-radius:12px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:10px}.lkk{font-size:12px;color:var(--sub);text-decoration:underline;white-space:nowrap;margin-left:6px}
 </style>
 </head>
 <body>
@@ -248,7 +257,7 @@ body.lock{overflow:hidden}
 <div class="note">試作の操作バー（利用者には出ません）。各人の①の回答は、この試作のために用意した回答例です。</div></div>
 <div class="phone" id="app"></div>
 <div class="mask" id="mask"></div><div class="sheet" id="sheet"></div><div class="toast" id="toast"></div><input type="file" id="upimg" accept="image/*" multiple hidden><input type="file" id="updoc" multiple hidden>
-<script>window.__PUB=true</script>
+<script>if(location.hostname.endsWith('github.io'))location.replace('https://start.tenpo-os.com/');window.__PUB=true</script>
 <script>
 const PUB=!!window.__PUB;let BASE=new Date(2026,10,20);const WD=['日','月','火','水','木','金','土'];
 function dLabel(n){const d=new Date(BASE);d.setDate(d.getDate()+n);return `${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`}
@@ -279,7 +288,7 @@ a:{id:'a',chip:'Aさん：カフェ・住宅街・12席（連載の例）',biz:'
   wage:{label:'時給',unit:'円',v:1200,src:'tmp',min:1000,max:2500,step:10},
   loan:{label:'借入の返済',unit:'円',v:50000,src:'tmp',min:0,max:300000,step:5000,range:[0,80000],why:'①では聞いていません。400万円を7年で返す例として月5万円。',how:'内装と設備の見積もりを1社から取る。'},
   keep:{label:'毎月手元に残したい額',unit:'円',v:250000,src:'tmp',min:0,max:800000,step:10000,why:'①では聞いていません。25万円で置いています。ご自身の額に変えてください。'},
-  rentRate:{label:'家賃を売上の何%と見るか',unit:'%',v:10,src:'tmp',min:5,max:20,step:1,why:'「家賃は売上の10%前後」という一般的な目安を仮定として使っています。'},
+  rentRate:{label:'家賃を売上の何%と見るか',unit:'%',v:10,src:'tmp',min:5,max:20,step:1,why:'この計画では、仮に売上の10%と置いています。払ってよい家賃という意味ではありません。'},
   perTsubo:{label:'1坪あたりの席数',unit:'席',v:1.6,src:'tmp',min:0.8,max:3,step:0.1,why:'厨房やトイレを含めた広さの目安。'}}},
 t:{id:'t',chip:'Tさん：カフェ・出勤前の持ち帰り・0席',biz:'カフェ',
  answers:[[1,'purpose','利用場面','出勤前の持ち帰り'],[2,'branch0','（分岐の設問）',UND],[3,'setup','ドリンクと合わせる商品','焼き菓子'],
@@ -299,7 +308,7 @@ t:{id:'t',chip:'Tさん：カフェ・出勤前の持ち帰り・0席',biz:'カ�
   otherRate:{label:'その他の経費',unit:'%',v:12,src:'tmp',min:5,max:25,step:1,range:[10,15],why:'水道光熱・消耗品・カード手数料など。'},
   loan:{label:'借入の返済',unit:'円',v:40000,src:'tmp',min:0,max:300000,step:5000,range:[0,60000],why:'①では聞いていません。300万円を7年で返す例。',how:'設備の見積もりを取る。'},
   keep:{label:'毎月手元に残したい額',unit:'円',v:250000,src:'tmp',min:0,max:800000,step:10000,why:'①では聞いていません。25万円で置いています。'},
-  rentRate:{label:'家賃を売上の何%と見るか',unit:'%',v:10,src:'tmp',min:5,max:20,step:1,why:'一般的な目安を仮定として使っています。'},
+  rentRate:{label:'家賃を売上の何%と見るか',unit:'%',v:10,src:'tmp',min:5,max:20,step:1,why:'この計画では、仮に売上の10%と置いています。払ってよい家賃という意味ではありません。'},
   stop:{label:'前を通る人のうち買う割合',unit:'%',v:5,src:'tmp',min:1,max:20,step:0.5,why:'仮に5%で置いています。'}}},
 b:{id:'b',chip:'Bさん：イタリアン・候補を内見中・28席',biz:'イタリアン',
  answers:[[1,'purpose','利用場面','仕事帰りの夕食'],[2,'branch1','（分岐の設問）',UND],[3,'setup','優先する厨房設備','ピザ窯'],
@@ -329,7 +338,7 @@ d:{id:'d',chip:'Dさん：いまお店がある・2店舗目・12席',biz:'カ�
   labor:{label:'人件費（月）',unit:'円',v:350000,src:'ex',min:0,max:1500000,step:10000,range:[350000,500000],why:'いまのお店と同じ35万円。2店舗目は、任せる人の給与の分だけ増えることがあります。',how:'誰に任せるか、いくら払うかを決める。'},
   loan:{label:'借入の返済',unit:'円',v:60000,src:'tmp',min:0,max:300000,step:5000,range:[40000,90000],why:'500万円を7年で返す例。',how:'設備の見積もりを取る。'},
   keep:{label:'2店舗目から毎月残したい額',unit:'円',v:200000,src:'tmp',min:0,max:800000,step:10000,why:'20万円で置いています。'},
-  rentRate:{label:'家賃を売上の何%と見るか',unit:'%',v:10,src:'tmp',min:5,max:20,step:1,why:'一般的な目安を仮定として使っています。'},
+  rentRate:{label:'家賃を売上の何%と見るか',unit:'%',v:10,src:'tmp',min:5,max:20,step:1,why:'この計画では、仮に売上の10%と置いています。払ってよい家賃という意味ではありません。'},
   perTsubo:{label:'1坪あたりの席数',unit:'席',v:1.6,src:'tmp',min:0.8,max:3,step:0.1,why:'厨房やトイレを含めた広さの目安。'}}},
 c:{id:'c',chip:'Cさん：サロン・ベッド2台・担当1人',biz:'サロン',
  answers:[[1,'purpose','主力の施術','もみほぐし（自由入力）'],[2,'branch1','（分岐の設問）',UND],[3,'setup','施術間の片付け・準備時間','15分'],
@@ -376,9 +385,9 @@ function checksB(){const sup=st().sup;const L=[
  return L;}
 
 /* ===== 状態 ===== */
-let M=null;const KEY=window.__PUB?'tenpo-start:plan:v1':'tenpo-start-proto-v21';let S=load()||{};let cur=(S._cur&&P[S._cur])?S._cur:'a';
+let M=null;const KEY=window.__PUB?'tenpo-start:plan:v1':'tenpo-start-proto-v22';let S=load()||{};let cur=(S._cur&&P[S._cur])?S._cur:'a';
 function fresh(pid){const f={};for(const[k,o]of Object.entries(P[pid].fields))f[k]={v:o.v,src:o.src};const q=HQ[pid],k={},kA=[];const put=(a,b)=>{if(b==null||b===UND)return;k[a]=b;kA.push(a)};
- put('career',q.exp);put('when',q.when);put('hours',q.time);put('holiday',q.off);put('who',q.who);put('ownR',q.own);if(P[pid].biz!=='サロン')put('late',(q.time||'').includes('深夜')?'出す':'出さない');
+ put('career',q.exp);put('when',q.when);put('hours',q.time);put('holiday',q.off);put('who',q.who);put('ownR',q.own);if(pid!=='c')put('late',(q.time||'').includes('深夜')?'出す':'出さない');
  return{stage:'form',day:0,f,checks:{},events:[],obs:{},sup:null,k,kA,worry:q.worry}}
 function st(){if(!S[cur])S[cur]=fresh(cur);return S[cur]}
 function save(){try{S._cur=cur;localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -454,14 +463,14 @@ function hireSheet(){const s=st();s.ap=s.ap||[];const A=s.ap,f=vals();const team
  document.getElementById('aadd').onclick=()=>{const n=document.getElementById('an').value.trim();if(!n){toast('名前を入れてください');return}A.push({n,from,st:0});log(`応募者を1人足した（${from}）`);re()};
  document.querySelectorAll('[data-apn]').forEach(b=>b.onclick=()=>{const a=A[+b.dataset.apn];a.st++;if(a.st===3)log('スタッフを1人、採用に決めた');re()});
  document.querySelectorAll('[data-apx]').forEach(b=>b.onclick=()=>{A[+b.dataset.apx].st=4;re()})}
-function memo5(){const s=st(),p=P[cur],k=Object.fromEntries(Object.entries(s.k||{}).filter(x=>x[1]!==UND));const a=n=>p.answers[n-1][3]===UND?(k['a'+n]||null):p.answers[n-1][3];const food=p.biz!=='サロン';
- const tk=(k.hours||k.holiday)?[k.hours,k.holiday?k.holiday+'休み':null].filter(Boolean).join('・'):null;
- const lk=n=>p.answers[n-1][3]===UND?'text':'lock';const R=[[food?'来てほしい場面':'主力の施術',a(1),'a1',lk(1)],food?['中心の商品',a(3),'a3',lk(3)]:['中心のメニュー',`${p.answers[6][3]}・${p.answers[4][3]}`,'a7','lock'],['仕事に使える時間',tk,'hours','text'],['運営する人',k.who||null,'who','text'],['大切にしたいこと',k.must||null,'must','text'],['調整できること',k.flex||null,'flex','text']];
+function memo5(){const s=st(),p=P[cur],k=Object.fromEntries(Object.entries(s.k||{}).filter(x=>x[1]!==UND));const a=n=>p.answers[n-1][3]===UND?(k['a'+n]||null):p.answers[n-1][3];const food=cur!=='c';
+ const hol=k.holiday?(k.holiday==='なし'?'休みなし':k.holiday+'休み'):null,tk=(k.work||k.hours||hol)?[k.work?k.work:k.hours?`営業${k.hours}／準備と片付けは未定`:null,hol].filter(Boolean).join('・'):null;const ivc=cur==='c'&&S._u&&S._u._iv;
+ const lk=n=>p.answers[n-1][3]===UND?'text':'lock';const R=[ivc?['来てほしい場面',k.scene||null,'scene','text']:[food?'来てほしい場面':'主力の施術',a(1),'a1',lk(1)],food?['中心の商品',a(3),'a3',lk(3)]:['中心のメニュー',`${ivc&&a(1)?a(1)+'・':''}${p.answers[6][3]}・${p.answers[4][3]}`,'a7','lock'],['仕事に使える時間',tk,k.work||!k.hours?'work':'hours','text'],['運営する人',k.who||null,'who','text'],['大切にしたいこと',k.must||null,'must','text'],['調整できること',k.flex||null,'flex','text']];
  const n=[R[0][1],R[1][1],R[2][1],R[3][1],(k.must&&k.flex)].filter(Boolean).length;
  const x=cur==='b'?null:sensitivity().filter(y=>s.f[y.k].src==='tmp')[0];
  return `<div class="card"><div class="kh">${ic('ans',20)}<h2>5項目のメモ</h2><span class="kc">${n}/5</span></div><p class="lead">物件やメニューを選ぶときに、立ち返る所です。迷う所は「未定」のままで進めます。</p>
  ${R.map((r,i)=>`<button class="nrow" data-kk="${r[2]}" data-kt="${r[3]}"><span class="nn ${r[1]?'okc':''}">${i<4?i+1:5}</span><span class="nt2"><small>${r[0]}</small><b>${r[1]?esc(r[1]):'未定'}</b></span>${r[1]?'':'<span class="tag unk">＋ 書く</span>'}<em>›</em></button>`).join('')}
- ${x?`<button class="nrow" data-tab="check"><span class="nic">${ic('check',18)}</span><span class="nt2"><small>次に確かめること</small><b>${x.o.task?'店の前で10分、数える':x.o.label+'を決める'}</b></span><em>›</em></button>`:''}</div>`}
+ ${x?`<button class="nrow" data-tab="check"><span class="nic">${ic('check',18)}</span><span class="nt2"><small>今日の1つ（次に確かめること）</small><b>${x.o.task?'店の前で10分、数える':x.o.label+'を決める'}</b></span><em>›</em></button>`:''}</div>`}
 const MI=[['bukken','物件を借りるお金','保証金・礼金・仲介手数料・前家賃など','契約のとき'],['naiso','内装・設備の工事','','着工から引き渡しまで'],['kiki','厨房機器・家具・レジ','','開店の1か月前まで'],['junbi','開店前の仕入れ・備品・告知','','開店の直前']];
 function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m=s.m,r=calc(),f=r.f;if(m.naiso==null&&k.naisoB)m.naiso=k.naisoB;
  const rent=cur==='b'&&s.sup?(s.sup.rent+s.sup.common):Math.max(0,r.limit||0),mon=r.cost+r.other+r.labor+f.loan+rent,keep=f.keep||0;
@@ -483,24 +492,24 @@ function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m
  const up=()=>{const g=q=>(m[q]||0),t1=MI.reduce((a,x)=>a+g(x[0]),0),t2=mon*(m.unM||0)+keep*(m.seiM||0),t3=(k.own||0)+(k.borrow||0),d=t3-t1-t2;
   document.getElementById('mt1').textContent=t1?man(t1):'未定';document.getElementById('mt2').textContent=man(t2);document.getElementById('mt3').textContent=t3?man(t3):'未定';
   const miss=MI.filter(x=>!m[x[0]]).length;
-  document.getElementById('mres').innerHTML=`<div class="q">要るお金の合計${miss?`（未定が${miss}つ）`:''}</div><div class="a">${man(t1+t2)}</div><p>${!t3?'用意するお金を入れると、足りるかどうかが出ます。':d>=0?`用意するお金 ${man(t3)} で、${man(d)} の余裕があります。`:`用意するお金 ${man(t3)} では、あと ${man(-d)} 足りません。ここで分かってよかった数字です。工事の範囲・持つ月数・借りる額のどれを動かすか、一緒に考えられます。`}</p>`};
+  document.getElementById('mres').innerHTML=`<div class="q">${miss?`入力済み分の合計（未定が${miss}つ）`:'要るお金の合計'}</div><div class="a">${man(t1+t2)}</div><p>${!t3?'用意するお金を入れると、足りるかどうかが出ます。':miss?`未定の欄が${miss}つ残っています。足りるかどうかは、そろってから確かめます。いまは、用意するお金 ${man(t3)}・入力済み分 ${man(t1+t2)} です。`:d>=0?`用意するお金 ${man(t3)} で、${man(d)} の余裕があります。`:`用意するお金 ${man(t3)} では、あと ${man(-d)} 足りません。ここで分かってよかった数字です。工事の範囲・持つ月数・借りる額のどれを動かすか、一緒に考えられます。`}</p>`};
  document.querySelectorAll('#sheet [data-m]').forEach(el=>el.oninput=()=>{const q=el.dataset.m,v=el.value===''?null:+el.value;if(q==='unM'||q==='seiM')m[q]=v||0;else if(q==='own'||q==='borrow'){if(v==null)delete k[q];else k[q]=v*10000}else m[q]=v==null?null:v*10000;save();up()});
  up();if(!s._mlog){s._mlog=1;log('開業資金の一覧を開いた')}}
 const myId=()=>{if(!S._id){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';S._id='TS-'+Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');save()}return S._id};
 function askSheet(topic,id){const s=st(),p=P[cur],k=s.k||{},r=calc(),[rd,rn]=roadCount();s.sv=s.sv||{};
- const rows=[['相談したいこと',topic],['お店',`${p.answers[0][3]===UND?'':p.answers[0][3]+'の'}${p.biz}`],['月の売上の見通し',man(r.sales)],[cur==='b'?'家賃を払う前に残る額':'家賃に回せる額',man(metric())],['まだ仮の数字',tmpN()+'つ'],['開店までの進み',`${rd}/${rn}件`]];
+ const rows=[['相談したいこと',topic],['お店',`${p.answers[0][3]===UND||(S._u&&S._u._iv)?'':p.answers[0][3]+'の'}${p.biz}`],['月の売上の見通し',man(r.sales)],[cur==='b'?'家賃を払う前に残る額':'家賃に回せる額',man(metric())],['まだ仮の数字',tmpN()+'つ'],['開店までの進み',`${rd}/${rn}件`]];
  if(id)rows.push(['いっしょに渡す文',`${SERV[id].t}（${bCount(id)[0]}項目）`]);
+ const nth=Math.max((s.asks||[]).length,askN())+1,who=[['相談番号',`${myId()}（${nth}回目）`]].concat(k.name?[['店名',k.name]]:[]).concat(k.area?[['エリア',k.area]]:[],k.when&&k.when!==UND?[['開きたい時期',k.when]]:[]);
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
- <div class="grp">事務局に伝わる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
+ <div class="grp">事務局に伝わる内容</div><ul class="rows">${who.concat(rows).map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
   <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
- <button class="btn dark" id="askgo">この内容で、LINEで相談する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。事務局には、あなたのLINEの名前で届きます。</p>`);
+ <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。事務局には、あなたのLINEの名前で届きます。</p>`);
  document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
-  const nth=(s.asks||[]).length+1,who=[['相談番号',`${myId()}（${nth}回目）`]].concat(k.name?[['店名',k.name]]:[]).concat(k.area?[['エリア',k.area]]:[],k.when&&k.when!==UND?[['開きたい時期',k.when]]:[]);
   const txt=`【TENPO/START 事務局への相談】\n${who.concat(rows).map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}${id?`\n\n――――\n${mailText(id)}`:''}`;
   const url=LINE_ID?`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`:`https://line.me/R/share?text=${encodeURIComponent(txt)}`;
   try{navigator.clipboard.writeText(txt)}catch(e){}
-  s.asks=s.asks||[];s.asks.push({t:topic,day:s.day});if(id)s.sv[id]=1;log(`「${esc(topic)}」を事務局に相談した`);save();
-  openSheet(`<h3>LINEを開きます</h3><p class="shl">相談の文を入れた状態で、LINEが開きます。そのまま送ってください。文はコピーもしてあります。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付くので、事務局は続きとして読めます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
+  s.asks=s.asks||[];s.asks.push({t:topic,day:s.day});if(id)s.sv[id]=1;log(`「${esc(topic)}」の相談の文を用意した`);if(IVS){IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave()}save();
+  openSheet(`<h3>相談の文を用意しました</h3><p class="shl">下のボタンで、文を入れた状態のLINEが開きます。LINEの中で送るまでは、何も送られません。文はコピーもしてあります。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付くので、事務局は続きとして読めます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
   <a class="btn dark" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener" id="lineopen">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render();
   try{window.open(url,'_blank','noopener')}catch(e){}}}
 function obsBox(k){const o=st().obs[k];return o?`<div class="box obsb"><div class="q">実測（数えた数）</div><p style="margin-top:2px">${o.obs}</p><div class="q" style="margin-top:8px">推定（当てはめた数）</div><p style="margin-top:2px">${o.est}</p></div>`:''}
@@ -532,7 +541,8 @@ function planTop(v){const s=st(),r=calc(),f=r.f,n=tmpN(),B=cur==='b';let t,p,stu
  if(B){const m=r.profit??r.pre;t=`いまの数字なら、月${man(m)}が${r.profit!=null?'手元に残り':'家賃を払う前に残り'}そうです。`;p='「仕事帰りの夕食」として、夜の営業だけで見ています。'}
  else if(r.cap<=0){t=`いまの数字のままだと、家賃を払う前に毎月${man(-r.cap)}足りません。`;p='ここで分かってよかった、という段階です。変えられるところを一緒に探しましょう。';stuck=1}
  else if(r.cap<r.ref){t=`家賃が月${man(r.cap)}までなら、続けていけそうです。`;p=`毎月${man(f.keep)}を手元に残す前提で出しています。`}
- else{t=`家賃は月${man(r.ref)}を目安に、探していけそうです。`;p=`毎月${man(f.keep)}を手元に残しても、${man(r.cap)}までは払える計算です。`}
+ else{t=`家賃は月${man(r.ref)}を参考額に、探し始められそうです。`;p=`${man(r.ref)}は、売上の${f.rentRate}%と仮に置いた参考額です。毎月${man(f.keep)}を手元に残す前提で、家賃に回せる額は${man(r.cap)}と出ています。`}
+ if(S._u&&S._u._iv&&S._u.rent!=null&&cur!=='b'){const dd=r.cap-S._u.rent;p+=` 気になっている物件の家賃は月${man(S._u.rent)}。家賃に回せる額${man(r.cap)}${dd>=0?'の中に収まっています':'を'+man(-dd)+'上回っています'}。どちらも仮の計算です。`}
  let h=face('あなたの答えから、こう見ています',t,p+(n?` まだ仮の数字が${n}つ入っています。`:''),n?'仮の数字を一緒に確かめる':'','data-tab="check"')+(stuck?`<div class="alt"><button data-ask="計画が毎月足りない。どこを変えるか相談したい">1人で悩まず、事務局に相談する</button></div>`:'');
  const out=r.cost+r.other+r.labor+f.loan,last=B?(r.profit??r.pre):r.cap;
  const rows=[['入ってくる','月の売上',r.sales,'in'],['出ていく','原価・経費・人件費・返済',out,'out']];
@@ -688,7 +698,7 @@ const IC2={chart:'<path d="M4 19V10M10 19V5M16 19v-7M21 19H3"/>',yen:'<path d="M
  flag:'<path d="M5 21V4M5 5h11l-2 3.5 2 3.5H5"/>',who:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'};
 function ic(n,sz){const d=IC2[n]||ICON[n];sz=sz||18;return `<svg class="ic" viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`}
 const pbar=(a,b,c)=>`<div class="pbar ${c||''}"><i style="width:${b?Math.round(a/b*100):0}%"></i></div>`;
-function karteData(){const p=P[cur],s=st();s.k=s.k||{};const food=p.biz!=='サロン';
+function karteData(){const p=P[cur],s=st();s.k=s.k||{};const food=cur!=='c';
  const A=n=>{const a=p.answers[n-1],u=a[3]===UND,v=u?(s.k['a'+n]||null):a[3];return{k:'a'+n,label:a[2].replace('（分岐の設問）','こだわりたい点'),val:v,src:u?(v?'you':null):'ans',type:u?'text':'lock'}};
  const K=(k,label,type,opts)=>{const v=s.k[k];return{k,label,val:v==null?null:(type==='num'?man(v):v),src:v!=null?((s.kA||[]).includes(k)?'ans':'you'):null,type,opts}};
  const keep=p.fields.keep?{k:'keep',label:'毎月手元に残したい額',val:yen(s.f.keep.v),src:s.f.keep.src==='tmp'?'tmp':'you',type:'field'}:null;
@@ -713,14 +723,14 @@ function ansTab(){const D=karteData();const [f,n]=karteCount();
  D.forEach(x=>{const a=x.items.filter(kFilled).length;h+=`<div class="card"><div class="kh">${ic(x.icon,20)}<h2>${x.t}</h2><span class="kc">${a}/${x.items.length}</span></div>${pbar(a,x.items.length,'sm')}
  ${x.items.map(i=>`<button class="kr" data-kk="${i.k}" data-kt="${i.type}"><span class="kl">${i.label}</span>${i.val?`<span class="kv ${i.src}">${esc(i.val)}</span>`:`<span class="kadd">＋ 入れる</span>`}</button>`).join('')}</div>`});
  return h+svCard()}
-function kClick(k,type){if(type==='lock'){toast('ヒアリングの答えです');return}if(type==='field'){editSheet(k);return}if(type==='sup'){supSheet();return}if(type==='meas'){measSheet();return}
- const s=st();const it=karteData().flatMap(x=>x.items).find(i=>i.k===k)||{label:'開店の目標日',type:'date'};const cur0=k==='open'?(s.open||''):(s.k[k]??'');
+function kClick(k,type){if(type==='lock'){toast(PUB?'お店の画面のいちばん下「ヒアリングの答えを見る・直す」から変えられます':'ヒアリングの答えです');return}if(type==='field'){editSheet(k);return}if(type==='sup'){supSheet();return}if(type==='meas'){measSheet();return}
+ const s=st();const it=karteData().flatMap(x=>x.items).find(i=>i.k===k)||{scene:{label:'来てほしい場面',type:'text'},work:{label:'仕事に使える時間（準備・片付けを含む）',type:'text'}}[k]||{label:'開店の目標日',type:'date'};const cur0=k==='open'?(s.open||''):(s.k[k]??'');
  const ms=new Set(it.type==='multi'&&cur0?String(cur0).split('・'):[]);
  let inp=it.type==='multi'?`<div class="seg" id="kmul">${it.opts.map(o=>`<button data-v="${o}" class="${ms.has(o)?'on':''}">${o}</button>`).join('')}</div><p class="small">いくつでも選べます。</p>`:it.type==='opts'?`<div class="seg" id="kseg">${it.opts.map(o=>`<button data-v="${o}" class="${cur0===o?'on':''}">${o}</button>`).join('')}</div>`
   :`<div class="field"><input type="${it.type==='num'?'number':it.type==='date'?'date':'text'}" id="kin" value="${esc(cur0)}" ${it.type==='num'?'placeholder="円で入力（例：3000000）"':''}></div>`;
  openSheet(`<h3>${it.label}</h3><p class="small">分からなければ空のままで大丈夫です。</p>${inp}<button class="btn dark" id="ksave">入れる</button>${cur0!==''?'<button class="btn ghost" id="kclr">空に戻す</button>':''}`);
  let v=cur0;const set=val=>{if(k==='open'){if(val)s.open=val;else delete s.open}else if(val===''||val==null)delete s.k[k];else s.k[k]=it.type==='num'?+val:val;
-  if(val!=='')log(`カルテに「${it.label}」を入れた`);const q=s._ret;closeSheet();render();if(q)(String(q).startsWith('blk:')?blockSheet(+q.slice(4)):svSheet(q))};
+  if(val!=='')log(`「${it.label}」を書いた`);const q=s._ret;closeSheet();render();if(q)(String(q).startsWith('blk:')?blockSheet(+q.slice(4)):svSheet(q))};
  document.querySelectorAll('#kmul button').forEach(b=>b.onclick=()=>{ms.has(b.dataset.v)?ms.delete(b.dataset.v):ms.add(b.dataset.v);b.classList.toggle('on');v=it.opts.filter(o=>ms.has(o)).join('・')});
  document.querySelectorAll('#kseg button').forEach(b=>b.onclick=()=>{v=b.dataset.v;document.querySelectorAll('#kseg button').forEach(z=>z.classList.toggle('on',z===b))});
  document.getElementById('ksave').onclick=()=>{const el=document.getElementById('kin');set(el?el.value.trim():v)};
@@ -760,7 +770,7 @@ function roadData(){const R=roadData0();const I=(id,t,dl,note,src,o)=>Object.ass
   I('gphoto','Googleに営業時間・メニュー・写真を入れる',-7,'外観・内観・商品の写真が3〜5枚あると、公開直後の印象が整います。フォルダの写真が使えます。',[22]),
   I('kokuchi','開店日を、InstagramとGoogleで知らせる',-14,'',[])]});return R}
 function roadData0(){const p=P[cur],f=vals(),k=st().k||{};const bi=k.menkyo==='要る'?['yes','美容にあたる施術と答えているため']:k.menkyo==='要らない'?['no','美容にあたらない施術と答えているため']:['ask','美容にあたる施術をする場合'];
- const late=k.late==='出す'?['yes','深夜にお酒を出すと答えているため']:k.late==='出さない'?['no','深夜にお酒を出さないと答えているため']:['ask','営業時間がまだ分からないため'];const food=p.biz!=='サロン';
+ const late=k.late==='出す'?['yes','深夜にお酒を出すと答えているため']:k.late==='出さない'?['no','深夜にお酒を出さないと答えているため']:['ask','営業時間がまだ分からないため'];const food=cur!=='c';
  const team=cur==='d'?2:cur==='a'?f.extra+1:cur==='t'?f.team:cur==='b'?4:f.staff,seats=cur==='t'?0:food?f.seats:f.beds;
  const hire=team>=2,cap=seats+team;
  const hireN=hire?['yes',`ピーク時${team}人と答えているため`]:['no','1人で営業すると答えているため（人を雇うときは必要）'];
@@ -917,7 +927,7 @@ function buddy(v){const s=st();s.meas=s.meas||[];let m;
   else{s.road=s.road||{};const it=roadData().flatMap(p=>p.items).find(i=>i.need[0]!=='no'&&!i.auto&&!s.road[i.id]);
    m=it?[`次は「${it.t}」です`,`窓口は${it.who}。済んだら印を付けてください。`,'開店までを見る','data-tab="road"']:['やることは、ひととおり済んでいます','','開店までを見る','data-tab="road"']}}
  const ev=s.events.slice(-4).reverse();
- return `<div class="card buddy"><div class="bh"><span class="bav">${ic('people',16)}</span>いま一緒に進めること</div><h2>${m[0]}</h2>${m[1]?`<p class="lead">${m[1]}</p>`:''}<button class="btn dark" ${m[3]}>${m[2]}</button>${s.worry?`<button class="wl2" data-tab="${{'お金':'plan','物件':'plan','集客':'check','人':'road','手続き':'road'}[s.worry]||'plan'}">不安に挙げた「${s.worry}」のことは、ここから ›</button>`:''}</div>
+ return `<div class="card buddy"><div class="bh"><span class="bav">${ic('people',16)}</span>いま一緒に進めること</div><h2>${m[0]}</h2>${m[1]?`<p class="lead">${m[1]}</p>`:''}<button class="btn dark" ${m[3]}>${m[2]}</button>${s.worry?`<button class="wl2" data-tab="${/集客|お客|人通り/.test(s.worry)?'check':/採用|スタッフ|手続き|許可|届/.test(s.worry)||s.worry==='人'?'road':'plan'}">気になっていること「${esc(s.worry.length>22?s.worry.slice(0,22)+'…':s.worry)}」は、ここから ›</button>`:''}</div>
  <div class="card"><div class="kh">${ic('flag',20)}<h2>ここまでの歩み</h2><span class="kc">${s.events.length}件</span></div><ul class="tl">${ev.map(e=>`<li><span>${dLabel(e.day).split('（')[0]}</span><div>${e.text}</div></li>`).join('')}</ul></div>`}
 
 /* ===== 依頼の文が自然にできあがる → 自分で送る／いなければテンポスタート事務局に頼む ===== */
@@ -931,7 +941,7 @@ const SERV={
  saiyo:{icon:'who',t:'スタッフ募集の文',copy:'文をコピーして、求人に載せる',ask:'採用の進め方が分からない → 事務局に相談する'},
  web:{icon:'ans',t:'GoogleとInstagramの紹介文',copy:'紹介文をコピーする',ask:'設定のやり方が分からない → 事務局に相談する'},
  os:{icon:'chart',t:'開店後への引き継ぎ',copy:'',ask:'開店後のことを、事務局に相談する'}};
-function brief(id){const s=st(),k=s.k||{},p=P[cur],sup=s.sup,food=p.biz!=='サロン';
+function brief(id){const s=st(),k=s.k||{},p=P[cur],sup=s.sup,food=cur!=='c';
  const a=n=>{const x=p.answers[n-1][3];return x===UND?(k['a'+n]||null):x};const op=s.open?fmtDate(new Date(s.open+'T00:00:00')):null;const mn=v=>v!=null?man(v):null;
  const biz=[['業態',`${p.biz}（${a(1)}）`],[food?'席数':'ベッドの台数',a(4)]];
  if(id==='naiso')return[...biz,[p.answers[2][2],a(3)],['物件',sup?`${sup.name}（${sup.tsubo}坪・${sup.kind}）`:(k.area?k.area+'で探し中':null),'area'],['開店の目標',op,'open'],['内装にかけられる額',mn(k.naisoB),'naisoB'],['雰囲気',k.mood,'mood'],['色のイメージ',k.color,'color']];
@@ -951,12 +961,12 @@ function mailText(id){const s=st(),k=s.k||{},b=brief(id);const pc=f=>(s.ph||[]).
   return `件名：内装工事のご相談（${b[0][1]}）\n\nはじめまして。${nm}の開業を準備している者です。\n内装工事について、ご相談させてください。\n\n■ お店の概要\n${L}${ex}\n\n■ お願いしたいこと\n・内見への同行（席数とレイアウトが入るかの確認）\n・概算の見積もりと、工期の目安\n\nお手数をおかけしますが、よろしくお願いいたします。`}
  if(id==='design')return `件名：ロゴ・制作物のご相談（${b[1][1]}）\n\nはじめまして。${nm}の開業を準備している者です。\n開店に向けた制作物について、ご相談させてください。\n\n■ お店について\n${L}\n\n■ お願いしたいこと\n・上の「作りたい物」の見積もりと、納期の目安\n\nよろしくお願いいたします。`;
  if(id==='kouko')return `創業計画の下書き（日本政策金融公庫の創業計画書に写すための材料）\n\n${L}\n\n※ 数字のうち仮置きのものは、計画の画面で印を確かめてから写してください。`;
- const p=P[cur],food=p.biz!=='サロン';const g=l=>(b.find(x=>x[0]===l)||[])[1]||'未定';
- if(id==='saiyo')return `【オープニングスタッフ募集】${nm}（${g('業態')}）\n\n${g('開店の目標')==='未定'?'近日':g('開店の目標')}に開店する新しいお店です。最初から一緒にお店をつくってくれる方を募集します。\n\n■ 仕事の内容\n接客・提供・片付け${p.biz==='サロン'?'':'・かんたんな仕込み'}\n\n■ 場所\n${g('場所')}\n\n■ 時間\n営業時間：${g('営業時間')}／休み：${g('休み')}\n週2日・1日4時間から相談できます。\n\n■ 時給\n${g('時給')}（研修中も同じ）\n\n■ 応募のしかた\nこの投稿への返信、またはお店のアカウントへのメッセージでどうぞ。面接の日は、一緒に決めます。`;
+ const p=P[cur],food=cur!=='c';const g=l=>(b.find(x=>x[0]===l)||[])[1]||'未定';
+ if(id==='saiyo')return `【オープニングスタッフ募集】${nm}（${g('業態')}）\n\n${g('開店の目標')==='未定'?'近日':g('開店の目標')}に開店する新しいお店です。最初から一緒にお店をつくってくれる方を募集します。\n\n■ 仕事の内容\n接客・提供・片付け${cur==='c'?'':'・かんたんな仕込み'}\n\n■ 場所\n${g('場所')}\n\n■ 時間\n営業時間：${g('営業時間')}／休み：${g('休み')}\n週2日・1日4時間から相談できます。\n\n■ 時給\n${g('時給')}（研修中も同じ）\n\n■ 応募のしかた\nこの投稿への返信、またはお店のアカウントへのメッセージでどうぞ。面接の日は、一緒に決めます。`;
  if(id==='web')return `■ Googleビジネスプロフィールの説明\n${nm}は、${g('場所')==='未定'?'':g('場所')+'の'}${g('業態')}です。${g('雰囲気')==='未定'?'':g('雰囲気')+'雰囲気のお店で、'}${g(food?'席数':'ベッドの台数')}をご用意しています。営業時間は${g('営業時間')}、お休みは${g('休み')}です。\n\n■ Instagramのプロフィール\n${k.name||'（店名）'}｜${p.biz}\n${g('場所')==='未定'?'':'📍'+g('場所')+'\n'}🕘 ${g('営業時間')}（${g('休み')}休み）\n${g('開店の目標')==='未定'?'開店準備中':g('開店の目標')+' OPEN'}`;
  if(id==='zeiri')return `件名：開業にあたってのご相談（${b[0][1]}）\n\nはじめまして。${nm}の開業を準備している者です。\n開業の届出と、開業後の帳簿について、ご相談させてください。\n\n■ お店の概要\n${L}\n\n■ お聞きしたいこと\n・開業までに出す届出と、その期限\n・帳簿のつけ方と、お願いできる範囲\n\nよろしくお願いいたします。`;
  return L}
-function svBtn(id){const s=st();s.sv=s.sv||{};const v=SERV[id],[f,n]=bCount(id);return `<button class="svb" data-sv="${id}">${ic(v.icon,16)}<span><b>${v.t}</b><small>${s.sv[id]?'事務局に相談中':`要る情報 ${f}/${n} がそろっています`}</small>${pbar(f,n,'sm')}</span><em>›</em></button>`}
+function svBtn(id){const s=st();s.sv=s.sv||{};const v=SERV[id],[f,n]=bCount(id);return `<button class="svb" data-sv="${id}">${ic(v.icon,16)}<span><b>${v.t}</b><small>${s.sv[id]?'相談の文を用意済み':`要る情報 ${f}/${n} がそろっています`}</small>${pbar(f,n,'sm')}</span><em>›</em></button>`}
 function svSheet(id){const s=st();s.sv=s.sv||{};const v=SERV[id],b=brief(id),[f,n]=bCount(id),txt=mailText(id);
  openSheet(`<h3>${ic(v.icon)}${v.t}</h3>
  <div class="kpi" style="margin-top:10px"><div class="kn">${f}<small>/${n}</small></div><div class="kb"><b>これまでに入れた情報から、できています</b>${pbar(f,n)}</div></div>
@@ -991,12 +1001,12 @@ function shopTab(v){const s=st(),k=s.k||{},p=P[cur];s.ph=s.ph||[];const D=karteD
  const cover=s.ph.find(x=>x.id===s.cover);const r=calc();
  const badges=[p.answers[3][3],p.answers[4][3],'ピーク時'+p.answers[5][3],s.sup?s.sup.name:(k.area||null),s.open?fmtDate(new Date(s.open+'T00:00:00'))+' 開店':null].filter(Boolean);
  const ans=cur==='b'?`<button class="tile" data-tab="check">${ic('check',18)}<span>内見チェック</span><b>${v.cDone}<small>/${v.cAll}</small></b></button><button class="tile" data-tab="plan">${ic('chart',18)}<span>月の売上</span><b>${man(r.sales)}</b></button>`
-  :`<button class="tile" data-tab="plan">${ic('chart',18)}<span>月の売上</span><b>${man(r.sales)}</b></button><button class="tile" data-tab="plan">${ic('yen',18)}<span>家賃は</span><b>${r.limit>0?man(r.limit)+'<small>まで</small>':'<small>見直しが要ります</small>'}</b></button>`;
+  :`<button class="tile" data-tab="plan">${ic('chart',18)}<span>月の売上</span><b>${man(r.sales)}</b></button><button class="tile" data-tab="plan">${ic('yen',18)}<span>${r.limit>0&&r.limit===r.ref?'家賃の参考額':'家賃に回せる額'}</span><b>${r.limit>0?man(r.limit)+'<small>仮</small>':'<small>見直しが要ります</small>'}</b></button>`;
  const CV={'白と木の色':['#EFE6D6','#3c3226'],'黒・濃い色':['#2b2f2d','#fff'],'緑':['#36583F','#fff'],'暖かい色':['#A9562A','#fff']}[k.color];const cv=cover?['#1d2622','#fff']:(CV||['#fff','#36583F']);
  const od=s.open?new Date(s.open+'T00:00:00'):null,left=od?Math.ceil((od-new Date(BASE.getFullYear(),BASE.getMonth(),BASE.getDate()+s.day))/864e5):null;
  const ph3=s.ph.slice(-3).reverse(),moods=k.mood?String(k.mood).split('・'):[];
  let h=`<div class="card shopc fade"><div class="cvr ${CV||cover?'':'none'}" style="background:${cv[0]};color:${cv[1]}">${cover?`<img src="${cover.d}" alt="">`:''}
- <div class="cin"><div class="ck">${p.answers[0][3]===UND?'':p.answers[0][3]+'の'}${p.biz}${p.exist?'・2店舗目':''}</div><h1>${k.name?esc(k.name):'店名はこれから'}</h1><div class="crule"></div>
+ <div class="cin"><div class="ck">${p.answers[0][3]===UND||(S._u&&S._u._iv)?'':p.answers[0][3]+'の'}${p.biz}${p.exist?'・2店舗目':''}</div><h1>${k.name?esc(k.name):'店名はこれから'}</h1><div class="crule"></div>
  <div class="cs">${badges.slice(0,3).map(esc).join('　')}</div>${od?`<div class="co">OPEN ${od.getFullYear()}.${od.getMonth()+1}.${od.getDate()}　あと${left}日</div>`:''}</div>
  <button class="edit" data-kk="name" data-kt="text">${k.name?'店名を変える':'＋ 店名'}</button></div>
  <div class="mood">${[0,1,2].map(i=>ph3[i]?`<button class="mp" data-ph="${ph3[i].id}"><img src="${ph3[i].d}" alt=""></button>`:`<button class="mp add" data-tab="files">${ic('files',18)}<span>写真</span></button>`).join('')}</div>
@@ -1011,10 +1021,10 @@ function shopTab(v){const s=st(),k=s.k||{},p=P[cur];s.ph=s.ph||[];const D=karteD
  const rcN=(s.rc||[]).length,apN=(s.ap||[]).length,[wf,wn]=bCount('web');
  h+=`<div class="card"><div class="kh">${ic('flag',20)}<h2>開店に向けて整えること</h2></div>
  <button class="nrow" data-x="money"><span class="nic">${ic('yen',18)}</span><span class="nt2"><b>開業資金</b><small>開けるまでのお金と、続けるためのお金</small></span><span class="tag ${s.m&&MI.some(x=>s.m[x[0]])?'ok':'doc'}">${s.m?MI.filter(x=>s.m[x[0]]).length:0}/4</span><em>›</em></button>
- ${p.biz!=='サロン'?`<button class="nrow" data-x="recipe"><span class="nic">${ic('ans',18)}</span><span class="nt2"><b>メニューとレシピ</b><small>売値と材料費から、原価率を出す</small></span><span class="tag ${rcN?'ok':'doc'}">${rcN}品</span><em>›</em></button>`:''}
+ ${cur!=='c'?`<button class="nrow" data-x="recipe"><span class="nic">${ic('ans',18)}</span><span class="nt2"><b>メニューとレシピ</b><small>売値と材料費から、原価率を出す</small></span><span class="tag ${rcN?'ok':'doc'}">${rcN}品</span><em>›</em></button>`:''}
  <button class="nrow" data-x="hire"><span class="nic">${ic('people',18)}</span><span class="nt2"><b>採用</b><small>人手 → 募集 → 応募者</small></span><span class="tag ${apN?'ok':'doc'}">応募 ${apN}人</span><em>›</em></button>
  <button class="nrow" data-sv="web"><span class="nic">${ic('place',18)}</span><span class="nt2"><b>GoogleとInstagram</b><small>紹介文ができています</small></span><span class="tag doc">${wf}/${wn}</span><em>›</em></button></div>`;
- return h+svCard()+(PUB?`<p class="ftn" style="text-align:center">入れた内容は、この端末の中だけに保存されます。${S._id?`<br>相談番号 ${S._id}`:''}<br><button class="lk" data-pubreset="1">ヒアリングをやり直す</button></p>`:'')}
+ return h+svCard()+(PUB?`<p class="ftn" style="text-align:center">この端末のこのブラウザに保存されます。${S._id?`<br>相談番号 ${S._id}`:''}<br><button class="lk" data-ivopen="1">ヒアリングの答えを見る・直す</button></p>`:'')}
 function blockSheet(i){const x=karteData()[i],a=x.items.filter(kFilled).length;
  openSheet(`<h3>${ic(x.icon)}${x.t}</h3><div class="kpi" style="margin-top:8px"><div class="kn">${a}<small>/${x.items.length}</small></div><div class="kb">${pbar(a,x.items.length)}</div></div>
  ${x.items.map(it=>`<button class="kr" data-brk="${it.k}" data-kt="${it.type}" data-bid="blk:${i}"><span class="kl">${it.label}</span>${it.val?`<span class="kv ${it.src}">${esc(it.val)}</span>`:`<span class="kadd">＋ 入れる</span>`}</button>`).join('')}
@@ -1053,7 +1063,7 @@ function header(sub,title){const p=P[cur];return `<header class="top"><img class
 function tabbar(tab,n){return `<nav class="tabbar">${TABS.map(([k,l])=>`<button data-tab="${k}" class="${k===tab?'on':''}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg><span>${l}</span>${k==='check'&&n?`<em>${n}</em>`:''}</button>`).join('')}</nav>`}
 function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:renderC,d:renderD}[cur]();v.check=cur==='b'?v.check+measCard():measCard()+v.check;v.road=roadTab();v.files=filesTab();const tab=s.tab||'shop';
  const n=v.nCheck??Math.min(4,sensitivity().length);let body;
- if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry?`不安に挙げた「${s.worry}」のことから、一緒に見ていきます。`:''}順番どおりでなくて、分かっている所からでかまいません。`):'')+backCard()+shopTab(v);else if(tab==='plan')body=planTop(v);else if(tab==='check'&&cur!=='b')body=checkTop();else body=tabFace(tab,v)+v[tab];
+ if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry&&s.worry.length<=12?`気になっている「${esc(s.worry)}」のことから、一緒に見ていきます。`:s.worry?'気になっていることから、一緒に見ていきます。':''}順番どおりでなくて、分かっている所からでかまいません。`):'')+backCard()+shopTab(v);else if(tab==='plan')body=planTop(v);else if(tab==='check'&&cur!=='b')body=checkTop();else body=tabFace(tab,v)+v[tab];
  return header(dLabel(s.day),tab==='shop'?'':TTL[tab][0])+`<div class="wrap">${body}</div>`+tabbar(tab,n)}
 
 /* ===== シート ===== */
@@ -1193,50 +1203,369 @@ function memoSheet(){openSheet(`<div class="memo"><h3>設計メモ（第21版）
 /* ===== 描画 ===== */
 function renderDemo(){const s=st();document.getElementById('demoRow').innerHTML=`<b>回答例</b>`+Object.values(P).map(p=>`<button data-p="${p.id}" class="${p.id===cur?'on':''}">${p.chip}</button>`).join('')+
  `<b>操作</b><button data-act="nextDay" ${s.stage==='form'?'disabled style="opacity:.4"':''}>翌日にする（いま ${dLabel(s.day)}）</button><button data-act="restart">最初から</button><button data-act="memo">設計メモ</button>`}
-const pubText=h=>PUB?h.replace(/①の回答/g,'ヒアリングの答え').replace(/①では聞いていません。/g,'').replace(/①/g,'ヒアリング'):h;
-function render(){const app=document.getElementById('app');if(PUB&&!S._u){app.innerHTML=pubForm();save();return}const s=st();
+const pubText=h=>PUB?(cur==='t'&&S._u&&S._u._iv?h.replace(/朝のピーク/g,'混む時間').replace(/朝1時間/g,'混む1時間').replace(/朝(\d)/g,'混む1時間に$1').replace(/朝に/g,'混む時間に').replace(/朝の/g,'混む時間の'):h).replace(/①の回答/g,'ヒアリングの答え').replace(/①では聞いていません。/g,'').replace(/①/g,'ヒアリング'):h;
+function render(){const app=document.getElementById('app');if(PUB){const md=ivMode();if(md){app.innerHTML=ivRender(md);save();return}}const s=st();
  if(PUB){s.stage='home';s.day=Math.max(0,Math.floor((new Date().setHours(0,0,0,0)-BASE.getTime())/864e5))}else{renderDemo();const dm=document.querySelector('.demo');if(dm)document.documentElement.style.setProperty('--dh',dm.offsetHeight+'px')}
  app.innerHTML=pubText(s.stage==='form'?renderForm():renderHome());save()}
-/* ===== 公開用：ヒアリング ===== */
-const FO={biz:['カフェ','レストラン・食堂','持ち帰りの店','サロン'],team:['1','2','3','4'],dur:['60','90','120'],place:['まだ構想中','エリアを検討中','候補を内見中','契約済み'],prop:['賃料','立地・人通り','広さ','設備','雰囲気'],
- exp:['ない','ある（3年未満）','ある（3年以上）','店長・責任者の経験あり'],when:['3か月以内','半年以内','1年以内','まだ決めていない'],off:['なし','週1日','週2日'],who:['1人で','家族・パートナーと','人を雇う'],
- own:['100万円未満','100〜300万円','300〜500万円','500万円以上','答えない'],keep:['15','20','25','30'],worry:['お金','物件','集客','人','手続き']};
-function pubForm(){const u=S._fd=S._fd||{};const sal=u.biz==='サロン',take=u.biz==='持ち帰りの店';
- const seg=(k,suf)=>`<div class="seg">${FO[k].map(o=>`<button type="button" data-fq="${k}" data-v="${o}" class="${u[k]===o?'on':''}">${o}${suf||''}</button>`).join('')}</div>`;
- const inp=(k,ph,num)=>`<input data-fi="${k}" ${num?'type="number" inputmode="numeric"':''} value="${esc(u[k]??'')}" placeholder="${ph}">`;
- const q=(l,b,opt)=>`<div class="fq"><label>${l}${opt?'':'<i>必須</i>'}</label>${b}</div>`;
- return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START"><span class="biz">開業支援</span></header><div class="wrap fade">
- ${face('はじめまして','あなたのお店のことを、聞かせてください','分かる所だけで大丈夫です。あとから変えられます。3分ほどで、最初の計画が出ます。')}
- <div class="card"><h2>お店のこと</h2>
- ${q('どんなお店ですか',seg('biz'))}
- ${u.biz?q(sal?'主力の施術':'どんな場面で来てもらいたいですか',inp('purpose',sal?'例：もみほぐし':'例：昼食と午後の休憩'),1)+(sal?'':q('最初に何を目当てに来てもらいますか',inp('item','例：コーヒーと温かいサンドイッチ'),1))
-  +(take?'':q(sal?'ベッドの台数':'席数',inp('seats',sal?'例：2':'例：12',1)))+q(sal?'中心メニューの料金（円）':'客単価（円）',inp('price',sal?'例：8000':'例：1100',1))
-  +(sal?q('中心メニューの施術時間',seg('dur','分'),1):'')+q(sal?'同時に施術する人数':'いちばん混む時間の営業人数（自分を入れて）',seg('team','人')):''}</div>
- ${u.biz?`<div class="card"><h2>物件のこと</h2>${q('物件探しは、どこまで進んでいますか',seg('place'),1)}${q('いちばん大事にしたい条件',seg('prop'),1)}</div>
- <div class="card"><h2>あなたのこと</h2><p class="lead">選ぶだけです。飛ばしても進めます。</p>
- ${q('この業態で働いた経験',seg('exp'),1)}${q('いつごろ開きたいですか',seg('when'),1)}${q('営業したい時間',inp('time','例：10時〜17時'),1)}${q('休みは週に何日',seg('off'),1)}${q('だれと始めますか',seg('who'),1)}
- ${q('自己資金の目安',seg('own'),1)}${q('毎月、手元に残したい額',seg('keep','万円'),1)}${q('いちばん不安なこと',seg('worry'),1)}</div>
- <button class="btn dark" data-pubgo="1">計画を見る</button><p class="ftn" style="text-align:center">入れた内容は、この端末の中だけに保存されます。</p>`:''}</div>`}
+/*IV:BEGIN*/
+/* この間は tenpo-start/interview-src から embed.mjs で入れています。ここを直接直さないでください。 */
+const IV=(()=>{
+// TENPO/START interview v1.0 — source of wording, order and branches.
+// This module performs no network, storage or plan writes.
+const VERSION = '1.0.0';
+const choices = entries => entries.map(([value,label]) => ({value,label}));
+const select = (id,label,entries,extra={}) => ({id,label,type:'select',options:choices(entries),...extra});
+const text = (id,label,example,extra={}) => ({id,label,type:'text',example,maxLength:600,...extra});
+const number = (id,label,unit,example,min=1,extra={}) => ({id,label,type:'number',unit,example,min,integer:true,...extra});
+const BUSINESSES = choices([
+ ['cafe','カフェ'],['restaurant','レストラン・食堂・定食屋'],['bar','居酒屋・バー'],
+ ['cake','ケーキ屋・菓子店'],['takeaway','持ち帰りの店'],['salon','サロン'],['other','ほかの業態']
+]);
+const CORE = [
+ {id:'businessType',label:'どんなお店を開きたいですか',type:'select',options:BUSINESSES},
+ select('salesModel','売上は、どの形で考えると近いですか',[
+  ['seated','席で過ごしてもらう店'],['takeaway','持ち帰ってもらう店'],['salon','予約枠で施術する店']
+ ],{branch:'chooseModel',help:'両方ある場合は、最初に中心となる方を選びます。もう一方の売上は自動で足しません。'}),
+ select('experience','お店を開いた経験はありますか',[
+  ['first','初めて開く'],['worked','働いた経験はあるが、開くのは初めて'],
+  ['opened','開業したことがある'],['operating','今もお店を運営している']
+ ]),
+ text('purpose','どんな場面で来てもらいたいですか','近所の人が、昼食や午後の休憩に立ち寄る',{
+  examples:{takeaway:'仕事帰りに夕食を持ち帰る',salon:'仕事帰りに体を休めたい時'}}),
+ text('mainProduct','中心の商品は何にしたいですか','コーヒーと温かいサンドイッチ',{
+  salonLabel:'中心のメニューは何にしたいですか',examples:{takeaway:'手土産のケーキ',salon:'60分のもみほぐし'}}),
+ number('capacity','席数は、いくつで考えていますか','席',12,1,{branch:'notTakeaway',
+  salonLabel:'同時に使える施術の席やベッドは、いくつですか',salonUnit:'台',salonExample:2,
+  help:'まだ物件が決まっていなくても、仮で書けます。持ち帰りだけの場合は、前の画面で店の形を変えます。'}),
+ number('averageSpendYen','1人が1回に使う金額は、いくらで考えていますか','円',1100,1,{
+  takeawayLabel:'1組が1回の会計で使う金額は、いくらで考えていますか',
+  salonLabel:'中心のメニューの料金は、いくらで考えていますか',salonExample:8000,
+  help:'飲食は1人分、持ち帰りは1会計分、サロンは1人1回分です。1品の値段と取り違えないようにします。'}),
+ number('serviceMinutes','中心のメニューの施術時間は何分ですか','分',60,1,{branch:'salon',
+  help:'準備や片付けの時間は別に考えます。30分・45分なども自由に書けます。'}),
+ number('peakStaff','いちばん混む時間は、何人で営業しますか（自分を入れて）','人',2,1,{
+  salonLabel:'いちばん混む時間に、同時に施術する人は何人ですか（自分を入れて）',
+  help:'店主を数えた合計です。サロンは受付だけの人を含めません。家族か雇う人かは、ここから決めつけません。'}),
+ select('propertyStage','物件探しは、どこまで進んでいますか',[
+  ['idea','まだ構想中'],['area','エリアを検討中'],['viewing','候補を内見中'],
+  ['contracted','契約済み'],['existing','今の物件を使う']
+ ]),
+ {id:'priorities',label:'大切にしたいことと、調整できることを分けてみましょう',type:'group',fields:[
+  text('mustKeep','大切にしたいこと','夕方には営業を終えること'),
+  text('canAdjust','調整できること','メニュー数と手作りの範囲')
+ ]}
+];
+const OPTIONAL = [
+ text('openingTarget','いつごろ開きたいですか','来年の秋ごろ'),
+ text('area','どの辺りで考えていますか','住宅街。エリアは未定'),
+ text('businessHours','営業したい時間は何時から何時までですか','10時〜17時'),
+ text('workingHours','準備や片付けを含め、仕事に使える時間はどのくらいですか','9時〜18時。準備にかかる時間は、これから確かめる'),
+ number('daysOffPerWeek','週に何日、休みたいですか','日',1,0,{max:7}),
+ text('operators','だれが、どんな時間に運営しますか','店主1人を基本に、昼だけ補助を頼む'),
+ number('helperHoursPerDay','補助を頼む時間は、1日何時間で考えていますか','時間',3,0,{integer:false,max:24,branch:'helper'}),
+ number('ownFundsYen','自分で用意できるお金は、いくらですか','円',2000000,0,{private:true}),
+ number('desiredMonthlyTakeHomeYen','毎月、手元に残したい額はいくらですか','円',250000,0,{private:true}),
+ // ---- ここから5問は Claude が追加（2026/11/21、松尾さんの指示）。計画の「仮」を本人の答えに替えるための任意の質問。
+ text('shopName','店名は決まっていますか。仮の名前でも書けます','まだ仮で「◯◯珈琲」',{maxLength:60}),
+ text('motive','お店を始めたいと思った理由を、ひとことで残してください','近所に、1人でも落ち着ける場所をつくりたい'),
+ number('guestsPerDay','1日に、何人くらいに来てほしいですか','人',36,1,{branch:'hasModel',
+  takeawayLabel:'1日に、何組くらいの会計を見込みますか',takeawayUnit:'組',takeawayExample:30,
+  salonLabel:'1日に、何人くらいの予約を見込みますか',salonExample:4,
+  help:'まだ分からなければ「まだ決めていない」で進めます。書いた数は、計画の中で仮の見込みとして使います。'}),
+ number('candidateRentYen','気になっている物件の家賃は、月いくらですか（共益費込み）','円',180000,0,{branch:'hasProperty',
+  help:'候補がいくつかある時は、いちばん気になっている1つで書きます。'}),
+ select('borrowPlan','開業のために、お金を借りる予定はありますか',[
+  ['yes','借りる予定'],['maybe','借りるかもしれない'],['no','借りない予定']]),
+ text('worry','今、いちばん気になっていることは何ですか','何から手をつければよいか迷っている'),
+ text('existingEvidence','今の店で確かめたことがあれば、残してください','客単価1,100円。直近4週間の記録。新しい場所でも同じかは未定',{branch:'experienced'})
+];
+const ACTIONS = {next:'次へ',back:'戻る',unknown:'まだ決めていない',skip:'今は飛ばす',
+ decline:'答えない',review:'ここまでの答えを見る',finish:'この内容を残す',more:'分かることをもう少し書く',
+ provisional:'仮で置く',confirmed:'確かめた内容',voice:'キーボードの音声入力も使えます'};
+const ALL = [...CORE,...OPTIONAL];
+function valueOf(state,id){const a=state.answers[id];return ['answered','provisional'].includes(a?.status)?a.value:null;}
+function modelOf(state){
+ const b=valueOf(state,'businessType');
+ if(['cafe','restaurant','bar'].includes(b))return 'seated';
+ if(b==='takeaway')return 'takeaway';
+ if(b==='salon')return 'salon';
+ return ['cake','other'].includes(b)?valueOf(state,'salesModel'):null;
+}
+function isActive(q,state){const model=modelOf(state),b=valueOf(state,'businessType');
+ switch(q.branch){
+  case 'chooseModel':return ['cake','other'].includes(b);
+  case 'salon':return model==='salon';
+  case 'notTakeaway':return ['seated','salon'].includes(model);
+  case 'helper':return model!=='salon' && valueOf(state,'peakStaff')>1;
+  case 'experienced':return ['opened','operating'].includes(valueOf(state,'experience'));
+  case 'hasModel':return model!==null;
+  case 'hasProperty':return ['viewing','contracted','existing'].includes(valueOf(state,'propertyStage'));
+  default:return true;
+ }
+}
+function questionsFor(state,{optional=false}={}){return (optional?OPTIONAL:CORE).filter(q=>isActive(q,state)).map(q=>{
+ const model=modelOf(state);return {...q,label:q[model+'Label']||q.label,unit:q[model+'Unit']||q.unit,
+ example:q[model+'Example']??q.examples?.[model]??q.example,
+ options:q.id==='salesModel'&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon'):q.options};
+});}
+
+
+const STORAGE_KEY='tenpo-start:interview:v1';
+const stat=['answered','provisional','undecided','skipped','declined'];
+const blank=status=>({value:null,status,source:'user',updatedAt:null});
+function createInterview(id,now){
+ return {schemaVersion:VERSION,interviewId:id,createdAt:now,updatedAt:now,answers:{},
+  archived:[],ui:{questionId:'businessType'},consultation:{number:null,preparedCount:0,sentCount:null}};
+}
+function validValue(q,v){
+ if(q.type==='select')return q.options.some(o=>o.value===v);
+ if(q.type==='number')return typeof v==='number'&&Number.isFinite(v)&&v>=q.min&&(!q.integer||Number.isSafeInteger(v))&&(q.max===undefined||v<=q.max);
+ if(q.type==='text')return typeof v==='string'&&v.trim().length>0&&v.length<=q.maxLength;
+ if(q.type==='group')return v && !Array.isArray(v) && typeof v==='object' &&
+  Object.keys(v).every(k=>q.fields.some(f=>f.id===k)) &&
+  q.fields.every(f=>v[f.id]===null || v[f.id]===undefined || validValue(f,v[f.id])) &&
+  q.fields.some(f=>validValue(f,v[f.id]));
+ return false;
+}
+function setAnswer(state,id,value,status,now){
+ const q=[...questionsFor(state),...questionsFor(state,{optional:true})].find(q=>q.id===id);
+ if(!q||!isActive(q,state))throw new Error('今の設問ではありません');
+ if(!stat.includes(status)||(status==='declined'&&!q.private))throw new Error('回答の状態を確かめてください');
+ const has=['answered','provisional'].includes(status);
+ if(has&&!validValue(q,value))throw new Error('単位と入力内容を確かめてください');
+ const next=structuredClone(state);const oldModel=modelOf(state);
+ next.answers[id]={value:has?structuredClone(value):null,status,source:'user',updatedAt:now};
+ // A branch switch must never reinterpret 12 seats as 12 beds, or per-person price as per-check price.
+ if(id==='businessType' && valueOf(next,id)!==valueOf(state,id) && next.answers.salesModel){
+  next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;
+ }
+ const newModel=modelOf(next);
+ const reset=oldModel!==newModel?['capacity','averageSpendYen','serviceMinutes','peakStaff','helperHoursPerDay']:[];
+ for(const field of ALL){if(next.answers[field.id]&&(reset.includes(field.id)||!isActive(field,next))){
+  next.archived.push({id:field.id,model:oldModel,answer:next.answers[field.id],at:now});delete next.answers[field.id];
+ }}
+ next.updatedAt=now;return next;
+}
+function calculationInput(state){
+ const model=modelOf(state),need=['businessType','averageSpendYen','peakStaff'];
+ if(!model)need.push('salesModel');
+ if(model==='seated'||model==='salon')need.push('capacity');
+ if(model==='salon')need.push('serviceMinutes');
+ const missing=[...new Set(need)].filter(k=>valueOf(state,k)===null);
+ const data={model,capacity:model==='takeaway'?null:valueOf(state,'capacity'),
+  averageSpendYen:valueOf(state,'averageSpendYen'),peakStaff:valueOf(state,'peakStaff'),
+  serviceMinutes:model==='salon'?valueOf(state,'serviceMinutes'):null};
+ return {ready:missing.length===0,missing,data,sources:Object.fromEntries(need.map(k=>[k,state.answers[k]||blank('undecided')]))};
+}
+function progress(state,id,{optional=false}={}){const qs=questionsFor(state,{optional});
+ const position=Math.max(0,qs.findIndex(q=>q.id===id))+1;
+ return {position,total:qs.length,answered:qs.filter(q=>valueOf(state,q.id)!==null).length,
+ label:`${optional?'追加の質問':'お店の質問'} ${position}/${qs.length}`};
+}
+function saveInterview(storage,state){
+ try{storage.setItem(STORAGE_KEY,JSON.stringify(state));return {ok:true};}
+ catch{return {ok:false,message:'この端末に保存できませんでした。画面を閉じる前に、答えをコピーして残してください。'};}
+}
+function loadInterview(storage){
+ try{const raw=storage.getItem(STORAGE_KEY);if(!raw)return {state:null,error:null};const s=JSON.parse(raw);
+  if(s.schemaVersion!==VERSION)return {state:null,error:'別の版の答えです。元の内容を残して、読み込み方を確かめてください。'};
+  if(!s.answers||Array.isArray(s.answers)||!Array.isArray(s.archived)||!s.ui)throw new Error('format');
+  for(const [id,a]of Object.entries(s.answers)){
+   const q=ALL.find(q=>q.id===id);
+   if(!q||!a||!stat.includes(a.status)||(a.status==='declined'&&!q.private)||
+    (['answered','provisional'].includes(a.status)?!validValue(q,a.value):a.value!==null))throw new Error('answer');
+  }return {state:s,error:null};
+ }catch{return {state:null,error:'保存した答えを読み込めませんでした。元の内容は消していません。'};}
+}
+function legacyPayload(state){
+ const c=calculationInput(state);if(!c.ready)return {ready:false,missing:c.missing,payload:null};
+ const v=id=>valueOf(state,id),p=c.data;
+ // A handoff payload only. Existing applyUser() must preserve sources and handle model-specific units.
+ const businessLabel={cafe:'カフェ',restaurant:'レストラン・食堂・定食屋',bar:'居酒屋・バー',cake:'ケーキ屋・菓子店',takeaway:'持ち帰りの店',salon:'サロン',other:'ほかの業態'}[v('businessType')];
+ return {ready:true,missing:[],payload:{biz:{seated:'カフェ',takeaway:'持ち帰りの店',salon:'サロン'}[p.model],businessLabel,
+  businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
+  price:p.averageSpendYen,team:p.peakStaff,dur:p.serviceMinutes,
+  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators'),keepYen:v('desiredMonthlyTakeHomeYen'),
+  ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),sources:c.sources},
+  requiresIntegration:true};
+}
+
+return {VERSION,BUSINESSES,CORE,OPTIONAL,ACTIONS,ALL,valueOf,modelOf,isActive,questionsFor,STORAGE_KEY,createInterview,setAnswer,calculationInput,progress,saveInterview,loadInterview,legacyPayload};})();
+/*IV:END*/
+/* ===== 公開用：ヒアリング（質問の文・順番・分岐は interview-src/questions.mjs が正。ここは画面と、計画への受け渡し） ===== */
+let IVS=null,IVNOTE=null,IVERR=null,IVRAW=null;
+const IVL={businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
+ averageSpendYen:{d:'1人が1回に使う金額',takeaway:'1回の会計の金額',salon:'中心のメニューの料金'},serviceMinutes:'施術時間',peakStaff:{d:'混む時間の人数',salon:'同時に施術する人数'},propertyStage:'物件探し',priorities:'大切にしたいこと・調整できること',
+ openingTarget:'開きたい時期',area:'エリア',businessHours:'営業したい時間',workingHours:'仕事に使える時間',daysOffPerWeek:'休み（週）',operators:'運営する人',helperHoursPerDay:'補助を頼む時間（1日）',
+ ownFundsYen:'自分で用意できるお金',desiredMonthlyTakeHomeYen:'毎月、手元に残したい額',worry:'いちばん気になっていること',shopName:'店名',motive:'お店を始めたい理由',guestsPerDay:{d:'1日に来てほしい人数',takeaway:'1日の会計の数',salon:'1日の予約の数'},candidateRentYen:'気になる物件の家賃',borrowPlan:'お金を借りる予定',existingEvidence:'今の店で確かめたこと'};
+const ivNow=()=>new Date().toISOString();
+const ivModel=()=>IV.modelOf(IVS);
+const ivLabel=id=>{const L=IVL[id];return typeof L==='string'?L:(L[ivModel()]||L.d)};
+const ivIsCore=id=>IV.CORE.some(q=>q.id===id);
+const ivTag=a=>a.status==='answered'?'<span class="tag ok">確かめた</span>':a.status==='provisional'?'<span class="tag ans">仮</span>':'';
+function ivShow(q,a){if(!a||a.value==null)return null;const v=a.value;
+ if(q.type==='select')return (IV.ALL.find(x=>x.id===q.id).options.find(o=>o.value===v)||{}).label||null;
+ if(q.type==='number')return q.unit==='円'?yen(v):v+q.unit;
+ if(q.type==='group')return q.fields.filter(f=>v[f.id]).map(f=>`${f.label}：${v[f.id]}`).join('／');
+ return v}
+function ivSave(){const r=IV.saveInterview(localStorage,IVS);IVNOTE=r.ok?null:r.message;return r.ok}
+function ivMigrate(u){const put=(id,v)=>{try{if(v==null||v===''||(typeof v==='number'&&isNaN(v)))return;IVS=IV.setAnswer(IVS,id,v,'provisional',ivNow())}catch(e){}};
+ const sal=u.biz==='サロン',take=u.biz==='持ち帰りの店'||(!sal&&u.seats!==undefined&&u.seats!==''&&+u.seats===0);
+ put('businessType',take?'takeaway':{'カフェ':'cafe','レストラン・食堂':'restaurant','サロン':'salon'}[u.biz]);
+ if(sal)put('mainProduct',u.purpose);else{put('purpose',u.purpose);put('mainProduct',u.item)}
+ if(!take&&+u.seats>0)put('capacity',+u.seats);if(+u.price>0)put('averageSpendYen',+u.price);if(sal&&+u.dur>0)put('serviceMinutes',+u.dur);if(+u.team>0)put('peakStaff',+u.team);
+ put('propertyStage',{'まだ構想中':'idea','エリアを検討中':'area','候補を内見中':'viewing','契約済み':'contracted'}[u.place]);put('businessHours',u.time);
+ put('daysOffPerWeek',{'なし':0,'週1日':1,'週2日':2}[u.off]);if(+u.keep>0)put('desiredMonthlyTakeHomeYen',+u.keep*10000);ivSave()}
+function ivBoot(){try{IVRAW=localStorage.getItem(IV.STORAGE_KEY)}catch(e){}
+ const r=IV.loadInterview(localStorage);
+ if(r.error){IVERR=r.error;try{localStorage.setItem(IV.STORAGE_KEY+':backup',IVRAW)}catch(e){}}
+ IVS=r.state;
+ if(!IVS){IVS=IV.createInterview('IV-'+Date.now().toString(36).toUpperCase(),ivNow());const old=S._u&&!S._u._iv?S._u:(!S._u&&S._fd&&S._fd.biz?S._fd:null);if(old&&!r.error)ivMigrate(old)}}
+const ivOffL=n=>n==null?null:n===0?'なし':`週${n}日`;
+function ivU(){const c=IV.calculationInput(IVS);if(!c.ready)return null;const p=IV.legacyPayload(IVS).payload,v=id=>IV.valueOf(IVS,id),s=id=>(IVS.answers[id]||{}).status,
+  lab=id=>{const o=IV.ALL.find(x=>x.id===id).options.find(o=>o.value===v(id));return o?o.label:null},pr=v('priorities')||{};
+ return{_iv:1,model:c.data.model,bizL:v('businessType')==='other'?'お店':p.businessLabel,purpose:p.purpose,item:p.item,seats:p.seats,price:p.price,team:p.team,dur:p.dur,time:p.time,off:p.off,who:p.who,keepYen:p.keepYen,ownYen:p.ownYen,
+  placeL:lab('propertyStage'),expL:lab('experience'),must:pr.mustKeep||null,flex:pr.canAdjust||null,helper:v('helperHoursPerDay'),work:v('workingHours'),when:v('openingTarget'),area:v('area'),worry:v('worry'),evidence:v('existingEvidence'),name:v('shopName'),motive:v('motive'),guests:v('guestsPerDay'),rent:v('candidateRentYen'),borrow:v('borrowPlan'),stage:v('propertyStage'),
+  st:{seats:s('capacity'),price:s('averageSpendYen'),team:s('peakStaff'),dur:s('serviceMinutes'),helper:s('helperHoursPerDay'),keepYen:s('desiredMonthlyTakeHomeYen'),off:s('daysOffPerWeek'),guests:s('guestsPerDay')}}}
+/* 本人の答えは「ヒアリングの答え」、確かめた内容は「あなたの入力」。聞いていない数（回転数・営業日数・原価率など）は仮置きのまま、根拠を添える。 */
+const P0=JSON.stringify(P);
+function applyIV(u){const m={seated:'a',takeaway:'t',salon:'c'}[u.model];{const Z=JSON.parse(P0)[m];P[m].fields=Z.fields;P[m].answers=Z.answers}const p=P[m],F=p.fields,A=p.answers,team=u.team,price=u.price,st=u.st||{};
+ const setF=(k,v,stt,why)=>{const f=F[k];if(!f||v==null||isNaN(v))return;f.v=v;f.src=stt==='answered'?'you':'ans';f.min=Math.min(f.min,v);f.max=Math.max(f.max,v);delete f.range;if(why)f.why=why};
+ p.biz=u.bizL;A[0][3]=(m==='c'?u.item:u.purpose)||UND;A[7][3]=u.placeL||UND;A[8][3]=UND;A[4][3]=yen(price);A[5][3]=team+'人';setF('price',price,st.price);
+ if(F.rentRate)F.rentRate.why=`この計画では、仮に売上の${F.rentRate.v}%と置いています。払ってよい家賃という意味ではありません。`;
+ if(m==='a'){A[2][3]=u.item||UND;A[3][3]=u.seats+'席';setF('seats',u.seats,st.seats);setF('extra',Math.max(0,team-1),st.team);F.extra.note=`「いちばん混む時間${team}人」から自分を引いた数`;
+  const tv=price<1500?3:price<3000?2:1.2;F.turns.v=tv;F.turns.range=[Math.round(tv*0.7*10)/10,Math.round(tv*1.2*10)/10];F.turns.why=`ヒアリングでは聞いていません。1人${yen(price)}のお店として、この計画では仮に1日${tv}回転と置いています。金額が高いお店ほど、滞在が長く回転は少なめに見ています。`;
+  if(u.guests!=null&&u.seats>0){const gv=Math.round(u.guests/u.seats*10)/10;F.turns.max=Math.max(F.turns.max,gv);F.turns.min=Math.min(F.turns.min,gv);setF('turns',gv,st.guests,`ヒアリングの「1日${u.guests}人」を、${u.seats}席で割った数です。見込みなので、店の前で数えて確かめます。`)}
+  F.staffH.label='自分以外の人が入る時間（1日）';
+  if(u.helper!=null)setF('staffH',u.helper,st.helper,'ヒアリングの答えです。');else{F.staffH.v=team>=3?6:3;F.staffH.why=`ヒアリングで分かるのは混む時間の人数だけです。この計画では仮に1日${team>=3?6:3}時間と置いています。`}
+  F.costRate.why='この計画では、仮に30%と置いています。レシピを3品入れると、自分の数字に替えられます。'}
+ if(m==='t'){A[2][3]=u.item||UND;A[3][3]='0席';setF('team',team,st.team);let pk=price<700?25:price<2000?8:5,of=price<700?40:price<2000?14:10;const gq=u.guests!=null;if(gq){pk=Math.round(u.guests/4);of=u.guests-pk*2}
+  Object.assign(F.peak,{label:'混む時間・1時間の注文数',v:pk,range:[Math.round(pk*0.4),Math.round(pk*1.4)],why:gq?`ヒアリングの「1日${u.guests}組」を、混む2時間に半分、それ以外に半分と仮に分けています。`:`ヒアリングでは聞いていません。席ではなく注文数で計算します。1回の会計${yen(price)}のお店として、この計画では仮に混む1時間${pk}件（1日${pk*2+of}件）と置いています。`,how:'出したい場所で、混む時間に10分、前を通る人を数える。数えた人数は実測、そこから出す注文数は推定として残します。'});
+  Object.assign(F.peakH,{why:'この計画では、仮に2時間と置いています。',how:'同じ場所で、時間帯を変えて比べる。'});Object.assign(F.off,{v:of,range:[Math.round(of*0.4),Math.round(of*1.5)],why:`混む時間以外の合計を、この計画では仮に1日${of}件と置いています。`,how:'混まない時間にも10分数える。'});
+  F.costRate.why=`この計画では、仮に${F.costRate.v}%と置いています。容器や袋の分を含めて見ています。`;F.days.how='休む曜日を決める。'}
+ if(m==='c'){A[3][3]=u.seats+'台';setF('beds',u.seats,st.seats);setF('staff',team,st.team);setF('dur',u.dur,st.dur);A[6][3]=u.dur+'分';
+  if(u.guests!=null&&F.util&&F.hours&&F.gap){const cap1=Math.min(u.seats,team)*Math.floor(F.hours.v*60/(u.dur+F.gap.v)),uv=cap1>0?Math.min(100,Math.round(u.guests/cap1*100)):null;if(uv!=null){F.util.min=Math.min(F.util.min,uv);setF('util',uv,st.guests,`ヒアリングの「1日${u.guests}人」を、1日に受けられる${cap1}枠で割った割合です。${u.guests>cap1?'受けられる枠を超えているので、100%で止めています。':''}`)}}}
+ HQ[m]={exp:u.expL||null,when:u.when||null,time:u.time||null,off:ivOffL(u.off),who:u.who||null,own:u.ownYen!=null?man(u.ownYen):null,keep:u.keepYen,worry:u.worry||null};
+  if(F.loan){if(u.borrow==='no'){F.loan.v=0;F.loan.src='ans';F.loan.min=0;delete F.loan.range;F.loan.why='ヒアリングの「借りない予定」から、0円にしています。'}else F.loan.why=`${u.borrow?'ヒアリングでは借りる額と条件を聞いていません。':'ヒアリングでは聞いていません。'}この計画では仮に月${man(F.loan.v)}と置いています。借りる額と期間が決まったら替えてください。`}
+ if(F.days){const has=u.off!=null&&u.off<7,d=has?[30,26,22,17,13,9,4][u.off]:F.days.v;F.days.v=d;F.days.src='tmp';F.days.min=Math.min(F.days.min,d);F.days.range=[Math.max(1,d-4),Math.min(31,d+2)];
+  F.days.why=has?`ヒアリングの「${u.off===0?'休みなし':'週'+u.off+'日休み'}」から、仮に月${d}日と置いています。祝日や臨時の休みは入れていません。`:`ヒアリングでは聞いていません。この計画では仮に月${d}日と置いています。`}
+ if(F.keep){if(u.keepYen!=null)setF('keep',u.keepYen,st.keepYen,'ヒアリングの答えです。');else{F.keep.src='tmp';F.keep.why=`ヒアリングでは聞いていません。この計画では仮に月${man(F.keep.v)}と置いています。ご自身の額に変えてください。`}}
+ cur=m}
+const ivKv=u=>({career:u.expL,when:u.when,hours:u.time,holiday:ivOffL(u.off),who:u.who,ownR:u.ownYen!=null?man(u.ownYen):null,must:u.must,flex:u.flex,work:u.work,area:u.area,scene:u.model==='salon'?u.purpose:null,evidence:u.evidence,name:u.name,motive:u.motive});
+/* 答えを直した時：写真・メモ・相談番号・歩みは残す。直した項目の数字だけを入れ替える。実測した数字は上書きしない。 */
+function ivSync(u,prev){const m=cur,first=!S[m],pv=prev&&prev._iv?prev:null;
+ if(first){S[m]=fresh(m);const o=S._m&&S._m!==m&&S[S._m];if(o){for(const k of Object.keys(o))if(!['f','checks','obs','sup','stage','tab','k','kA','worry','seatsM'].includes(k))S[m][k]=o[k];S[m].k={...(o.k||{}),...S[m].k}}}
+ const s=S[m];s.stage='home';
+ if(!first){const MAP={seats:'seats',beds:'seats',price:'price',extra:'team',team:'team',staff:'team',dur:'dur',staffH:'helper',keep:'keepYen',days:'off',turns:'guests',peak:'guests',off:'guests',util:'guests',loan:'borrow'};
+  for(const[fk,uk]of Object.entries(MAP)){const d=P[m].fields[fk];if(!s.f[fk]||!d||s.f[fk].src==='obs')continue;if(!pv&&s.f[fk].src==='you')continue;
+   if(!pv||pv.model!==u.model||pv[uk]!==u[uk]||(pv.st||{})[uk]!==(u.st||{})[uk]||((fk==='turns'||fk==='peak'||fk==='off')&&pv.price!==u.price))s.f[fk]={v:d.v,src:d.src}}}
+ const k=s.k=s.k||{};s.kA=s.kA||[];const kv=ivKv(u),pk=pv?ivKv(pv):null;
+ for(const[kk,val]of Object.entries(kv)){if(val==null)continue;if(k[kk]==null||(pk&&pk[kk]!==val)){k[kk]=val;if(!s.kA.includes(kk))s.kA.push(kk)}}
+ if(u.ownYen!=null&&(k.own==null||(pv&&pv.ownYen!==u.ownYen)))k.own=u.ownYen;
+ if(u.worry)s.worry=u.worry;S._m=m}
+function ivPlan(){const u=ivU();if(!u)return;const prev=S._u||S._uOld||null;applyIV(u);const had=!!prev;ivSync(u,prev);S._u=u;delete S._uOld;
+ if(!S._t0){S._t0=Date.now();BASE=new Date(new Date().setHours(0,0,0,0))}S._iv=null;S[cur].day=Math.max(0,Math.floor((new Date().setHours(0,0,0,0)-BASE.getTime())/864e5));
+ if(!had)S[cur].tab={area:'check',viewing:'check',contracted:'road',existing:'road'}[u.stage]||'plan';log(had?'ヒアリングの答えを直した':'ヒアリングの答えから、最初の計画を受け取った');save();scrollTo(0,0);render()}
+function ivFinish(){S._ivDone=1;ivSave();const u=ivU();
+ if(S._u&&u){ivPlan();toast('答えを残しました');return}
+ if(S._u&&!u){S._uOld=S._u;delete S._u}
+ S._iv={mode:'memo',just:1};save();scrollTo(0,0);render()}
+const ivMode=()=>S._iv&&S._iv.mode?S._iv.mode:S._u?null:S._ivDone?'memo':'q';
+const ivHead=()=>`<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START"><span class="biz">開業支援</span></header>`;
+const ivBanner=()=>(IVERR?`<div class="ivb">${IVERR}${IVRAW?`<br><button class="lk" data-ivcopy="raw">元の答えをコピーする</button>`:''}</div>`:'')+(IVNOTE?`<div class="ivb">${IVNOTE}<br><button class="lk" data-ivcopy="now">答えをコピーする</button></div>`:'');
+const IVFT='<p class="ftn" style="text-align:center">この端末のこのブラウザに保存されます。<br>ブラウザや端末を変えると、引き継がれません。</p>';
+function ivCur(opt){const qs=IV.questionsFor(IVS,{optional:opt});let q=qs.find(x=>x.id===S._iv.qid);if(!q){q=qs.find(x=>!IVS.answers[x.id])||qs[0];S._iv.qid=q.id;S._iv.d=null}return{qs,q,i:qs.indexOf(q)}}
+function ivQuestion(opt){if(!S._iv||S._iv.mode!==(opt?'opt':'q'))S._iv={mode:opt?'opt':'q',qid:IVS.ui.questionId};const{q,i}=ivCur(opt),I=S._iv;
+ if(!I.d){const a=IVS.answers[q.id];I.d={v:a&&a.value!=null?a.value:(q.type==='group'?{}:''),st:a&&a.status==='answered'?'answered':'provisional'}}
+ const d=I.d,pg=IV.progress(IVS,q.id,{optional:opt}),hello=!opt&&!I.edit&&i===0&&!S._ivDone&&!Object.keys(IVS.answers).length;let body;
+ if(q.type==='select')body=`<div class="ivo">${q.options.map(o=>`<button type="button" data-ivopt="${o.value}" class="${d.v===o.value?'on':''}">${o.label}</button>`).join('')}</div>`;
+ else if(q.type==='number')body=`<div class="ivn"><input data-ivi="v" type="text" inputmode="${q.integer?'numeric':'decimal'}" value="${esc(d.v)}" placeholder="例：${q.example}" autocomplete="off"><i>${q.unit}</i></div><p class="ivy" id="ivy"></p>`;
+ else if(q.type==='text')body=`<textarea data-ivi="v" rows="3" maxlength="${q.maxLength}" placeholder="例：${esc(q.example)}">${esc(d.v)}</textarea>`;
+ else body=q.fields.map(f=>`<label class="ivl">${f.label}</label><textarea data-ivi="${f.id}" rows="2" maxlength="${f.maxLength}" placeholder="例：${esc(f.example)}">${esc(d.v[f.id]||'')}</textarea>`).join('');
+ const stg=q.type==='select'?'':`<div class="ivs"><button type="button" data-ivst="provisional" class="${d.st!=='answered'?'on':''}">${IV.ACTIONS.provisional}</button><button type="button" data-ivst="answered" class="${d.st==='answered'?'on':''}">${IV.ACTIONS.confirmed}</button></div>`;
+ const help=q.id==='businessType'?'カフェでも、持ち帰りが中心なら「持ち帰りの店」を選んでください。':q.help;
+ return ivHead()+`<div class="wrap fade">${ivBanner()}${hello?face('はじめまして','まだ決まっていなくても大丈夫です','分かることから、1つずつ残しましょう。開きたい気持ちがあれば、そこから始められます。'):''}
+ <div class="card"><div class="ivp">${I.edit?'答えを直す':pg.label}</div><h2 class="ivh">${q.label}</h2>${help?`<p class="lead">${help}</p>`:''}${body}${stg}
+ ${q.type==='text'||q.type==='group'?`<p class="ivv">${IV.ACTIONS.voice}。文字になった内容を見てから、進んでください。</p>`:''}<p class="iverr" id="iverr">${I.err||''}</p>
+ <button class="btn dark" data-ivnext="1">${I.edit?'この内容にする':IV.ACTIONS.next}</button>
+ <div class="alt"><button data-ivalt="undecided">${IV.ACTIONS.unknown}</button><button data-ivalt="skipped">${IV.ACTIONS.skip}</button>${q.private?`<button data-ivalt="declined">${IV.ACTIONS.decline}</button>`:''}</div></div>
+ ${I.edit?'<button class="btn ghost" data-ivback="1">変えずに戻る</button>':(i>0||opt)?`<button class="btn ghost" data-ivback="1">${IV.ACTIONS.back}</button>`:''}${IVFT}</div>`}
+function ivRead(q){const d=S._iv.d,z=x=>String(x??'').trim();
+ if(q.type==='select')return d.v===''?undefined:d.v;if(q.type==='text')return z(d.v)||undefined;
+ if(q.type==='group'){const o={};for(const f of q.fields)if(z(d.v[f.id]))o[f.id]=z(d.v[f.id]);return Object.keys(o).length?o:undefined}
+ const t=z(d.v).replace(/[０-９．]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).replace(/[,，、\s円席人分台日]|時間/g,'');if(!t)return undefined;
+ const mm=t.match(/^(\d+(?:\.\d+)?)万$/);if(mm&&q.unit==='円')return Math.round(+mm[1]*10000);const n=Number(t);return Number.isFinite(n)?n:NaN}
+function ivErr(m){S._iv.err=m;const e=document.getElementById('iverr');if(e)e.textContent=m}
+function ivGo(next){S._iv=next;if(next.qid)IVS.ui.questionId=next.qid;ivSave();save();scrollTo(0,0);render()}
+function ivCommit(status){const I=S._iv,opt=I.mode==='opt',{q}=ivCur(opt);let val=null;
+ if(!status){val=ivRead(q);if(val===undefined){ivErr('書かずに進む場合は「まだ決めていない」を選べます');return}if(Number.isNaN(val)){ivErr(`数字で入れてください。単位は「${q.unit}」です`);return}status=q.type==='select'?'provisional':I.d.st}
+ const bm=ivModel();
+ try{IVS=IV.setAnswer(IVS,q.id,val,status,ivNow())}catch(e){ivErr(e.message+(q.type==='number'?`（${q.min}以上${q.max!==undefined?'、'+q.max+'以下':''}${q.integer?'の整数':''}）`:''));return}
+ if(bm&&ivModel()!==bm)toast('お店の形に合わせて質問を変えました');
+ const nqs=IV.questionsFor(IVS,{optional:opt}),ni=nqs.findIndex(x=>x.id===q.id);
+ ivGo(I.edit?{mode:I.ret||'review'}:ni+1<nqs.length?{mode:I.mode,qid:nqs[ni+1].id}:{mode:'review'})}
+function ivBack(){const I=S._iv,opt=I.mode==='opt';if(I.edit){ivGo({mode:I.ret||'review'});return}const{qs,i}=ivCur(opt);if(i>0)ivGo({mode:I.mode,qid:qs[i-1].id});else if(opt)ivGo({mode:'review'})}
+function ivReview(){const row=q=>{const a=IVS.answers[q.id],v=ivShow(q,a);return `<button class="nrow" data-ivedit="${q.id}"><span class="nt2"><small>${ivLabel(q.id)}</small><b>${v?esc(v):a?(a.status==='declined'?'答えない':'未定'):'まだ書いていません'}</b></span>${a&&v?ivTag(a):''}<span class="lkk">直す</span></button>`};
+ const core=IV.questionsFor(IVS),optq=IV.questionsFor(IVS,{optional:true}),oa=optq.some(q=>IVS.answers[q.id]),left=core.filter(q=>!IVS.answers[q.id]).length;
+ return ivHead()+`<div class="wrap fade">${ivBanner()}${face('ここまでの答え','答えと未定を、一覧にしました',`直したい所は、その行を押してください。未定のままでも残せます。${left?`まだ書いていない質問が${left}つあります。`:''}`)}
+ <div class="card"><div class="kh"><h2>お店の質問</h2></div>${core.map(row).join('')}</div>
+ ${oa?`<div class="card"><div class="kh"><h2>追加の質問</h2></div>${optq.map(row).join('')}</div>`:''}
+ <button class="btn dark" data-ivfin="1">${IV.ACTIONS.finish}</button><button class="btn ghost" data-ivmore="1">${IV.ACTIONS.more}</button>
+ ${S._u?'<button class="btn ghost" data-ivquit="1">変えずに、お店の画面へ戻る</button>':''}${IVFT}</div>`}
+function ivMemo(){const c=IV.calculationInput(IVS),v=id=>IV.valueOf(IVS,id),pr=v('priorities')||{},bh=v('businessHours'),wh=v('workingHours'),off=v('daysOffPerWeek'),just=S._iv&&S._iv.just;
+ const tk=[wh?wh:bh?`営業${bh}／準備と片付けは未定`:null,off!=null?(off===0?'休みなし':`週${off}日休み`):null].filter(Boolean).join('・')||null;
+ const R=[['来てほしい場面',v('purpose'),'purpose'],[ivLabel('mainProduct'),v('mainProduct'),'mainProduct'],['仕事に使える時間',tk,wh||!bh?'workingHours':'businessHours'],['運営する人',v('operators'),'operators'],['大切にしたいこと',pr.mustKeep||null,'priorities'],['調整できること',pr.canAdjust||null,'priorities']];
+ const missL={businessType:'お店の形',salesModel:'売上の形'};
+ return ivHead()+`<div class="wrap fade">${ivBanner()}${face(just?'残しました':'おかえりなさい','ここからは、1人で考えなくて大丈夫です','いまの答えを、5項目のメモにまとめました。物件やメニューを選ぶときに、立ち返る所です。')}
+ <div class="card"><div class="kh">${ic('ans',20)}<h2>5項目のメモ</h2></div><p class="lead">迷う所は「未定」のままで進めます。行を押すと書けます。</p>
+ ${R.map((r,i)=>`<button class="nrow" data-ivedit="${r[2]}" data-ivret="memo"><span class="nn ${r[1]?'okc':''}">${i<4?i+1:5}</span><span class="nt2"><small>${r[0]}</small><b>${r[1]?esc(r[1]):'未定'}</b></span>${r[1]?'':'<span class="tag unk">＋ 書く</span>'}<em>›</em></button>`).join('')}</div>
+ ${c.ready?`<div class="card"><h2>計算できる条件がそろいました</h2><p class="lead">いまの答えから、月の売上と家賃に回せる額を、仮の数字で出せます。聞いていない所（原価や営業日数など）は仮で置き、根拠と変え方を一緒に見せます。</p><button class="btn dark" data-ivplan="1">計画を見る</button></div>`
+ :`<div class="card"><h2>売上と、家賃に回せる額</h2><p class="lead">条件を確かめると計算できます。いま足りないのは、次の答えです。未定の所を、ほかの数字で埋めることはしません。</p>
+ ${c.missing.filter(id=>id!=='salesModel'||IV.questionsFor(IVS).some(q=>q.id==='salesModel')).map(id=>`<button class="nrow" data-ivedit="${id}" data-ivret="memo"><span class="nt2"><small>計算に使う答え</small><b>${missL[id]||ivLabel(id)}</b></span><span class="tag unk">＋ 書く</span><em>›</em></button>`).join('')}</div>`}
+ <div class="alt"><button data-ivask="1">事務局に相談する</button><button data-ivopen="1">ヒアリングの答えを見る</button></div>
+ <p class="ftn" style="text-align:center">事務局への相談は無料です。${S._id?`<br>相談番号 ${S._id}`:''}</p>${IVFT}</div>`}
+const askN=()=>(IVS&&IVS.consultation.preparedCount)||0;
+function ivAsk(){const v=id=>IV.valueOf(IVS,id),bl=(IV.BUSINESSES.find(o=>o.value===v('businessType'))||{}).label,nth=askN()+1;
+ const rows=[['相談番号',`${myId()}（${nth}回目）`],['相談したいこと','何から手をつければいいか相談したい'],bl&&['お店',bl],v('purpose')&&['来てほしい場面',v('purpose')],v('mainProduct')&&[ivLabel('mainProduct'),v('mainProduct')],v('area')&&['エリア',v('area')],v('openingTarget')&&['開きたい時期',v('openingTarget')],v('worry')&&['気になっていること',v('worry')]].filter(Boolean);
+ openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
+ <div class="grp">事務局に伝わる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
+ <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
+ <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。事務局には、あなたのLINEの名前で届きます。</p>`);
+ document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
+  const txt=`【TENPO/START 事務局への相談】\n${rows.map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}`;
+  const url=`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`;try{navigator.clipboard.writeText(txt)}catch(e){}
+  IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave();
+  openSheet(`<h3>相談の文を用意しました</h3><p class="shl">下のボタンで、文を入れた状態のLINEが開きます。LINEの中で送るまでは、何も送られません。文はコピーもしてあります。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付きます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
+  <a class="btn dark" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render()}}
+function ivRender(md){return md==='review'?ivReview():md==='memo'?ivMemo():ivQuestion(md==='opt')}
+/* ===== 公開用：以前の入力フォームで作った計画の読み込み（そのまま使えるように残す） ===== */
 function applyUser(u){const sal=u.biz==='サロン',take=u.biz==='持ち帰りの店'||(!sal&&+u.seats===0);const m=sal?'c':take?'t':'a';const p=P[m],F=p.fields,A=p.answers,team=+u.team||1,price=+u.price;
  const setF=(k,v,why)=>{const f=F[k];if(!f||v==null||isNaN(v))return;f.v=v;f.src='ans';f.min=Math.min(f.min,v);f.max=Math.max(f.max,v);delete f.range;if(why)f.why=why};
  p.biz=u.biz;A[0][3]=u.purpose||UND;A[7][3]=u.place||UND;A[8][3]=u.prop||UND;A[4][3]=yen(price);A[5][3]=team+'人';setF('price',price);
  if(m==='a'){A[2][3]=u.item||UND;A[3][3]=(+u.seats)+'席';setF('seats',+u.seats);setF('extra',Math.max(0,team-1));F.extra.note=`「いちばん混む時間${team}人」から自分を引いた数`;
-  const tv=price<1500?3:price<3000?2:1.2;F.turns.v=tv;F.turns.range=[Math.round(tv*0.7*10)/10,Math.round(tv*1.2*10)/10];F.turns.why=`ヒアリングでは聞いていません。客単価${yen(price)}のお店として、1日${tv}回転と置いています。客単価が高いお店ほど、滞在が長く回転は少なめに見ています。`;F.staffH.v=team>=3?6:3;F.staffH.label='自分以外の人が入る時間（1日）';F.staffH.why=`ヒアリングで分かるのは混む時間の人数だけです。1日${team>=3?6:3}時間と置いています。`;F.costRate.why='飲食店の目安として30%と置いています。'}
+  const tv=price<1500?3:price<3000?2:1.2;F.turns.v=tv;F.turns.range=[Math.round(tv*0.7*10)/10,Math.round(tv*1.2*10)/10];F.turns.why=`ヒアリングでは聞いていません。客単価${yen(price)}のお店として、この計画では仮に1日${tv}回転と置いています。客単価が高いお店ほど、滞在が長く回転は少なめに見ています。`;F.staffH.v=team>=3?6:3;F.staffH.label='自分以外の人が入る時間（1日）';F.staffH.why=`ヒアリングで分かるのは混む時間の人数だけです。この計画では仮に1日${team>=3?6:3}時間と置いています。`;F.costRate.why='この計画では、仮に30%と置いています。'}
  if(m==='t'){A[2][3]=u.item||UND;A[3][3]='0席';setF('team',team)}
  if(m==='c'){A[3][3]=(+u.seats)+'台';setF('beds',+u.seats);setF('staff',team);if(u.dur){setF('dur',+u.dur);A[6][3]=u.dur+'分'}}
  HQ[m]={exp:u.exp||null,when:u.when||null,time:u.time||null,off:u.off||null,who:u.who||(team>1?'人を雇う':'1人で'),own:u.own||null,keep:u.keep?+u.keep*10000:null,worry:u.worry||null};
  if(u.off&&F.days)setF('days',{'なし':30,'週1日':26,'週2日':22}[u.off],`ヒアリングの「休みは${u.off}」から。`);
  if(u.keep&&F.keep)setF('keep',+u.keep*10000,'ヒアリングの答えです。');
  cur=m}
-if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業支援';if(S._u){applyUser(S._u);BASE=new Date(new Date(S._t0).setHours(0,0,0,0))}
- document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.fi;if(k&&S._fd){S._fd[k]=e.target.value;save()}});
- document.addEventListener('click',e=>{const b=e.target.closest('[data-fq],[data-pubgo],[data-pubreset],[data-pubreset2]');if(!b)return;
-  if(b.dataset.fq){const u=S._fd,k=b.dataset.fq;u[k]=u[k]===b.dataset.v&&k!=='biz'?'':b.dataset.v;const y=scrollY;document.getElementById('app').innerHTML=pubForm();save();scrollTo(0,y);return}
-  if(b.dataset.pubgo){const u=S._fd,sal=u.biz==='サロン',take=u.biz==='持ち帰りの店';if(take)u.seats=0;
-   if(!(+u.price>0)){toast(sal?'料金を入れてください':'客単価を入れてください');return}if(!take&&!(+u.seats>0)){toast(sal?'ベッドの台数を入れてください':'席数を入れてください');return}if(!u.team){toast('人数を選んでください');return}
-   S._u={...u};S._t0=Date.now();BASE=new Date(new Date().setHours(0,0,0,0));applyUser(S._u);S[cur]=fresh(cur);S[cur].stage='home';log('ヒアリングに答え、最初の計画を受け取った');scrollTo(0,0);render();return}
-  if(b.dataset.pubreset){openSheet(`<h3>ヒアリングをやり直す</h3><p class="shl">いま入っている計画・メモ・写真は、この端末から消えます。元には戻せません。</p><button class="btn dark" data-pubreset2="1">消して、やり直す</button><button class="btn ghost" data-act="close">やめる</button>`);return}
-  if(b.dataset.pubreset2){const fd=S._u;closeSheet();S={_fd:fd,_id:S._id,_name:S._name};save();location.reload()}})}
+if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業支援';ivBoot();
+ if(S._u){S._u._iv?applyIV(S._u):applyUser(S._u);S._m=cur;BASE=new Date(new Date(S._t0).setHours(0,0,0,0))}
+ document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.ivi;if(!k||!S._iv||!S._iv.d)return;const d=S._iv.d;if(k==='v')d.v=e.target.value;else d.v[k]=e.target.value;
+  if(S._iv.err)ivErr('');const y=document.getElementById('ivy');if(y){const q=IV.ALL.find(x=>x.id===S._iv.qid),n=q&&q.unit==='円'?ivRead(q):null;y.textContent=typeof n==='number'&&!Number.isNaN(n)&&n>=10000?`＝ ${man(n)}`:''}});
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-ivopt],[data-ivst],[data-ivnext],[data-ivalt],[data-ivback],[data-ivedit],[data-ivfin],[data-ivmore],[data-ivquit],[data-ivplan],[data-ivopen],[data-ivask],[data-ivcopy]');if(!b)return;const D=b.dataset;
+  if(D.ivopt){S._iv.d.v=D.ivopt;document.querySelectorAll('[data-ivopt]').forEach(x=>x.classList.toggle('on',x===b));ivErr('');return}
+  if(D.ivst){S._iv.d.st=D.ivst;document.querySelectorAll('[data-ivst]').forEach(x=>x.classList.toggle('on',x===b));return}
+  if(D.ivnext){ivCommit();return}if(D.ivalt){ivCommit(D.ivalt);return}if(D.ivback){ivBack();return}
+  if(D.ivedit){ivGo({mode:ivIsCore(D.ivedit)?'q':'opt',qid:D.ivedit,edit:1,ret:D.ivret||'review'});return}
+  if(D.ivfin){ivFinish();return}
+  if(D.ivmore){const qs=IV.questionsFor(IVS,{optional:true});ivGo({mode:'opt',qid:(qs.find(q=>!IVS.answers[q.id])||qs[0]).id});return}
+  if(D.ivquit){S._iv=null;save();scrollTo(0,0);render();return}
+  if(D.ivplan){ivPlan();return}
+  if(D.ivopen){S._iv={mode:'review'};save();scrollTo(0,0);render();return}
+  if(D.ivask){ivAsk();return}
+  if(D.ivcopy){const t=D.ivcopy==='raw'?IVRAW:JSON.stringify(IVS);try{navigator.clipboard.writeText(t);toast('コピーしました。メモなどに貼って残してください')}catch(err){openSheet(`<h3>答えをコピーする</h3><p class="shl">下の文字をすべて選んで、コピーしてください。</p><textarea rows="8" style="width:100%;box-sizing:border-box" readonly>${esc(t)}</textarea>`)}return}})}
 let tt;function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1800)}
 function selectMsg(){const el=document.getElementById('msgbox'),r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast('選択しました。コピーしてください')}
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b){if(e.target.id==='mask')closeSheet();return}
