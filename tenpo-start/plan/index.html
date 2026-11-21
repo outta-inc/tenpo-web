@@ -501,20 +501,20 @@ function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m
  document.querySelectorAll('#sheet [data-m]').forEach(el=>el.oninput=()=>{const q=el.dataset.m,v=el.value===''?null:+el.value;if(q==='unM'||q==='seiM')m[q]=v||0;else if(q==='own'||q==='borrow'){if(v==null)delete k[q];else k[q]=v*10000}else m[q]=v==null?null:v*10000;save();up()});
  up();if(!s._mlog){s._mlog=1;log('開業資金の一覧を開いた')}}
 const myId=()=>{if(!S._id){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';S._id='TS-'+Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('');save()}return S._id};
-function askSheet(topic,id){const s=st(),p=P[cur],k=s.k||{},r=calc(),[rd,rn]=roadCount();s.sv=s.sv||{};
+function askSheet(topic,id){if(askGate())return;const s=st(),p=P[cur],k=s.k||{},r=calc(),[rd,rn]=roadCount();s.sv=s.sv||{};
  const rows=[['相談したいこと',topic],['お店',`${p.answers[0][3]===UND||(S._u&&S._u._iv)?'':p.answers[0][3]+'の'}${p.biz}`],['月の売上の見通し',man(r.sales)],[cur==='b'?'家賃を払う前に残る額':'家賃に回せる額',man(metric())],['まだ仮の数字',tmpN()+'つ'],['開店までの進み',`${rd}/${rn}件`]];
  if(id)rows.push(['いっしょに渡す文',`${SERV[id].t}（${bCount(id)[0]}項目）`]);
  const nth=Math.max((s.asks||[]).length,askN())+1,who=[['相談番号',`${myId()}（${nth}回目）`]].concat(k.name?[['店名',k.name]]:[]).concat(k.area?[['エリア',k.area]]:[],k.when&&k.when!==UND?[['開きたい時期',k.when]]:[]);
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${who.concat(rows).map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
   <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
- <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。事務局には、あなたのLINEの名前で届きます。</p>`);
+ <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すと、この内容が事務局に控えとして届きます。</p>`);
  document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
   const txt=`【TENPO/START 事務局への相談】\n${who.concat(rows).map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}${id?`\n\n――――\n${mailText(id)}`:''}`;
   const url=LINE_ID?`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`:`https://line.me/R/share?text=${encodeURIComponent(txt)}`;
   try{navigator.clipboard.writeText(txt)}catch(e){}
-  s.asks=s.asks||[];s.asks.push({t:topic,day:s.day});if(id)s.sv[id]=1;log(`「${esc(topic)}」の相談の文を用意した`);if(IVS){IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave()}save();
-  openSheet(`<h3>相談の文を用意しました</h3><p class="shl">下のボタンで、文を入れた状態のLINEが開きます。LINEの中で送るまでは、何も送られません。文はコピーもしてあります。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付くので、事務局は続きとして読めます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
+  s.asks=s.asks||[];s.asks.push({t:topic,day:s.day});if(id)s.sv[id]=1;log(`「${esc(topic)}」の相談の文を用意した`);if(IVS){IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave()}save();accConsult(topic,txt,nth);
+  openSheet(`<h3>相談の文を用意しました</h3><p class="shl">この文は、事務局にも控えとして届きます。下のボタンで、文を入れた状態のLINEが開くので、そのまま送ってください。事務局が、この公式LINEでお返事します。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付くので、事務局は続きとして読めます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
   <a class="btn dark" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener" id="lineopen">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render();
   try{window.open(url,'_blank','noopener')}catch(e){}}}
 function obsBox(k){const o=st().obs[k];return o?`<div class="box obsb"><div class="q">実測（数えた数）</div><p style="margin-top:2px">${o.obs}</p><div class="q" style="margin-top:8px">推定（当てはめた数）</div><p style="margin-top:2px">${o.est}</p></div>`:''}
@@ -1530,17 +1530,17 @@ function ivMemo(){const c=IV.calculationInput(IVS),v=id=>IV.valueOf(IVS,id),pr=v
  <div class="alt"><button data-ivask="1">事務局に相談する</button><button data-ivopen="1">ヒアリングの答えを見る</button></div>
  <p class="ftn" style="text-align:center">事務局への相談は無料です。${S._id?`<br>相談番号 ${S._id}`:''}${accFoot()}</p>${IVFT}</div>`}
 const askN=()=>(IVS&&IVS.consultation.preparedCount)||0;
-function ivAsk(){const v=id=>IV.valueOf(IVS,id),bl=(IV.BUSINESSES.find(o=>o.value===v('businessType'))||{}).label,nth=askN()+1;
+function ivAsk(){if(askGate())return;const v=id=>IV.valueOf(IVS,id),bl=(IV.BUSINESSES.find(o=>o.value===v('businessType'))||{}).label,nth=askN()+1;
  const rows=[['相談番号',`${myId()}（${nth}回目）`],['相談したいこと','何から手をつければいいか相談したい'],bl&&['お店',bl],v('purpose')&&['来てほしい場面',v('purpose')],v('mainProduct')&&[ivLabel('mainProduct'),v('mainProduct')],v('area')&&['エリア',v('area')],v('openingTarget')&&['開きたい時期',v('openingTarget')],v('worry')&&['気になっていること',v('worry')]].filter(Boolean);
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
  <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
- <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すまで、何も送られません。事務局には、あなたのLINEの名前で届きます。</p>`);
+ <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すと、この内容が事務局に控えとして届きます。</p>`);
  document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
   const txt=`【TENPO/START 事務局への相談】\n${rows.map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}`;
   const url=`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`;try{navigator.clipboard.writeText(txt)}catch(e){}
-  IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave();
-  openSheet(`<h3>相談の文を用意しました</h3><p class="shl">下のボタンで、文を入れた状態のLINEが開きます。LINEの中で送るまでは、何も送られません。文はコピーもしてあります。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付きます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
+  IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave();accConsult('何から手をつければいいか相談したい',txt,nth);
+  openSheet(`<h3>相談の文を用意しました</h3><p class="shl">この文は、事務局にも控えとして届きます。下のボタンで、文を入れた状態のLINEが開くので、そのまま送ってください。事務局が、この公式LINEでお返事します。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付きます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
   <a class="btn dark" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render()}}
 function ivRender(md){return md==='review'?ivReview():md==='memo'?ivMemo():ivQuestion(md==='opt')}
 /* ===== 公開用：以前の入力フォームで作った計画の読み込み（そのまま使えるように残す） ===== */
@@ -1629,6 +1629,8 @@ async function accGo(prov){const err=m=>{const e=document.getElementById('acc_er
   if(r.error)throw r.error;
   if(prov==='email')openSheet(`<h3>メールを送りました</h3><p class="shl">${esc(email)} に届いたリンクを、<b>この端末のこのブラウザ</b>で開いてください。開くと、いまの計画がアカウントに結びつきます。</p><p class="emp">届かない時は、迷惑メールのフォルダも見てください。</p><button class="btn ghost" data-act="close">閉じる</button>`)}
  catch(e){delete S._accP;save();err(accNice(e))}}
+async function accConsult(topic,body,nth){if(!PUB||!S._acc||!ACCU)return false;try{await accSync();await accRpc('start_consult_put',{p_topic:topic,p_body:body,p_nth:nth});return true}catch(e){return false}}
+function askGate(){if(!PUB||S._acc)return false;openSheet(`<h3>事務局への相談は、登録した方が使えます</h3><p class="shl">登録は無料です。登録すると、ここまでの内容がそのまま事務局に伝わるので、最初から説明し直さなくて済みます。</p><button class="btn dark" data-accopen="1">無料で登録して、相談する</button><button class="btn ghost" data-act="close">あとで</button>`);return true}
 function accOut(){const fin=()=>{delete S._acc;delete S._accP;ACCU=null;ACCMSG=null;save();closeSheet();render();toast('ログアウトしました。内容は、この端末に残っています')};(SB?SB.auth.signOut().catch(()=>{}):Promise.resolve()).then(fin)}
 function accCard(tab){if(S._acc||!S._u||!['shop','plan'].includes(tab))return'';const s=st();if(s.events.length<3&&s.day<1)return'';if(S._accLater!=null&&s.day-S._accLater<3)return'';
  return `<div class="card soft"><h2>この計画を続ける</h2><p class="lead">ここまでの回答と、自分で残した変更を引き継げます。別の端末でも、続きから開けます。</p><button class="btn dark" data-accopen="1">無料で登録して、この計画を続ける</button><button class="lk" data-acclater="1" style="display:block;margin:6px auto 0">あとで登録する</button></div>`}
