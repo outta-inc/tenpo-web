@@ -1,6 +1,6 @@
 {
  "name": "TENPO/START 開業支援",
- "short_name": "TENPO START",
+ "short_name": "TENPO/START",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
