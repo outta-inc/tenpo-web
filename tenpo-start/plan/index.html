@@ -257,6 +257,11 @@ textarea[data-ivi]{width:100%;box-sizing:border-box;border:1.5px solid var(--lin
 .ivb{background:var(--badbg);color:var(--bad);border-radius:12px;padding:12px;font-size:13px;line-height:1.7;margin-bottom:10px}.lkk{font-size:12px;color:var(--sub);text-decoration:underline;white-space:nowrap;margin-left:6px}
 .toast.act{pointer-events:auto;white-space:normal;display:flex;gap:10px;align-items:center;width:max-content;max-width:88vw;border-radius:16px;line-height:1.5}.toast button{background:none;border:0;color:#fff;font:inherit;font-weight:700;text-decoration:underline;padding:6px 2px;white-space:nowrap}.ri .dn{display:block;font-size:11.5px;color:var(--sub);font-weight:400;margin-top:2px}
 html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+.field input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]),.field select,.field textarea,.addf input:not([type=checkbox]):not([type=radio]){width:100%;box-sizing:border-box;min-width:0;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font:inherit;font-size:16px;background:#fff;color:inherit;-webkit-appearance:none;appearance:none}
+@supports (-webkit-touch-callout:none){input,select,textarea{font-size:16px!important}}
+.dtb{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid var(--line);border-radius:10px;padding:12px;background:#fff;min-height:48px;box-sizing:border-box}.dtv{font-size:16px;font-weight:700}.dtv.no{font-weight:400;color:var(--sub)}.dth{font-size:13px;font-weight:700;text-decoration:underline;white-space:nowrap}
+.field .dtb input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0}
+.dtq{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.dtq button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font:inherit;font-size:13px;color:inherit}.dtq button.on{border-color:#185534;background:#185534;color:#fff}
 </style>
 </head>
 <body>
@@ -734,7 +739,7 @@ function kClick(k,type){if(type==='lock'){toast(PUB?'お店の画面のいちば
  const s=st();const it=karteData().flatMap(x=>x.items).find(i=>i.k===k)||{scene:{label:'来てほしい場面',type:'text'},work:{label:'仕事に使える時間（準備・片付けを含む）',type:'text'}}[k]||{label:'開店の目標日',type:'date'};const cur0=k==='open'?(s.open||''):(s.k[k]??'');
  const ms=new Set(it.type==='multi'&&cur0?String(cur0).split('・'):[]);
  let inp=it.type==='multi'?`<div class="seg" id="kmul">${it.opts.map(o=>`<button data-v="${o}" class="${ms.has(o)?'on':''}">${o}</button>`).join('')}</div><p class="small">いくつでも選べます。</p>`:it.type==='opts'?`<div class="seg" id="kseg">${it.opts.map(o=>`<button data-v="${o}" class="${cur0===o?'on':''}">${o}</button>`).join('')}</div>`
-  :`<div class="field"><input type="${it.type==='num'?'number':it.type==='date'?'date':'text'}" id="kin" value="${esc(cur0)}" ${it.type==='num'?'placeholder="円で入力（例：3000000）"':''}></div>`;
+  :it.type==='date'?`<div class="field">${dateField('kin',cur0,[['3か月後',90],['半年後',182],['1年後',365]])}</div>`:`<div class="field"><input type="${it.type==='num'?'number':it.type==='date'?'date':'text'}" id="kin" value="${esc(cur0)}" ${it.type==='num'?'placeholder="円で入力（例：3000000）"':''}></div>`;
  openSheet(`<h3>${it.label}</h3><p class="small">分からなければ空のままで大丈夫です。</p>${inp}<button class="btn dark" id="ksave">入れる</button>${cur0!==''?'<button class="btn ghost" id="kclr">空に戻す</button>':''}`);
  let v=cur0;const set=val=>{if(k==='open'){if(val)s.open=val;else delete s.open}else if(val===''||val==null)delete s.k[k];else s.k[k]=it.type==='num'?+val:val;
   if(val!=='')log(`「${it.label}」を書いた`);const q=s._ret;closeSheet();render();if(q)(String(q).startsWith('blk:')?blockSheet(+q.slice(4)):svSheet(q))};
@@ -1660,7 +1665,7 @@ function tdAll(){const s=st();s.road=s.road||{};s.ts=s.ts||{};s.td=s.td||[];cons
  (s.ct||[]).filter(c=>c.wait).forEach(c=>out.push({id:'c:'+c.id,cid:c.id,t:`${c.n}：${c.wait}`,who:c.n,due:null,st:'wait',contact:1}));
  return out}
 const byDue=(a,b)=>(a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9999')?1:0;
-function tdRow(x){const t0=iso(tdNow()),due=x.due?(x.due<t0&&x.st!=='done'?(x.auto?`早めに（目安は${md(x.due)}）`:`${md(x.due)} 過ぎています`):x.due===t0?'今日':md(x.due)+(x.auto?'ごろ':'')):(x.hint||'期限なし');
+function tdRow(x){const t0=iso(tdNow()),due=x.due?(x.due<t0&&x.st!=='done'?(x.auto?`早めに・目安は${md(x.due)}`:`${md(x.due)} 過ぎています`):x.due===t0?'今日':md(x.due)+(x.auto?'ごろ':'')):(x.hint||'期限なし');
  return `<div class="lrow"><button class="tdc ${x.st}" data-tl="tdc:${x.id}" aria-label="済みにする"></button><button class="lm tdm" data-tl="tde:${x.id}"><b class="${x.st==='done'?'tdd':''}">${esc(x.t)}</b><small>${due}・${esc(x.who)}${x.st==='wait'||x.st==='doing'?'・'+TST[x.st]:''}</small></button></div>`}
 function tdCard(){const s=st(),A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),open=A.filter(x=>x.st!=='done'),soon=open.filter(x=>x.due&&x.due<=wk).sort(byDue),late=soon.filter(x=>x.due<t0&&!x.auto).length,early=soon.filter(x=>x.due<t0&&x.auto).length,wait=open.filter(x=>x.st==='wait').length;
  const rows=soon.length?soon.slice(0,5):open.filter(x=>!x.contact).slice(0,3);
@@ -1679,7 +1684,7 @@ function tdEdit(id,isNew){const s=st(),x=isNew?{id:'',t:'',who:'自分',due:'',s
  openSheet(`<h3>${isNew?'やることを足す':esc(x.t)}</h3>
  ${x.mine?`<div class="field"><label>やること</label><input id="td_t" value="${esc(x.t)}" placeholder="例：内装会社に電話して、見積もりを頼む"></div>`:''}
  ${isNew?'':`<div class="field"><label>いまの状態</label><div class="seg" id="td_st">${Object.entries(TST).map(o=>`<button type="button" data-v="${o[0]}" class="${x.st===o[0]?'on':''}">${o[1]}</button>`).join('')}</div></div>`}
- <div class="field"><label>期限${x.auto&&x.due?'（開店の目標日から置いた目安）':''}</label><input type="date" id="td_due" value="${x.due||''}"></div>
+ <div class="field"><label>期限${x.auto&&x.due?'（開店の目標日から置いた目安）':''}</label>${dateField('td_due',x.due)}</div>
  <div class="field"><label>だれがやるか</label><input id="td_who" value="${esc(x.who)}" placeholder="例：自分・家族・内装会社"></div>
  <div class="field"><label>メモ</label><textarea id="td_note" rows="2">${esc(x.note)}</textarea></div>
  <button class="btn dark" id="td_save">${isNew?'足す':'この内容にする'}</button>
@@ -1763,7 +1768,7 @@ function buySheet(){const s=st();s.buy=s.buy||[];const tb=s.buy.reduce((a,x)=>a+
 const PRE0=['入店から注文まで、迷わず進めるか','注文から提供までの時間を測る','会計の流れと、レジ・決済の動き','片付けと、次のお客さんの案内','注文が重なった時に、どこが詰まるか'];
 function preSheet(){const s=st();s.pre=s.pre||{date:'',who:'',ck:{},fix:[]};const p=s.pre;
  openSheet(`<h3>プレオープンの段取り</h3><p class="shl">開店の前に、身近な人に来てもらって1回通します。直す所を見つけるための日です。</p>
- <div class="field"><label>プレオープンの日</label><input type="date" id="pre_d" value="${p.date||''}"></div><div class="field"><label>呼ぶ人</label><textarea id="pre_w" rows="2" placeholder="例：家族と友人6人。12時と13時に3人ずつ">${esc(p.who)}</textarea></div>
+ <div class="field"><label>プレオープンの日</label>${dateField('pre_d',p.date,[['1週間後',7],['2週間後',14],['1か月後',30]])}</div><div class="field"><label>呼ぶ人</label><textarea id="pre_w" rows="2" placeholder="例：家族と友人6人。12時と13時に3人ずつ">${esc(p.who)}</textarea></div>
  <div class="grp">当日、試すこと</div>${PRE0.map((t,i)=>`<div class="lrow"><button class="tdc ${p.ck[i]?'done':''}" data-tl="preck:${i}"></button><div class="lm"><b class="${p.ck[i]?'tdd':''}">${cur==='c'?t.replace('注文から提供までの時間','受付から施術の始まりまでの時間').replace('注文が重なった時','予約が続いた時').replace('入店から注文まで','来店から受付まで'):t}</b></div></div>`).join('')}
  <div class="grp">直す所</div>${p.fix.map((x,i)=>`<div class="lrow"><button class="tdc ${x.d?'done':''}" data-tl="prefx:${i}"></button><div class="lm"><b class="${x.d?'tdd':''}">${esc(x.t)}</b></div></div>`).join('')||'<p class="emp">気づいた所を、その場で足してください。</p>'}
  <div class="field"><input id="pre_f" placeholder="例：伝票を置く場所がない"></div><button class="btn ghost" id="pre_fa">＋ 直す所を足す</button><button class="btn dark" id="pre_s">残す</button>`);
@@ -1811,6 +1816,15 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tl]');if(b
   if(a==='preck'){s.pre.ck[v]=!s.pre.ck[v];save();preSheet();return}if(a==='prefx'){s.pre.fix[+v].d=!s.pre.fix[+v].d;save();preSheet();return}}
  const c=e.target.closest('[data-act2=close]');if(c)closeSheet()});
 let tt;function toast(t){const e=document.getElementById('toast');e.classList.remove('act');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1800)}
+/* 日付の欄：いまの日付を日本語で見せ、「日付を選ぶ」と、よく使う近道を出す。中の input は元の id のまま */
+function dtLabel(v){if(!v)return '';const d=new Date(v+'T00:00:00');if(isNaN(d))return '';return (d.getFullYear()!==new Date().getFullYear()?d.getFullYear()+'年':'')+`${d.getMonth()+1}月${d.getDate()}日（${'日月火水木金土'[d.getDay()]}）`}
+function dateField(id,val,quick){quick=quick||[['今日',0],['1週間後',7],['1か月後',30]];const l=dtLabel(val);
+ return `<div class="dtf"><div class="dtb"><span class="dtv ${l?'':'no'}">${l||'まだ決めていない'}</span><span class="dth">${l?'日付を変える':'日付を選ぶ'}</span><input type="date" id="${id}" value="${val||''}" aria-label="日付を選ぶ"></div><div class="dtq">${quick.map(q=>`<button type="button" data-dq="${q[1]}">${q[0]}</button>`).join('')}<button type="button" data-dq="x">なしにする</button></div></div>`}
+function dtSync(f){const i=f.querySelector('input[type=date]'),l=dtLabel(i.value),v=f.querySelector('.dtv');v.textContent=l||'まだ決めていない';v.classList.toggle('no',!l);f.querySelector('.dth').textContent=l?'日付を変える':'日付を選ぶ'}
+document.addEventListener('change',e=>{const f=e.target.closest&&e.target.closest('.dtf');if(f&&e.target.type==='date'){f.querySelectorAll('.dtq button').forEach(b=>b.classList.remove('on'));dtSync(f)}});
+document.addEventListener('click',e=>{const q=e.target.closest('[data-dq]');if(q){const f=q.closest('.dtf'),i=f.querySelector('input[type=date]');if(q.dataset.dq==='x')i.value='';else{const d=new Date();d.setDate(d.getDate()+(+q.dataset.dq));i.value=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+  f.querySelectorAll('.dtq button').forEach(b=>b.classList.toggle('on',b===q&&q.dataset.dq!=='x'));dtSync(f);return}
+ const b=e.target.closest('.dtb');if(b){const i=b.querySelector('input[type=date]');try{if(i.showPicker)i.showPicker()}catch(_){}}});
 function toastUndo(t,fn){const e=document.getElementById('toast');e.textContent='';const sp=document.createElement('span');sp.textContent=t;const b=document.createElement('button');b.type='button';b.textContent='元に戻す';b.onclick=ev=>{ev.stopPropagation();clearTimeout(tt);e.classList.remove('on','act');fn()};e.append(sp,b);e.classList.add('on','act');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on','act'),6000)}
 /* 開店までの項目を済みにする・戻す。済みにした日を残し、ここまでの歩みに書く */
 function roadMark(id){const s=st(),r=s.road=s.road||{},all=()=>roadData().flatMap(p=>p.items),it=all().find(i=>i.id===id);if(!it||it.auto)return;
