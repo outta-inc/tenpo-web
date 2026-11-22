@@ -548,7 +548,7 @@ function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m
  <p class="emp">見積もりや募集資料が届いたら、その数字に替えてください。</p></div>
  <div class="sec">${stp(2,'続けるためのお金','<span id="mt2"></span>')}
  <div class="lrow"><div class="lm"><b>運転資金</b><small>毎月出ていくお金 ${man(mon)}（計画から${rent?'・家賃'+man(rent)+'を含む':''}）</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="unM" value="${m.unM}"><i>か月分</i></span></div>
- <div class="lrow"><div class="lm"><b>生活費</b><small>毎月手元に残したい額 ${man(keep)}</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="seiM" value="${m.seiM}"><i>か月分</i></span></div>
+ <div class="lrow"><div class="lm"><b>生活費</b><small>${st().ow?(st().ow.work?'あなたの給料':'人に任せるので、お店からは出ません'):'毎月手元に残したい額'} ${man(keep)}</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="seiM" value="${m.seiM}"><i>か月分</i></span></div>
  <p class="emp">何か月分を持つかは、仮で3か月と置いています。売上が計画に届くまでの備えです。</p></div>
  <div class="sec">${stp(3,'どこから用意するか','<span id="mt3"></span>')}
  <div class="lrow"><div class="lm"><b>自己資金</b>${k.ownR&&!k.own?`<small>ヒアリングの答え：${esc(k.ownR)}</small>`:''}</div>${inp('own')}</div>
@@ -2206,11 +2206,11 @@ function msConfirm(d,th,left){const U=new Set(d.unclear||[]),u=k=>U.has(k)||d[k]
 
 /* ===== 2026-11-23 開業資金：候補の物件で考える／家賃は実際の物件から（回せる額は使わない）／公庫の目安 ===== */
 function fundRent(p){const s=st();if(cur==='b'&&s.sup)return s.sup.rent+s.sup.common;if(p)return p.rent;return s.rentSeen||0}
-function fundNeed(p,m,r){const f=r.f,g=q=>(m[q]||0),bk=p&&ppInit(p)?ppInit(p).t:g('bukken'),t1=bk+g('naiso')+g('kiki')+g('junbi'),rent=fundRent(p),mon=r.cost+r.other+r.labor+f.loan+rent,t2=mon*(m.unM||0)+(f.keep||0)*(m.seiM||0);return{bk,t1,t2,mon,rent,all:t1+t2}}
+function fundNeed(p,m,r){const f=r.f,g=q=>(m[q]||0),bk=p&&ppInit(p)?ppInit(p).t:g('bukken'),t1=bk+g('naiso')+g('kiki')+g('junbi'),rent=fundRent(p),mon=r.cost+r.other+r.labor+f.loan+rent,t2=mon*(m.unM||0)+cbLive(f)*(m.seiM||0);return{bk,t1,t2,mon,rent,all:t1+t2}}
 function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m=s.m,r=calc(),f=r.f;if(m.naiso==null&&k.naisoB)m.naiso=k.naisoB;s.pp=s.pp||[];
  let pick=s.pp.find(x=>x.id===s.pick)||null;if(!pick&&s.pick)delete s.pick;
  if(pick&&ppInit(pick))m.bukken=ppInit(pick).t;
- const N=fundNeed(pick,m,r),keep=f.keep||0;
+ const N=fundNeed(pick,m,r),keep=cbLive(f);
  const w=v=>v?Math.round(v/10000):'';const inp=(key,ph,ro)=>`<span class="mi"><input type="number" inputmode="numeric" data-m="${key}" value="${w(key==='own'?k.own:key==='borrow'?k.borrow:m[key])}" placeholder="${ph||'未定'}"${ro?' readonly':''}><i>万円</i></span>`;
  const naisoHint=pick?(/居抜き/.test(pick.memo||'')?'居抜き：残る設備しだいで、工事を小さくできます':/スケルトン/.test(pick.memo||'')?'スケルトン：床・壁・天井・設備から作るので、大きくなりがちです':''):'';
  const rows=s.pp.length?s.pp.map(p=>{const n=fundNeed(p,m,r),j=ppJudge(p);return `<button class="fpk ${pick&&pick.id===p.id?'on':''}" data-fpick="${p.id}"><span><b>${esc(p.n)}</b><small>家賃 ${man(p.rent)}${ppInit(p)?'・契約時 '+man(ppInit(p).t):'・契約時の額は未入力'}${j?'・1日'+j.n.need+j.n.unit:''}</small></span><em>${man(n.all)}</em></button>`}).join(''):'';
@@ -2223,7 +2223,7 @@ function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m
  <p class="emp">見積もりや募集資料が届いたら、その数字に替えてください。${pick&&ppInit(pick)?'物件を借りるお金は、物件の比較で直せます。':''}</p></div>
  <div class="sec">${stp(2,'続けるためのお金','<span id="mt2"></span>')}
  <div class="lrow"><div class="lm"><b>運転資金</b><small>毎月出ていくお金 ${man(N.mon)}（${N.rent?`家賃${man(N.rent)}${pick?'（'+esc(pick.n)+'）':s.rentSeen?'（募集で見た額）':''}を含む`:'家賃はまだ入っていません。物件を選ぶと入ります'}）</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="unM" value="${m.unM}"><i>か月分</i></span></div>
- <div class="lrow"><div class="lm"><b>生活費</b><small>毎月手元に残したい額 ${man(keep)}</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="seiM" value="${m.seiM}"><i>か月分</i></span></div>
+ <div class="lrow"><div class="lm"><b>生活費</b><small>${st().ow?(st().ow.work?'あなたの給料':'人に任せるので、お店からは出ません'):'毎月手元に残したい額'} ${man(keep)}</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="seiM" value="${m.seiM}"><i>か月分</i></span></div>
  <p class="emp">何か月分を持つかは、仮で3か月と置いています。売上が計画に届くまでの備えです。</p></div>
  <div class="sec">${stp(3,'どこから用意するか','<span id="mt3"></span>')}
  <div class="lrow"><div class="lm"><b>自己資金</b>${k.ownR&&!k.own?`<small>ヒアリングの答え：${esc(k.ownR)}</small>`:''}</div>${inp('own')}</div>
@@ -2260,6 +2260,75 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-fundpp]');
 .kko p{font-size:12.5px;line-height:1.7;color:var(--ink);margin:6px 0 0}.kko .kkos{color:var(--sub);font-size:11.5px}
 .mi input[readonly]{background:var(--lime2)!important;color:var(--sub)}
 .ppfund{margin-top:10px;font-size:13.5px}`;document.head.appendChild(c)})();
+
+/* ===== 2026-11-23 計算のもと：係数を1枚で見て直す／あなたの給料とお店に残す額を分ける ===== */
+const CB_G=[['cust','お客さんと売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work']],['cost','原価と経費',['costRate','otherRate','loan']],['ppl','人',['extra','staffH','wage','labor','share']],['size','広さ',['perTsubo']]];
+const CB_ICON='<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+function cbBtn(g,sub){return `<button class="cbtn" data-cb="${g||''}"><span class="cbi">${CB_ICON}</span><span class="cbt"><b>計算のもとを見る・直す</b><small>${sub||'客単価・回転数・あなたの給料など'}</small></span><em>›</em></button>`}
+function refRent(){const s=st(),pp=s.pp||[],p=pp.find(x=>x.id===s.pick);if(p)return{rent:p.rent,n:p.n};if(s.rentSeen)return{rent:s.rentSeen,n:'募集で見た家賃'};if(pp.length){const q=[...pp].sort((a,b)=>a.rent-b.rent)[0];return{rent:q.rent,n:q.n}}return null}
+function owSync(){const s=st();if(cur==='b'||!s.ow||!s.f.keep)return;const o=s.ow,v=(o.work?o.pay:o.mgr)+(o.left||0);s.f.keep.v=v;s.f.keep.src='you'}
+function cbSum(){if(cur==='b'){const r=calc();return{big:man(r.pre),lab:'家賃を払う前に残る額',sub:'いまのお店の数字から'}}const rr=refRent(),r=calc(),u=hmPeople(r);
+ if(rr){const n=hmNeed(rr.rent);if(n)return{big:`1日 ${n.need}${n.unit}`,lab:'続けるのに要る数',sub:`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算・いまの計画は${n.have}${n.unit}`,val:n.need}}
+ return{big:man(r.cap),lab:'家賃を払う前に残る額',sub:`1日${u?u.have+u.unit:''}・月の売上 ${man(r.sales)}。家賃を入れると、要る人数で出ます`,val:null}}
+function cbSheet(focus){const s=st(),F=P[cur].fields;let prev=cbSum().val;
+ const tag=k=>{const x=s.f[k];return `<span class="cbsrc ${x.src}">${SRC[x.src]||''}</span>`};
+ const row=k=>{const o=F[k],x=s.f[k];if(!o||!x||o.min==null||typeof x.v!=='number')return'';const ch=x.v!==o.v;
+  return `<div class="cbr" id="cbr_${k}"><div class="cbl"><b>${o.label}</b>${tag(k)}</div><div class="cbs"><button class="cbm" data-cbk="${k}" data-d="-1" aria-label="減らす">−</button><span class="cbv">${fmtV(k,x.v)}</span><button class="cbm" data-cbk="${k}" data-d="1" aria-label="増やす">＋</button></div>
+  <div class="cbx">${o.why?`<details><summary>なぜこの数字？</summary><p>${o.why}${o.how?`<br><b>確かめ方：</b>${o.how}`:''}</p></details>`:''}${ch?`<button class="lk" data-cbr="${k}">最初の値（${fmtV(k,o.v)}）に戻す</button>`:''}</div></div>`};
+ const ow=s.ow,owG=cur==='b'?'':`<div class="cbg ${ow?'':'need'}" id="cbg_own"><div class="cbh">あなたの取り分${ow?'':'<span class="cbnew">まず、ここから</span>'}</div>
+  <p class="cbn">あなたの給料は、人件費に入っていません。お店が毎月出せるかを、ここで入れた額で計算します。</p>
+  <div class="seg cbseg" id="cb_work"><button data-v="1" class="${ow&&ow.work?'on':''}">自分もお店で働く</button><button data-v="0" class="${ow&&!ow.work?'on':''}">人に任せる</button></div>
+  ${ow?`<div class="cbr"><div class="cbl"><b>${ow.work?'あなたの給料（毎月）':'店長に払う給料（毎月）'}</b><span class="cbsrc you">あなたの入力</span></div><div class="cbs"><button class="cbm" data-cbo="${ow.work?'pay':'mgr'}" data-d="-1">−</button><span class="cbv">${man(ow.work?ow.pay:ow.mgr)}</span><button class="cbm" data-cbo="${ow.work?'pay':'mgr'}" data-d="1">＋</button></div><div class="cbx"><p class="cbn">${ow.work?'生活に毎月要る額です。開業資金の「生活費」にも使います。':'人に任せる時は、店長の給料をここに入れます。'}</p></div></div>
+  <div class="cbr"><div class="cbl"><b>それとは別に、お店に残したい額（毎月）</b><span class="cbsrc you">あなたの入力</span></div><div class="cbchips">${[0,30000,50000,100000].map(v=>`<button data-cbl="${v}" class="${(ow.left||0)===v?'on':''}">${v?man(v):'なし'}</button>`).join('')}</div><div class="cbx"><p class="cbn">貯え・設備の買い替え・返済の余裕のぶん。</p></div></div>`:'<p class="cbn">どちらかを押すと、金額を入れる欄が出ます。</p>'}</div>`;
+ const tmpN=Object.keys(s.f).filter(k=>s.f[k].src==='tmp'&&F[k]&&k!=='rentRate').length;
+ openSheet(`<h3>計算のもと</h3><p class="shl">「1日に何人要るか」「要るお金」は、下の数字から出しています。−と＋で動かすと、上の答えがすぐ変わります。</p>
+ <div class="cbsum" id="cbsum"></div>
+ ${tmpN?`<p class="cbtmp">仮置きの数字が${tmpN}つあります。分かった所から、あなたの数字に替えてください。</p>`:''}
+ ${owG}
+ ${CB_G.map(([g,t,ks])=>{const rs=ks.map(row).join('');return rs?`<div class="cbg" id="cbg_${g}"><div class="cbh">${t}</div>${rs}</div>`:''}).join('')}
+ <div class="alt"><button data-ask="計算のもとの数字の決め方を相談したい">数字の決め方を、事務局に相談する</button></div>
+ <button class="btn ghost" data-act="close">閉じる</button>`);
+ const sum=()=>{const c=cbSum(),d=prev!=null&&c.val!=null?c.val-prev:0;document.getElementById('cbsum').innerHTML=`<small>${c.lab}</small><b>${c.big}${d?`<i class="${d>0?'up':'dn'}">${d>0?'+'+d:'−'+(-d)}</i>`:''}</b><span>${c.sub}</span>`};
+ document.querySelectorAll('#sheet [data-cbk]').forEach(b=>b.onclick=()=>{const k=b.dataset.cbk,o=F[k],x=s.f[k],before=cbSum().val;const st2=k==='price'?(cur==='c'?500:50):k==='wage'?50:k==='loan'||k==='labor'?10000:o.step;let v=Math.round((x.v+(+b.dataset.d)*st2)*1000)/1000;v=Math.min(o.max,Math.max(o.min,v));if(v===x.v)return;applyEdit(k,v,'you');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
+ document.querySelectorAll('#sheet [data-cbr]').forEach(b=>b.onclick=()=>{const k=b.dataset.cbr,o=F[k],before=cbSum().val;applyEdit(k,o.v,o.src);save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
+ document.querySelectorAll('#cb_work button').forEach(b=>b.onclick=()=>{const before=cbSum().val,w=b.dataset.v==='1';s.ow=s.ow||{pay:s.f.keep?s.f.keep.v:250000,mgr:280000,left:0};s.ow.work=w;owSync();log(w?'自分もお店で働く、と決めた':'お店を人に任せる、と決めた');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
+ document.querySelectorAll('#sheet [data-cbo]').forEach(b=>b.onclick=()=>{const q=b.dataset.cbo,before=cbSum().val;s.ow[q]=Math.max(0,Math.min(1000000,(s.ow[q]||0)+(+b.dataset.d)*10000));owSync();save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
+ document.querySelectorAll('#sheet [data-cbl]').forEach(b=>b.onclick=()=>{const before=cbSum().val;s.ow.left=+b.dataset.cbl;owSync();save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
+ window.cbPrev=v=>{prev=v;sum()};sum();
+ if(focus){const el=document.getElementById('cbg_'+focus);if(el)setTimeout(()=>el.scrollIntoView({block:'start'}),60)}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!b)return;e.preventDefault();e.stopPropagation();cbSheet(b.dataset.cb||null)},true);
+/* 入口：続けていけるか・物件の比較・開業資金 */
+(function(){const v0=viaCard;viaCard=function(){const s=st();let h=v0();if(cur!=='b'&&!s.ow)h=`<div class="card cbask"><h2>あなたも、お店で働きますか？</h2><p class="lead">あなたの給料は人件費に入っていません。働くかどうかと、毎月要る額で、続けるのに要る人数が大きく変わります。</p><button class="btn dark" data-cb="own">答えて、計算に入れる</button></div>`+h;return h+cbBtn('','客単価・回転数・原価・あなたの給料などを、1枚で')}})();
+(function(){const p0=ppSheet;ppSheet=function(){p0();const bx=document.querySelector('#sheet .ppbase');if(bx)bx.insertAdjacentHTML('afterend',cbBtn('cust','この人数のもと（客単価・回転数・あなたの給料など）'))}})();
+(function(){const m0=moneySheet;moneySheet=function(){m0();const se=document.querySelectorAll('#sheet .sec')[2];if(se)se.insertAdjacentHTML('beforeend',cbBtn('cost','毎月出ていくお金のもと（原価・経費・あなたの給料）'))}})();
+/* 1つずつ直す画面の試算も、回せる額ではなく要る人数で */
+(function(){const e0=editSheet;editSheet=function(k){e0(k);const ev=document.getElementById('ev'),er=document.getElementById('er'),box=document.getElementById('epv'),rr=cur==='b'?null:refRent();if(!ev||!box||!rr)return;
+ const pv=()=>{const v=parseFloat(ev.value);if(isNaN(v))return;const s=st(),x=s.f[k],old=x.v;x.v=v;const n=hmNeed(rr.rent);x.v=old;const b=hmNeed(rr.rent);if(!n||!b)return;const d=n.need-b.need;box.innerHTML=`<div class="q">家賃 ${man(rr.rent)} で続けるのに要る数</div><div class="a">1日 ${n.need}${n.unit}</div><p>いまより ${d>0?'+':''}${d}${n.unit}</p>`};
+ ev.addEventListener('input',pv);er.addEventListener('input',pv);pv()}})();
+(function(){const c=document.createElement('style');c.textContent=`
+.cbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-top:12px;padding:13px 14px;border-radius:14px;border:1.5px solid var(--green);background:#fff;color:var(--ink);font:inherit;box-sizing:border-box}
+.cbtn .cbi{flex:none;width:38px;height:38px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
+.cbtn .cbt{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.cbtn b{font-size:15px;color:var(--green)}.cbtn small{font-size:12px;color:var(--sub);line-height:1.5}.cbtn em{font-style:normal;color:var(--green);font-size:20px}
+.cbsum{position:sticky;top:64px;z-index:2;background:var(--green);color:#fff;border-radius:14px;padding:12px 14px;margin-top:12px;display:flex;flex-direction:column;gap:2px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.cbsum small{font-size:12px;opacity:.85}.cbsum b{font-size:24px;display:flex;align-items:baseline;gap:8px}.cbsum span{font-size:12px;opacity:.85;line-height:1.5}
+.cbsum i{font-style:normal;font-size:13px;padding:2px 8px;border-radius:99px;background:#fff}.cbsum i.up{color:var(--bad)}.cbsum i.dn{color:var(--ok)}
+.cbtmp{font-size:12.5px;color:var(--tmp);background:var(--tmpbg);border-radius:10px;padding:8px 12px;margin:10px 0 0;line-height:1.6}
+.cbg{border:1.5px solid var(--line);border-radius:14px;padding:4px 14px 10px;margin-top:12px;background:#fff}.cbg.need{border-color:var(--gold);background:#fffaf0}
+.cbh{font-weight:700;font-size:14.5px;padding:10px 0 4px;display:flex;align-items:center;gap:8px}.cbnew{font-size:11.5px;font-weight:700;color:#fff;background:var(--gold);border-radius:99px;padding:2px 8px}
+.cbn{font-size:12.5px;color:var(--sub);line-height:1.65;margin:4px 0 6px}
+.cbr{padding:10px 0;border-top:1px solid var(--line)}.cbg .cbr:first-of-type{border-top:0}
+.cbl{display:flex;align-items:center;justify-content:space-between;gap:8px}.cbl b{font-size:14px}
+.cbsrc{font-size:11px;border-radius:99px;padding:2px 8px;white-space:nowrap;background:var(--lime2);color:var(--sub)}.cbsrc.tmp{background:var(--tmpbg);color:var(--tmp)}.cbsrc.you,.cbsrc.ans{background:var(--okbg);color:var(--ok)}.cbsrc.ex,.cbsrc.obs{background:var(--chkbg);color:var(--chk)}
+.cbs{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cbm{width:52px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:22px;color:var(--green);font-weight:700;line-height:1}
+.cbm:active{background:var(--lime2)}.cbv{font-size:20px;font-weight:700}
+.cbx details{margin-top:6px;font-size:12.5px;color:var(--sub)}.cbx summary{color:var(--green);cursor:pointer}.cbx details p{line-height:1.65;margin:4px 0 0}
+.cbx .lk{margin-top:4px;padding:0;font-size:12.5px}
+.cbseg{margin-top:6px}
+.cbchips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.cbchips button{height:42px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:13.5px}.cbchips button.on{background:var(--green);border-color:var(--green);color:#fff}
+.cbask{border:1.5px solid var(--gold);background:#fffaf0}`;document.head.appendChild(c)})();
+
+function cbLive(f){const o=st().ow;return o&&cur!=='b'?(o.work?o.pay:0):(f.keep||0)}
 
 </script>
 </body>
