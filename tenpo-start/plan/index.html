@@ -2238,7 +2238,7 @@ function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m
   document.getElementById('mres').innerHTML=`<div class="q">${pick?esc(pick.n)+'で、':''}${miss?`入力済み分の合計（未定が${miss}つ）`:'要るお金の合計'}</div><div class="a">${man(n.all)}</div><p>${!t3?'用意するお金を入れると、足りるかどうかが出ます。':miss?`未定の欄が${miss}つ残っています。足りるかどうかは、そろってから確かめます。いまは、用意するお金 ${man(t3)}・入力済み分 ${man(n.all)} です。`:d>=0?`用意するお金 ${man(t3)} で、${man(d)} の余裕があります。`:`用意するお金 ${man(t3)} では、あと ${man(-d)} 足りません。ここで分かってよかった数字です。工事の範囲・持つ月数・借りる額・物件のどれを動かすか、一緒に考えられます。`}</p>`;
   document.getElementById('kko').innerHTML=kkoNote(n,k,f)};
  document.querySelectorAll('#sheet [data-m]').forEach(el=>el.oninput=()=>{const q=el.dataset.m,v=el.value===''?null:+el.value;if(q==='bukken'&&pick&&ppInit(pick))return;if(q==='unM'||q==='seiM')m[q]=v||0;else if(q==='own'||q==='borrow'){if(v==null)delete k[q];else k[q]=v*10000}else m[q]=v==null?null:v*10000;save();up()});
- document.querySelectorAll('#sheet [data-fpick]').forEach(b=>b.onclick=()=>{const v=b.dataset.fpick;if(v){s.pick=v;log(`開業資金を「${esc((s.pp.find(x=>x.id===v)||{}).n||'')}」で考えた`)}else{delete s.pick;if(m.bukken&&pick&&ppInit(pick)&&m.bukken===ppInit(pick).t)m.bukken=null}save();moneySheet()});
+ document.querySelectorAll('#sheet [data-fpick]').forEach(b=>b.onclick=()=>{const v=b.dataset.fpick;if(v){s.pick=v;log(`開業資金を「${esc((s.pp.find(x=>x.id===v)||{}).n||'')}」で考えた`)}else{if(pick&&s.rentSeen===pick.rent)delete s.rentSeen;delete s.pick;s._noPick=1;if(m.bukken&&pick&&ppInit(pick)&&m.bukken===ppInit(pick).t)m.bukken=null}if(v){const q=s.pp.find(x=>x.id===v);if(q)s.rentSeen=q.rent}save();moneySheet()});
  up();if(!s._mlog){s._mlog=1;log('開業資金の一覧を開いた')}}
 /* 公庫のひとこと。制度の上限と、審査で見られること、返済の月額の目安 */
 function kkoNote(n,k,f){const own=k.own||0,bor=k.borrow||0,all=n.all;let t=[];
@@ -2265,7 +2265,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-fundpp]');
 const CB_G=[['cust','お客さんと売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work']],['cost','原価と経費',['costRate','otherRate','loan']],['ppl','人',['extra','staffH','wage','labor','share']],['size','広さ',['perTsubo']]];
 const CB_ICON='<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
 function cbBtn(g,sub){return `<button class="cbtn" data-cb="${g||''}"><span class="cbi">${CB_ICON}</span><span class="cbt"><b>計算のもとを見る・直す</b><small>${sub||'客単価・回転数・あなたの給料など'}</small></span><em>›</em></button>`}
-function refRent(){const s=st(),pp=s.pp||[],p=pp.find(x=>x.id===s.pick);if(p)return{rent:p.rent,n:p.n};if(s.rentSeen)return{rent:s.rentSeen,n:'募集で見た家賃'};if(pp.length){const q=[...pp].sort((a,b)=>a.rent-b.rent)[0];return{rent:q.rent,n:q.n}}return null}
+function refRent(){const s=st(),pp=s.pp||[],p=pp.find(x=>x.id===s.pick);if(p)return{rent:p.rent,n:p.n};if(s.rentSeen)return{rent:s.rentSeen,n:'募集で見た家賃'};return null}
 function owSync(){const s=st();if(cur==='b'||!s.ow||!s.f.keep)return;const o=s.ow,v=(o.work?o.pay:o.mgr)+(o.left||0);s.f.keep.v=v;s.f.keep.src='you'}
 function cbSum(){if(cur==='b'){const r=calc();return{big:man(r.pre),lab:'家賃を払う前に残る額',sub:'いまのお店の数字から'}}const rr=refRent(),r=calc(),u=hmPeople(r);
  if(rr){const n=hmNeed(rr.rent);if(n)return{big:`1日 ${n.need}${n.unit}`,lab:'続けるのに要る数',sub:`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算・いまの計画は${n.have}${n.unit}`,val:n.need}}
@@ -2393,7 +2393,7 @@ function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')
  $i('rs_cam').onclick=()=>$i('rs_in').click();$i('rs_in').onchange=e=>msStart([...e.target.files]);
  $i('rs_ok').onclick=()=>{if(!sel)return;if(sel.id){const p=pp.find(x=>x.id===sel.id);s.pick=p.id;s.rentSeen=p.rent;log(`「${esc(p.n)}」の家賃 ${man(p.rent)} で考えることにした`)}else{delete s.pick;s.rentSeen=sel.v;log(`募集で見た家賃を${man(s.rentSeen)}と入れた`)}
   s.tab='home';s.area='viable';s._viaSeen=1;save();closeSheet();window.scrollTo(0,0);render()};
- if($i('rs_no'))$i('rs_no').onclick=()=>{delete s.rentSeen;delete s.pick;save();closeSheet();render()};
+ if($i('rs_no'))$i('rs_no').onclick=()=>{delete s.rentSeen;delete s.pick;s._noPick=1;save();closeSheet();render()};
  res()}
 /* 続けていけるか：家賃の出どころを、選んだ物件の名前で */
 (function(){const v0=viaCard;viaCard=function(){let h=v0();const s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(p&&p.rent===s.rentSeen)h=h.replace('<span>募集で見た家賃<small>自分で入れた額</small></span>',`<span>考えている物件の家賃<small>${esc(p.n)}</small></span>`);return h}})();
@@ -2448,6 +2448,19 @@ function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')
  L.push([rr?'毎月の差':'家賃を払う前に残る','',last]);
  return h+`<details class="fold" data-fold="plan" ${s.fo?'open':''}><summary>計算の中身を見る</summary><div class="card"><table class="pltb">${L.map((x,i)=>`<tr class="${i===L.length-1?'tot':''}"><td><b>${x[0]}</b>${x[1]?`<small>${x[1]}</small>`:''}</td><td>${x[2]<0?'−':''}${man(Math.abs(x[2]))}</td></tr>`).join('')}</table><p class="small" style="margin:8px 0 0">数字は「計算のもと」で変えられます。</p></div></details>`}})();
 (function(){const c=document.createElement('style');c.textContent='.pltb{width:100%;border-collapse:collapse;font-size:13.5px}.pltb td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}.pltb td:last-child{text-align:right;white-space:nowrap;font-weight:700}.pltb small{display:block;font-size:11.5px;color:var(--sub)}.pltb tr.tot td{border-bottom:0;font-size:15px}.flh>b{white-space:nowrap;flex:none}.flh>span{min-width:0}';document.head.appendChild(c)})();
+
+/* 2026-11-23 ヘッダー：業態と日付をやめ、店名と開店までの日数（押すと直せる） */
+function header(sub,title){const s=st(),k=s.k||{};let d='';if(s.open){const n=Math.round((new Date(s.open+'T00:00:00')-tdNow())/864e5);d=n>0?`開店まで<b>${n}</b>日`:n===0?'今日が開店日':`開店から${-n}日`}
+ return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><span class="hdi"><button class="hdn ${k.name?'':'emp'}" data-kk="name" data-kt="text">${k.name?esc(k.name):'お店の名前はこれから'}</button><button class="hdd ${s.open?'':'emp'}" data-kk="open" data-kt="date">${d||'開店日を決める ›'}</button></span>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
+(function(){const c=document.createElement('style');c.textContent='.hdi{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:46vw;margin-right:8px}.hdi button{background:none;border:0;padding:0;font:inherit;text-align:right;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hdi .hdn{font-size:13.5px;font-weight:700;color:var(--ink)}.hdn.emp{color:var(--sub);font-weight:500;font-size:12.5px}.hdd{font-size:11.5px;color:var(--sub);margin-top:1px}.hdd b{color:var(--green);font-size:13px;margin:0 1px}.hdd.emp{color:var(--green);font-weight:700}';document.head.appendChild(c)})();
+
+/* 2026-11-23 見直し：考える物件をアプリ全体で1つに保つ */
+function pickSync(){const s=st(),pp=s.pp||[];if(s.pick&&!pp.find(x=>x.id===s.pick)){delete s.pick;delete s.rentSeen}
+ if(pp.length>(s._ppN||0))delete s._noPick;s._ppN=pp.length;
+ if(!s.pick&&!s.rentSeen&&pp.length&&!s._noPick){const q=pp[pp.length-1];s.pick=q.id;s.rentSeen=q.rent}
+ const p=pp.find(x=>x.id===s.pick);if(p&&s.rentSeen!==p.rent)s.rentSeen=p.rent}
+(function(){const p0=ppSheet;ppSheet=function(){pickSync();save();p0()}})();
+(function(){const r0=render;render=function(){try{pickSync()}catch(e){}return r0.apply(this,arguments)}})();
 
 </script>
 </body>
