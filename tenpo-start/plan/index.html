@@ -311,6 +311,8 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .viat{margin:12px 0 0;padding:0;list-style:none}.viat li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;color:var(--sub)}.viat li:first-child{border-top:0}.viat li b{font-size:19px;color:var(--ink);white-space:nowrap}.viat li small{display:block;font-size:11.5px}
 .viat li.gap{background:var(--badbg);border-radius:10px;border:0;padding:10px 12px;margin-top:4px}.viat li.gap span,.viat li.gap b{color:var(--bad);font-weight:700}.viat li.gap.ok{background:#e6f1e8}.viat li.gap.ok span,.viat li.gap.ok b{color:#2c6a45}
 .nrow em.pl{font-size:14px;font-weight:700;color:var(--green);white-space:nowrap}
+.btn.ln,a.btn.ln{background:#06C755;border-color:#06C755;color:#fff}.alt button.ln{border-color:#06C755;color:#058c3d;font-weight:700}
+.lnb{background:#eaf8ef;border-radius:14px;padding:14px;margin-top:14px}.lnb>b{font-size:15px;color:#058c3d}.lnb ol{margin:8px 0 0;padding-left:20px;font-size:13.5px;line-height:1.9}.lnb p{font-size:12.5px;color:var(--sub);line-height:1.7;margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -566,14 +568,14 @@ function askSheet(topic,id){if(askGate())return;const s=st(),p=P[cur],k=s.k||{},
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${who.concat(rows).map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
   <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
- <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すと、この内容が事務局に控えとして届きます。</p>`);
+ <button class="btn ln" id="askgo">LINEで、この内容を送る</button><p class="small" style="margin-top:8px">次の画面で「LINEを開く」を押すと、公式LINE「TENPO/OS」のトークが、この文の入った状態で開きます。送信を押すと届き、返事もLINEに届きます。事務局への相談は無料です。同じ内容が、事務局に控えとして届きます。</p>`);
  document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
   const txt=`【TENPO/START 事務局への相談】\n${who.concat(rows).map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}${id?`\n\n――――\n${mailText(id)}`:''}`;
   const url=LINE_ID?`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`:`https://line.me/R/share?text=${encodeURIComponent(txt)}`;
   try{navigator.clipboard.writeText(txt)}catch(e){}
   s.asks=s.asks||[];s.asks.push({t:topic,day:s.day});if(id)s.sv[id]=1;log(`「${esc(topic)}」の相談の文を用意した`);if(IVS){IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave()}save();accConsult(topic,txt,nth);
   openSheet(`<h3>相談の文を用意しました</h3><p class="shl">この文は、事務局にも控えとして届きます。下のボタンで、文を入れた状態のLINEが開くので、そのまま送ってください。事務局が、この公式LINEでお返事します。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付くので、事務局は続きとして読めます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
-  <a class="btn dark" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener" id="lineopen">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render();
+  <a class="btn ln" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener" id="lineopen">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render();
   try{window.open(url,'_blank','noopener')}catch(e){}}}
 function obsBox(k){const o=st().obs[k];return o?`<div class="box obsb"><div class="q">実測（数えた数）</div><p style="margin-top:2px">${o.obs}</p><div class="q" style="margin-top:8px">推定（当てはめた数）</div><p style="margin-top:2px">${o.est}</p></div>`:''}
 function costRows(r,withKeep){const f=r.f;let h=`<ul class="rows"><li><span>売上</span><b>${man(r.sales)}</b></li><li><span>原価 ${chip('costRate','')}</span><b>−${man(r.cost)}</b></li><li><span>その他の経費 ${chip('otherRate','')}</span><b>−${man(r.other)}</b></li>`;
@@ -1602,13 +1604,13 @@ function ivAsk(){if(askGate())return;const v=id=>IV.valueOf(IVS,id),bl=(IV.BUSIN
  openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
  <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
- <button class="btn dark" id="askgo">この内容で、相談の文を用意する</button><p class="small" style="margin-top:8px">事務局への相談は無料です。押すと、この内容が事務局に控えとして届きます。</p>`);
+ <button class="btn ln" id="askgo">LINEで、この内容を送る</button><p class="small" style="margin-top:8px">次の画面で「LINEを開く」を押すと、公式LINE「TENPO/OS」のトークが、この文の入った状態で開きます。送信を押すと届き、返事もLINEに届きます。事務局への相談は無料です。同じ内容が、事務局に控えとして届きます。</p>`);
  document.getElementById('askgo').onclick=()=>{const hito=document.getElementById('askt').value.trim();
   const txt=`【TENPO/START 事務局への相談】\n${rows.map(x=>`・${x[0]}：${x[1]}`).join('\n')}${hito?`\n\n${hito}`:''}`;
   const url=`https://line.me/R/oaMessage/${encodeURIComponent(LINE_ID)}/?${encodeURIComponent(txt)}`;try{navigator.clipboard.writeText(txt)}catch(e){}
   IVS.consultation.number=myId();IVS.consultation.preparedCount=nth;ivSave();accConsult('何から手をつければいいか相談したい',txt,nth);
   openSheet(`<h3>相談の文を用意しました</h3><p class="shl">この文は、事務局にも控えとして届きます。下のボタンで、文を入れた状態のLINEが開くので、そのまま送ってください。事務局が、この公式LINEでお返事します。</p><p class="shl">あなたの相談番号は <b>${myId()}</b> です。次に相談する時も同じ番号が付きます。</p><div class="msg" style="max-height:220px;overflow:auto">${esc(txt)}</div>
-  <a class="btn dark" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render()}}
+  <a class="btn ln" style="text-align:center;text-decoration:none;box-sizing:border-box" href="${url}" target="_blank" rel="noopener">LINEを開く</a><button class="btn ghost" data-act="close">閉じる</button>`);render()}}
 function ivRender(md){return md==='review'?ivReview():md==='memo'?ivMemo():ivQuestion(md==='opt')}
 /* ===== 公開用：以前の入力フォームで作った計画の読み込み（そのまま使えるように残す） ===== */
 function applyUser(u){const sal=u.biz==='サロン',take=u.biz==='持ち帰りの店'||(!sal&&+u.seats===0);const m=sal?'c':take?'t':'a';const p=P[m],F=p.fields,A=p.answers,team=+u.team||1,price=+u.price;
@@ -1856,7 +1858,7 @@ function homeTab(){const s=st(),h=hmState(),R=h.R,c=k=>HM.filter(x=>R[x[0]][0]==
  return `<div class="hmh"><h1>お店を始めるまでの全部</h1><p>${first?'いただいた答えは、もう入っています。':''}決めることは9つです。順番は前後してかまいません。</p></div>
  <div class="hmc"><div><span>決まった</span><b>${c('done')}</b></div><div><span>仮で進行中</span><b class="t">${c('doing')}</b></div><div><span>これから</span><b class="n">${c('todo')}</b></div></div>
  <div class="card hml">${HM.map(([id,t],i)=>{const stt=R[id][0],now=id===h.next;return `<button class="hmr ${stt} ${now?'now':''}" data-hm="area:${id}"><span class="hmn">${stt==='done'?'✓':i+1}</span><span class="hmt"><b>${t}</b><small>${R[id][1]}</small></span>${now?'<em class="nx">次はここ</em>':`<em>${{done:'決まった',doing:'仮で進行中',todo:'これから'}[stt]}</em>`}<i>›</i></button>`}).join('')}</div>
- ${backCard()}<div class="alt hma"><button data-tab="ask">どれも、事務局に相談できます（無料）</button><button data-tl="guide:">このアプリでできること</button></div>`}
+ ${backCard()}<div class="alt hma"><button class="ln" data-tab="ask">どれも、LINEで事務局に相談できます（無料）</button><button data-tl="guide:">このアプリでできること</button></div>`}
 function hrow(icn,t,d,attr,tag){return `<button class="nrow" ${attr}><span class="nic">${ic(icn,18)}</span><span class="nt2"><b>${t}</b><small>${d}</small></span>${tag?`<em class="pl">${tag}</em>`:''}<em>›</em></button>`}
 /* 続けていけるか：見た家賃から、1日に要る人数を出す。差と、埋める道を見せる */
 function viaCard(){const s=st();if(cur==='b')return `<div class="card"><h2>${ic('chart')}計画の数字から見ます</h2><p class="lead">いまのお店の数字をもとに、家賃を払う前に残る額を出しています。</p><button class="btn ghost" data-tab="plan">計画を見る</button></div>`;
@@ -1891,7 +1893,7 @@ function areaPage(id,v){const s=st(),i=HM.findIndex(x=>x[0]===id);if(i<0){s.area
  if(id==='promo')b=`<div class="card">${hrow('ans','GoogleとInstagramの紹介文','紹介文ができます','data-sv="web"')}${hrow('flag','プレオープンの段取り','日・呼ぶ人・試すこと・直す所','data-tl="tool:pre"')}${hrow('chart','開店したあとへ','引き継げる内容','data-tl="tool:os"')}</div>`;
  const pv=i>0?HM[i-1]:null,nx=i<HM.length-1?HM[i+1]:null;
  return `<button class="bk" data-hm="home">‹ ホーム</button><div class="hmp"><p class="hmk">${i+1} / 9</p><h1>${t}</h1><p>${HML[id][0]}</p></div>${b}
- <div class="alt hma"><button data-ask="${HML[id][1]}">このことを、事務局に相談する</button></div>
+ <div class="alt hma"><button class="ln" data-ask="${HML[id][1]}">このことを、LINEで事務局に相談する</button></div>
  <div class="alt" style="margin-top:8px;justify-content:space-between">${pv?`<button data-hm="area:${pv[0]}">‹ ${pv[1]}</button>`:'<span></span>'}${nx?`<button data-hm="area:${nx[0]}">${nx[1]} ›</button>`:''}</div>`}
 function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')&&f.perTsubo?Math.round(f.seats/f.perTsubo*10)/10:null;
  openSheet(`<h3>募集で見た家賃</h3><p class="shl">家賃は場所でほぼ決まります。実際の額を入れると、その場所で続けるには1日に何人要るかが出ます。</p>
@@ -1904,7 +1906,7 @@ function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')
  $i('rs_ok').onclick=()=>{const v=+$i('rs_v').value;if(!(v>0)){toast('家賃を入れてください');return}s.rentSeen=Math.round(v*10000);log(`募集で見た家賃を${man(s.rentSeen)}と入れた`);s.tab='home';s.area='viable';s._viaSeen=1;save();closeSheet();window.scrollTo(0,0);render()};
  if($i('rs_no'))$i('rs_no').onclick=()=>{delete s.rentSeen;save();closeSheet();render()}}
 function askTab(){const s=st(),asks=s.asks||[],T=['何から手をつければいいか相談したい','エリアと物件のことを相談したい','開業資金と借入のことを相談したい','内装と設備のことを相談したい','手続きのことを相談したい','そのほかのことを相談したい'];
- return `<div class="hmp"><h1>相談</h1><p>テンポスタート事務局への相談は無料です。ここまでの内容がそのまま伝わるので、説明し直さなくて済みます。</p></div>
+ return `<div class="hmp"><h1>相談</h1><p>テンポスタート事務局への相談は無料です。やり取りは、いつものLINEでします。</p></div><div class="lnb"><b>LINEで相談する流れ</b><ol><li>下から、相談したいことを選ぶ</li><li>事務局に伝わる内容を確かめる</li><li>LINEが開くので、送信を押す</li></ol><p>ここまでの内容が文に入るので、最初から説明し直さなくて済みます。返事は、公式LINE「TENPO/OS」のトークに届きます。</p></div>
  <div class="card"><h2>相談したいことを選ぶ</h2>${T.map(t=>`<button class="nrow" data-ask="${t}"><span class="nt2"><b>${t.replace('を相談したい','').replace('相談したい','')}</b></span><em>›</em></button>`).join('')}</div>
  <div class="card"><h2>これまでの相談</h2>${asks.length?asks.slice().reverse().map(a=>`<div class="lrow"><div class="lm"><b>${esc(a.t)}</b><small>${dLabel(a.day)}・相談の文を用意した</small></div></div>`).join(''):'<p class="emp">まだありません。</p>'}</div>
  <div class="card">${hrow('who','連絡先と、やり取り','だれに何を頼んでいるか','data-tl="tool:ct"')}${hrow('people','頼むときの文','内装会社・デザイン・公庫・税理士など','data-hm="area:build"')}</div>`}
