@@ -2412,6 +2412,43 @@ function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')
 .rsman>small{display:block;font-size:12px;color:var(--sub);margin-top:6px}.rsman details{margin-top:6px;font-size:12.5px;color:var(--sub)}.rsman summary{color:var(--green)}.rsman details p{line-height:1.65;margin:4px 0 0}
 #rs_ok:disabled{opacity:.4}.rsoff{display:block;margin:10px auto 0;font-size:12.5px}`;document.head.appendChild(c)})();
 
+/* ===== 2026-11-23 計画のページを、いまの考え方に合わせる：家賃は実際の物件から／要る人数で見る／あなたの給料とお店に残す額を分ける ===== */
+(function(){const p0=planTop;planTop=function(v){if(cur==='b')return p0(v);
+ const s=st(),r=calc(),f=r.f,u=hmPeople(r),rr=refRent(),n=rr?hmNeed(rr.rent):null,ow=s.ow,F=P[cur].fields,tn=Object.keys(F).filter(k=>s.f[k]&&s.f[k].src==='tmp'&&k!=='rentRate').length;
+ let t,p,btn,attr;
+ if(n){const over=n.need-n.have;t=n.gap>=0?`この家賃でも、いまの計画で続けられる計算です。`:`この場所で続けるには、1日に${n.need}${n.unit}が要ります。`;
+  p=`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算しています。いまの計画は1日${n.have}${n.unit}${n.gap>=0?`で、毎月${man(n.gap)}残ります。`:`。あと${over}${n.unit}ぶん、毎月${man(-n.gap)}足りません。`}`;btn='計算のもとを見る・直す';attr='data-cb=""'}
+ else{t=r.cap>0?`家賃を払う前に、毎月${man(r.cap)}残る計算です。`:`いまの数字のままだと、家賃を払う前に毎月${man(-r.cap)}足りません。`;
+  p='家賃は場所でほぼ決まります。考えている場所の家賃を決めると、続けるのに1日に何人要るかが出ます。';btn='考える場所の家賃を決める';attr='data-hm="rent"'}
+ if(tn)p+=` まだ仮の数字が${tn}つあります。`;
+ const stuck=n?n.gap<0:r.cap<=0;
+ let h=face('あなたの答えから、こう見ています',t,p,btn,attr)+(n?`<div class="alt"><button data-hm="rent">考える場所の家賃を変える（いま ${man(rr.rent)}）</button></div>`:'')+(stuck?`<div class="alt"><button data-ask="計画が毎月足りない。どこを変えるか相談したい">1人で悩まず、事務局に相談する</button></div>`:'');
+ /* お金の流れ：入ってくる → 出ていく → 家賃 → あなたの給料 → お店に残す → 毎月の差 */
+ const out=r.cost+r.other+r.labor+f.loan,rent=rr?rr.rent:0;
+ const rows=[['入ってくる',`月の売上（1日${u.have}${u.unit}×${yen(f.price)}×${f.days}日）`,r.sales,'in'],['出ていく','材料・経費・人に払うお金・返済',out,'out']];
+ if(rr)rows.push(['家賃',esc(rr.n),rent,'out']);
+ if(ow){rows.push([ow.work?'あなたの給料':'店長の給料','毎月',ow.work?ow.pay:ow.mgr,'keep']);if(ow.left)rows.push(['お店に残す','貯え・買い替え・余裕',ow.left,'keep'])}else rows.push(['あなたの取り分','毎月の手元（給料か、残す額か、まだ決めていません）',f.keep,'keep']);
+ const last=r.sales-out-rent-f.keep;
+ rows.push([rr?'毎月の差':'家賃を払う前に残る',rr?(last>=0?'ここまで引いて残る':'ここまで引くと足りない'):'ここまで引いた残り',last,last>=0?'res':'bad']);
+ h+=`<div class="card"><h2>お金の流れ</h2><p class="lead">1か月で、こう動く見通しです。</p>${rows.map(x=>`<div class="fl"><div class="flh"><span><b>${x[0]}</b><small>${x[1]}</small></span><b class="${x[3]==='bad'?'neg':''}">${x[3]==='bad'?'−':''}${man(Math.abs(x[2]))}</b></div><div class="flb"><i class="${x[3]}" style="width:${Math.max(2,Math.min(100,Math.abs(x[2])/r.sales*100))}%"></i></div></div>`).join('')}
+  ${ow?'':`<button class="lk" data-cb="own">あなたの取り分を、給料とお店に残す額に分ける ›</button>`}</div>`;
+ /* 計算のもと（やり方で選ぶ）への入口と、まだ仮のもの */
+ const ten=Object.keys(F).filter(k=>s.f[k]&&s.f[k].src==='tmp'&&k!=='rentRate'&&k!=='keep').sort((a,b)=>(F[b].range?1:0)-(F[a].range?1:0));
+ h+=`<div class="card"><h2>計算のもと</h2><p class="lead">席の取り方・席が何回うまるか・月に何日開けるかなど、お店のやり方を選ぶと数字が決まります。</p>
+  ${ten.length?`<p class="small" style="margin:0 0 4px">まだ仮のもの</p><div class="pills">${ten.slice(0,6).map(k=>`<span class="pill">${F[k].label}</span>`).join('')}</div>`:''}${cbBtn('','客単価・回転数・あなたの給料など')}</div>`;
+ /* もし厳しかったら：要る人数か、家賃の前に残る額で */
+ const sens=sensitivity().slice(0,3);
+ if(sens.length){const at=(k,val)=>{const x=s.f[k],old=x.v;x.v=val;const o=rr?hmNeed(rr.rent):null,c=calc().cap;x.v=old;return{o,c}};
+  h+=`<div class="card"><h2>もし、思ったより厳しかったら</h2><p class="lead">悪いほうに振れたときも、先に見ておきましょう。</p>${sens.map(x=>{const a=at(x.k,x.worstV);const lab=F[x.k].label;
+   return `<button class="nrow" data-edit="${x.k}"><span class="nt2"><b>${lab}が ${fmtV(x.k,x.worstV)} だったら</b><small>${a.o?'続けるのに要る数':'家賃を払う前に残る額'}</small></span><span class="tag ${a.o?(a.o.gap>=0?'unk':'ng'):(a.c>0?'unk':'ng')}">${a.o?'1日'+a.o.need+a.o.unit:man(a.c)}</span><em>›</em></button>`}).join('')}</div>`}
+ const leftR=Object.keys(F).filter(k=>F[k].range&&s.f[k]&&s.f[k].src==='tmp').length;
+ h+=`<div class="card soft"><h2>契約の前に</h2><p class="lead" style="margin:0">物件や借入は、あとから戻しにくい判断です。${leftR?`仮の数字があと${leftR}つあります。全部でなくても、効く3つを確かめてからで間に合います。`:'大事な数字は、もう確かめてあります。'}決めた数字は「ここまでの歩み」に残るので、あとから見返せます。</p></div>`;
+ const L=[['月の売上',`1日${u.have}${u.unit} × ${yen(f.price)} × ${f.days}日`,r.sales],['材料（原価）',`売上の${f.costRate}%`,-r.cost],['光熱費・消耗品など',`売上の${f.otherRate}%`,-r.other],['人に払うお金',cur==='a'?`${f.extra}人 × ${f.staffH}時間 × ${yen(f.wage)} × ${f.days}日`:'',-r.labor],['借りたお金の返済','毎月',-f.loan]];
+ if(rr)L.push(['家賃',esc(rr.n),-rent]);if(ow){L.push([ow.work?'あなたの給料':'店長の給料','',-(ow.work?ow.pay:ow.mgr)]);if(ow.left)L.push(['お店に残す','',-ow.left])}else L.push(['あなたの取り分','',-f.keep]);
+ L.push([rr?'毎月の差':'家賃を払う前に残る','',last]);
+ return h+`<details class="fold" data-fold="plan" ${s.fo?'open':''}><summary>計算の中身を見る</summary><div class="card"><table class="pltb">${L.map((x,i)=>`<tr class="${i===L.length-1?'tot':''}"><td><b>${x[0]}</b>${x[1]?`<small>${x[1]}</small>`:''}</td><td>${x[2]<0?'−':''}${man(Math.abs(x[2]))}</td></tr>`).join('')}</table><p class="small" style="margin:8px 0 0">数字は「計算のもと」で変えられます。</p></div></details>`}})();
+(function(){const c=document.createElement('style');c.textContent='.pltb{width:100%;border-collapse:collapse;font-size:13.5px}.pltb td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}.pltb td:last-child{text-align:right;white-space:nowrap;font-weight:700}.pltb small{display:block;font-size:11.5px;color:var(--sub)}.pltb tr.tot td{border-bottom:0;font-size:15px}.flh>b{white-space:nowrap;flex:none}.flh>span{min-width:0}';document.head.appendChild(c)})();
+
 </script>
 </body>
 </html>
