@@ -2367,6 +2367,51 @@ const c=document.createElement('style');c.textContent='.cbfine{font-size:11.5px;
 .seatst{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.seatst button{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:9px 4px;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
 .seatst b{font-size:14px}.seatst small{font-size:11.5px;color:var(--sub)}.seatst button.on{background:var(--green);border-color:var(--green);color:#fff}.seatst button.on small{color:#fff;opacity:.85}`;document.head.appendChild(c)})();
 
+/* ===== 2026-11-23 家賃を決める画面の作り直し：候補から選ぶ／マイソクを撮る／まだ無ければ見た額を入れる。選ぶとすぐ「1日に何人」 ===== */
+function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')&&f.perTsubo?Math.round(f.seats/f.perTsubo*10)/10:null;
+ let sel=s.pick&&pp.find(x=>x.id===s.pick)?{id:s.pick}:s.rentSeen?{v:s.rentSeen}:null;
+ const curRent=()=>sel?(sel.id?pp.find(x=>x.id===sel.id).rent:sel.v):null;
+ const verdict=rent=>{const p=sel&&sel.id?pp.find(x=>x.id===sel.id):{rent},j=ppJudge(p);return j};
+ const mini=p=>{const j=ppJudge(p);if(!j)return'';return `<span class="rsj ${j.lv}">${j.lv==='ok'?'いまの計画で回る':j.lv==='mid'?'あと1日'+(j.n.need-j.n.have)+j.n.unit:'厳しい'}</span>`};
+ openSheet(`<h3>考える場所の家賃</h3><p class="shl">家賃は場所でほぼ決まります。ここで決めた家賃で、「1日に何人要るか」と「要るお金」を計算します。</p>
+ <div class="rsres" id="rs_res"></div>
+ ${pp.length?`<div class="grp">候補の物件から選ぶ</div>${pp.map(p=>`<button class="rsc ${sel&&sel.id===p.id?'on':''}" data-rsp="${p.id}"><span class="rsr"></span><span class="rst"><b>${esc(p.n)}</b><small>家賃 ${man(p.rent)}${p.tsubo?'・'+p.tsubo+'坪':''}</small></span>${mini(p)}</button>`).join('')}`:''}
+ <button class="btn ghost rscam" id="rs_cam"><svg class="ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>${pp.length?'マイソクを撮って、候補に足す':'マイソクを撮って、家賃を読み取る'}</button>
+ <input type="file" id="rs_in" accept="image/*" capture="environment" hidden>
+ <div class="grp">${pp.length?'まだ決めずに、見た額で考える':'まだ物件がない時は、見た額で考える'}</div>
+ <div class="rsman ${sel&&!sel.id?'on':''}"><div class="rsstep"><button data-rsd="-1">−1万</button><span><input id="rs_v" type="number" inputmode="decimal" placeholder="例：15" value="${sel&&!sel.id?Math.round(sel.v/1000)/10:''}"><i>万円</i></span><button data-rsd="1">＋1万</button></div><small>共益費込み・税込みの月額</small>
+ <details><summary>見た額の決め方</summary><p>募集サイトで、開きたいエリア${ts?`と、${ts}坪前後（${f.seats}席を${f.perTsubo}席/坪で置いた広さ）`:''}で探します。3〜5件見て、真ん中あたりの額を入れてください。アプリは相場を出しません。</p></details></div>
+ <button class="btn dark" id="rs_ok">この家賃で考える</button>
+ ${s.rentSeen||s.pick?'<button class="lk rsoff" id="rs_no">家賃を外して、まだ決めていない状態に戻す</button>':''}`);
+ const res=()=>{const r=curRent(),el=$i('rs_res');if(!r){el.className='rsres';el.innerHTML='<p>候補を選ぶか、見た額を入れると、ここに「1日に何人要るか」が出ます。</p>';$i('rs_ok').disabled=true;return}
+  const j=verdict(r);$i('rs_ok').disabled=false;if(!j){el.className='rsres';el.innerHTML=`<b>${man(r)}</b>`;return}
+  el.className='rsres '+j.lv;el.innerHTML=`<small>家賃 ${man(r)} で続けるには</small><b>1日 ${j.n.need}${j.n.unit}</b><span>いまの計画は${j.n.have}${j.n.unit}。${j.head}</span>`};
+ document.querySelectorAll('#sheet [data-rsp]').forEach(b=>b.onclick=()=>{sel={id:b.dataset.rsp};document.querySelectorAll('#sheet [data-rsp]').forEach(x=>x.classList.toggle('on',x===b));document.querySelector('#sheet .rsman').classList.remove('on');$i('rs_v').value='';res()});
+ const man2=()=>{const v=+$i('rs_v').value;sel=v>0?{v:Math.round(v*10000)}:null;document.querySelectorAll('#sheet [data-rsp]').forEach(x=>x.classList.remove('on'));document.querySelector('#sheet .rsman').classList.toggle('on',!!sel);res()};
+ $i('rs_v').oninput=man2;
+ document.querySelectorAll('#sheet [data-rsd]').forEach(b=>b.onclick=()=>{const v=(+$i('rs_v').value||(curRent()?Math.round(curRent()/1000)/10:0))+(+b.dataset.rsd);$i('rs_v').value=Math.max(0,Math.round(v*10)/10)||'';man2()});
+ $i('rs_cam').onclick=()=>$i('rs_in').click();$i('rs_in').onchange=e=>msStart([...e.target.files]);
+ $i('rs_ok').onclick=()=>{if(!sel)return;if(sel.id){const p=pp.find(x=>x.id===sel.id);s.pick=p.id;s.rentSeen=p.rent;log(`「${esc(p.n)}」の家賃 ${man(p.rent)} で考えることにした`)}else{delete s.pick;s.rentSeen=sel.v;log(`募集で見た家賃を${man(s.rentSeen)}と入れた`)}
+  s.tab='home';s.area='viable';s._viaSeen=1;save();closeSheet();window.scrollTo(0,0);render()};
+ if($i('rs_no'))$i('rs_no').onclick=()=>{delete s.rentSeen;delete s.pick;save();closeSheet();render()};
+ res()}
+/* 続けていけるか：家賃の出どころを、選んだ物件の名前で */
+(function(){const v0=viaCard;viaCard=function(){let h=v0();const s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(p&&p.rent===s.rentSeen)h=h.replace('<span>募集で見た家賃<small>自分で入れた額</small></span>',`<span>考えている物件の家賃<small>${esc(p.n)}</small></span>`);return h}})();
+(function(){const c=document.createElement('style');c.textContent=`
+.rsres{margin-top:12px;border-radius:14px;padding:12px 14px;background:var(--lime2);display:flex;flex-direction:column;gap:2px}.rsres p{margin:0;font-size:13px;color:var(--sub);line-height:1.6}
+.rsres small{font-size:12px;color:var(--sub)}.rsres b{font-size:24px}.rsres span{font-size:12.5px;color:var(--sub);line-height:1.6}
+.rsres.ok{background:var(--okbg)}.rsres.mid{background:var(--tmpbg)}.rsres.ng{background:var(--badbg)}
+.rsc{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;margin-top:8px;background:#fff;font:inherit;color:inherit}
+.rsc.on{border-color:var(--green);background:var(--okbg)}.rsr{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--line);box-sizing:border-box}.rsc.on .rsr{border:5px solid var(--green)}
+.rst{flex:1;display:flex;flex-direction:column;min-width:0}.rst b{font-size:14px}.rst small{font-size:12px;color:var(--sub)}
+.rsj{font-size:11.5px;border-radius:99px;padding:3px 8px;white-space:nowrap}.rsj.ok{background:var(--okbg);color:var(--ok)}.rsj.mid{background:var(--tmpbg);color:var(--tmp)}.rsj.ng{background:var(--badbg);color:var(--bad)}
+.rscam{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.rsman{border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-top:8px;background:#fff}.rsman.on{border-color:var(--green);background:var(--okbg)}
+.rsstep{display:grid;grid-template-columns:64px 1fr 64px;gap:8px;align-items:center}.rsstep button{height:46px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:inherit;font-weight:700;color:var(--green)}
+.rsstep span{display:flex;align-items:center;gap:4px}.rsstep input{width:100%;min-width:0;height:46px;border:1.5px solid var(--line);border-radius:10px;font:inherit;font-size:20px;font-weight:700;text-align:center;box-sizing:border-box}.rsstep i{font-style:normal;font-size:13px;color:var(--sub);white-space:nowrap}
+.rsman>small{display:block;font-size:12px;color:var(--sub);margin-top:6px}.rsman details{margin-top:6px;font-size:12.5px;color:var(--sub)}.rsman summary{color:var(--green)}.rsman details p{line-height:1.65;margin:4px 0 0}
+#rs_ok:disabled{opacity:.4}.rsoff{display:block;margin:10px auto 0;font-size:12.5px}`;document.head.appendChild(c)})();
+
 </script>
 </body>
 </html>
