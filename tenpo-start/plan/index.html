@@ -2204,6 +2204,63 @@ function msConfirm(d,th,left){const U=new Set(d.unclear||[]),u=k=>U.has(k)||d[k]
 .mswait{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px 0 18px}.mswait p{font-size:13.5px;color:var(--sub);text-align:center;line-height:1.7;margin:0}
 .msspin{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--green);animation:msr .9s linear infinite}@keyframes msr{to{transform:rotate(360deg)}}`;document.head.appendChild(c)})();
 
+/* ===== 2026-11-23 開業資金：候補の物件で考える／家賃は実際の物件から（回せる額は使わない）／公庫の目安 ===== */
+function fundRent(p){const s=st();if(cur==='b'&&s.sup)return s.sup.rent+s.sup.common;if(p)return p.rent;return s.rentSeen||0}
+function fundNeed(p,m,r){const f=r.f,g=q=>(m[q]||0),bk=p&&ppInit(p)?ppInit(p).t:g('bukken'),t1=bk+g('naiso')+g('kiki')+g('junbi'),rent=fundRent(p),mon=r.cost+r.other+r.labor+f.loan+rent,t2=mon*(m.unM||0)+(f.keep||0)*(m.seiM||0);return{bk,t1,t2,mon,rent,all:t1+t2}}
+function moneySheet(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const m=s.m,r=calc(),f=r.f;if(m.naiso==null&&k.naisoB)m.naiso=k.naisoB;s.pp=s.pp||[];
+ let pick=s.pp.find(x=>x.id===s.pick)||null;if(!pick&&s.pick)delete s.pick;
+ if(pick&&ppInit(pick))m.bukken=ppInit(pick).t;
+ const N=fundNeed(pick,m,r),keep=f.keep||0;
+ const w=v=>v?Math.round(v/10000):'';const inp=(key,ph,ro)=>`<span class="mi"><input type="number" inputmode="numeric" data-m="${key}" value="${w(key==='own'?k.own:key==='borrow'?k.borrow:m[key])}" placeholder="${ph||'未定'}"${ro?' readonly':''}><i>万円</i></span>`;
+ const naisoHint=pick?(/居抜き/.test(pick.memo||'')?'居抜き：残る設備しだいで、工事を小さくできます':/スケルトン/.test(pick.memo||'')?'スケルトン：床・壁・天井・設備から作るので、大きくなりがちです':''):'';
+ const rows=s.pp.length?s.pp.map(p=>{const n=fundNeed(p,m,r),j=ppJudge(p);return `<button class="fpk ${pick&&pick.id===p.id?'on':''}" data-fpick="${p.id}"><span><b>${esc(p.n)}</b><small>家賃 ${man(p.rent)}${ppInit(p)?'・契約時 '+man(ppInit(p).t):'・契約時の額は未入力'}${j?'・1日'+j.n.need+j.n.unit:''}</small></span><em>${man(n.all)}</em></button>`}).join(''):'';
+ openSheet(`<h3>${ic('yen')}開業資金</h3><p class="shl">開けるまでのお金と、続けるためのお金を分けて見ます。分からない所は空のままで大丈夫です。</p>
+ <div class="sec"><b class="sech">どの物件で考えるか</b>
+ ${s.pp.length?`<p class="emp" style="margin-top:4px">物件の比較に入れた候補です。押すと、その物件の家賃と契約のときのお金で計算します。右は要るお金の合計です。</p>${rows}<button class="fpk ${pick?'':'on'}" data-fpick=""><span><b>まだ決めていない</b><small>${s.rentSeen?'募集で見た家賃 '+man(s.rentSeen)+' で計算':'家賃を入れずに計算'}</small></span></button>`
+  :`<p class="emp" style="margin-top:4px">まだ候補の物件がありません。マイソクを撮って物件の比較に入れると、物件ごとに要るお金が出ます。</p><button class="btn ghost" data-tl="tool:pp">マイソクを撮って、候補に入れる</button>`}</div>
+ <div class="sec">${stp(1,'開けるまでのお金','<span id="mt1"></span>')}
+ ${MI.map(x=>{const bk=x[0]==='bukken'&&pick&&ppInit(pick);return `<div class="lrow"><div class="lm"><b>${x[1]}</b><small>${bk?`${esc(pick.n)}の募集資料から（${[ppInit(pick).a.dep?'保証金'+man(ppInit(pick).a.dep):'',ppInit(pick).a.key?'礼金'+man(ppInit(pick).a.key):'',ppInit(pick).a.brk?'仲介'+man(ppInit(pick).a.brk):'','前家賃'+man(ppInit(pick).a.pre)].filter(Boolean).join('・')}）`:(x[2]?x[2]+'・':'')+'支払い：'+x[3]}${x[0]==='naiso'&&naisoHint?`<br>${naisoHint}`:''}</small></div>${inp(x[0],'',bk)}</div>`}).join('')}
+ <p class="emp">見積もりや募集資料が届いたら、その数字に替えてください。${pick&&ppInit(pick)?'物件を借りるお金は、物件の比較で直せます。':''}</p></div>
+ <div class="sec">${stp(2,'続けるためのお金','<span id="mt2"></span>')}
+ <div class="lrow"><div class="lm"><b>運転資金</b><small>毎月出ていくお金 ${man(N.mon)}（${N.rent?`家賃${man(N.rent)}${pick?'（'+esc(pick.n)+'）':s.rentSeen?'（募集で見た額）':''}を含む`:'家賃はまだ入っていません。物件を選ぶと入ります'}）</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="unM" value="${m.unM}"><i>か月分</i></span></div>
+ <div class="lrow"><div class="lm"><b>生活費</b><small>毎月手元に残したい額 ${man(keep)}</small></div><span class="mi"><input type="number" inputmode="numeric" data-m="seiM" value="${m.seiM}"><i>か月分</i></span></div>
+ <p class="emp">何か月分を持つかは、仮で3か月と置いています。売上が計画に届くまでの備えです。</p></div>
+ <div class="sec">${stp(3,'どこから用意するか','<span id="mt3"></span>')}
+ <div class="lrow"><div class="lm"><b>自己資金</b>${k.ownR&&!k.own?`<small>ヒアリングの答え：${esc(k.ownR)}</small>`:''}</div>${inp('own')}</div>
+ <div class="lrow"><div class="lm"><b>借りたい額</b><small>公庫など</small></div>${inp('borrow')}</div>
+ <div class="kko" id="kko"></div></div>
+ <div class="box res" id="mres"></div>
+ ${svBtn('kouko')}<div class="alt"><button data-ask="開業資金の組み立てを相談したい">分からない・事務局に相談する</button></div>
+ <button class="btn ghost" data-act="close">閉じる</button>`);
+ const up=()=>{const n=fundNeed(pick,m,r),t3=(k.own||0)+(k.borrow||0),d=t3-n.all;
+  document.getElementById('mt1').textContent=n.t1?man(n.t1):'未定';document.getElementById('mt2').textContent=man(n.t2);document.getElementById('mt3').textContent=t3?man(t3):'未定';
+  const miss=MI.filter(x=>!(x[0]==='bukken'?n.bk:m[x[0]])).length;
+  document.getElementById('mres').innerHTML=`<div class="q">${pick?esc(pick.n)+'で、':''}${miss?`入力済み分の合計（未定が${miss}つ）`:'要るお金の合計'}</div><div class="a">${man(n.all)}</div><p>${!t3?'用意するお金を入れると、足りるかどうかが出ます。':miss?`未定の欄が${miss}つ残っています。足りるかどうかは、そろってから確かめます。いまは、用意するお金 ${man(t3)}・入力済み分 ${man(n.all)} です。`:d>=0?`用意するお金 ${man(t3)} で、${man(d)} の余裕があります。`:`用意するお金 ${man(t3)} では、あと ${man(-d)} 足りません。ここで分かってよかった数字です。工事の範囲・持つ月数・借りる額・物件のどれを動かすか、一緒に考えられます。`}</p>`;
+  document.getElementById('kko').innerHTML=kkoNote(n,k,f)};
+ document.querySelectorAll('#sheet [data-m]').forEach(el=>el.oninput=()=>{const q=el.dataset.m,v=el.value===''?null:+el.value;if(q==='bukken'&&pick&&ppInit(pick))return;if(q==='unM'||q==='seiM')m[q]=v||0;else if(q==='own'||q==='borrow'){if(v==null)delete k[q];else k[q]=v*10000}else m[q]=v==null?null:v*10000;save();up()});
+ document.querySelectorAll('#sheet [data-fpick]').forEach(b=>b.onclick=()=>{const v=b.dataset.fpick;if(v){s.pick=v;log(`開業資金を「${esc((s.pp.find(x=>x.id===v)||{}).n||'')}」で考えた`)}else{delete s.pick;if(m.bukken&&pick&&ppInit(pick)&&m.bukken===ppInit(pick).t)m.bukken=null}save();moneySheet()});
+ up();if(!s._mlog){s._mlog=1;log('開業資金の一覧を開いた')}}
+/* 公庫のひとこと。制度の上限と、審査で見られること、返済の月額の目安 */
+function kkoNote(n,k,f){const own=k.own||0,bor=k.borrow||0,all=n.all;let t=[];
+ t.push(`日本政策金融公庫の創業向けの融資（新規開業・スタートアップ支援資金）は、制度の上限が7,200万円（うち運転資金4,800万円）です。実際に借りられる額は、面談と審査で決まります。`);
+ if(all){const need=Math.max(0,all-own);if(own){const pc=Math.round(own/all*100);t.push(`いまの数字だと、自己資金は要るお金の${pc}%、借りる必要があるのは約${man(need)}です。${pc<20?'自己資金の割合が小さいと、借りられる額が希望より少なくなることがあります。':''}`)}else t.push(`自己資金を入れると、借りる必要がある額と、その割合が出ます。`)}
+ if(bor){const y7=bor/84,y10=bor/120;t.push(`${man(bor)}を借りると、返すのは元金だけで7年なら月約${man(y7)}、10年なら月約${man(y10)}（利息は別）。${f.loan?`計画に入れている返済は月${man(f.loan)}です。`:'計画の「借入の返済」に入れると、続けていけるかの計算に入ります。'}`)}
+ t.push('自己資金の条件は2024年に無くなりましたが、審査では、自己資金をどう貯めてきたか（通帳の動き）、同じ仕事の経験、計画の数字の根拠が見られます。');
+ return `<div class="kkoh">公庫で借りる時の目安</div>${t.map(x=>`<p>${x}</p>`).join('')}<p class="kkos">制度の中身は、公庫の「創業の手引」（2025年版）によります。変わることがあるので、申し込む前に公庫で確かめてください。</p>`}
+/* 物件の比較のカードから、開業資金へ */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-fundpp]');if(!b)return;e.preventDefault();const s=st();s.pick=b.dataset.fundpp;save();moneySheet()},true);
+(function(){const o=ppSheet;window.ppSheet=ppSheet=function(){o();const s=st();document.querySelectorAll('#sheet .ppi:not(.smp) .pph .lk[data-tl^="ppdel:"]').forEach(x=>{const id=x.dataset.tl.slice(6),card=x.closest('.ppi');if(!card)return;const a=document.createElement('button');a.className='btn ghost ppfund';a.dataset.fundpp=id;a.textContent=s.pick===id?'開業資金で見る（いま、この物件で計算中）':'この物件で、開業資金を見る';card.appendChild(a)})}})();
+(function(){const c=document.createElement('style');c.textContent=`
+.fpk{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;background:#fff;font:inherit;color:inherit}
+.fpk.on{border-color:var(--green);background:var(--okbg)}
+.fpk span{display:flex;flex-direction:column;gap:2px;min-width:0}.fpk b{font-size:14px}.fpk small{font-size:12px;color:var(--sub);line-height:1.5}
+.fpk em{font-style:normal;font-weight:700;font-size:15px;white-space:nowrap}
+.kko{margin-top:10px;background:var(--chkbg);border-radius:12px;padding:11px 12px}
+.kkoh{font-weight:700;font-size:13.5px;color:var(--chk)}
+.kko p{font-size:12.5px;line-height:1.7;color:var(--ink);margin:6px 0 0}.kko .kkos{color:var(--sub);font-size:11.5px}
+.mi input[readonly]{background:var(--lime2)!important;color:var(--sub)}
+.ppfund{margin-top:10px;font-size:13.5px}`;document.head.appendChild(c)})();
+
 </script>
 </body>
 </html>
