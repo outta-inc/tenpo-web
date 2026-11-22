@@ -2298,7 +2298,7 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;let prev=cbSum().val;
  if(focus){const el=document.getElementById('cbg_'+focus);if(el)setTimeout(()=>el.scrollIntoView({block:'start'}),60)}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!b)return;e.preventDefault();e.stopPropagation();cbSheet(b.dataset.cb||null)},true);
 /* 入口：続けていけるか・物件の比較・開業資金 */
-(function(){const v0=viaCard;viaCard=function(){const s=st();let h=v0();if(cur!=='b'&&!s.ow)h=`<div class="card cbask"><h2>あなたも、お店で働きますか？</h2><p class="lead">あなたの給料は人件費に入っていません。働くかどうかと、毎月要る額で、続けるのに要る人数が大きく変わります。</p><button class="btn dark" data-cb="own">答えて、計算に入れる</button></div>`+h;return h+cbBtn('','客単価・回転数・原価・あなたの給料などを、1枚で')}})();
+(function(){const v0=viaCard;viaCard=function(){const s=st();let h=v0();cbBtn('','客単価・回転数・原価・あなたの給料などを、1枚で')+h;if(cur!=='b'&&!s.ow)h=`<div class="card cbask"><h2>あなたも、お店で働きますか？</h2><p class="lead">あなたの給料は人件費に入っていません。働くかどうかと、毎月要る額で、続けるのに要る人数が大きく変わります。</p><button class="btn dark" data-cb="own">答えて、計算に入れる</button></div>`+h;return h}})();
 (function(){const p0=ppSheet;ppSheet=function(){p0();const bx=document.querySelector('#sheet .ppbase');if(bx)bx.insertAdjacentHTML('afterend',cbBtn('cust','この人数のもと（客単価・回転数・あなたの給料など）'))}})();
 (function(){const m0=moneySheet;moneySheet=function(){m0();const se=document.querySelectorAll('#sheet .sec')[2];if(se)se.insertAdjacentHTML('beforeend',cbBtn('cost','毎月出ていくお金のもと（原価・経費・あなたの給料）'))}})();
 /* 1つずつ直す画面の試算も、回せる額ではなく要る人数で */
@@ -2329,6 +2329,22 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!
 .cbask{border:1.5px solid var(--gold);background:#fffaf0}`;document.head.appendChild(c)})();
 
 function cbLive(f){const o=st().ow;return o&&cur!=='b'?(o.work?o.pay:0):(f.keep||0)}
+
+/* 2026-11-23 計算のもとを見つけやすく／1坪あたりの席数を「ゆったり・ふつう・詰めて」で選ぶ */
+const SEAT_ST=[['loose','ゆったり',1.0,'ソファや大きめの机。長く座ってもらうお店'],['mid','ふつう',1.5,'2人席と4人席が中心'],['tight','詰めて',2.0,'カウンター中心。席を多く取る']];
+(function(){const h0=homeTab;homeTab=function(){let h=h0();const c=cbSum();const card=`<div class="card cbhome"><div class="cbhh"><span class="cbi">${CB_ICON}</span><div><b>計算のもと</b><small>すべての数字は、ここの数字から出ています</small></div></div><div class="cbhv"><small>${c.lab}</small><b>${c.big}</b><span>${c.sub}</span></div><button class="btn dark" data-cb="">計算のもとを見る・直す</button></div>`;
+ const i=h.indexOf('<div class="card hml">');return i<0?h+card:h.slice(0,i)+card+h.slice(i)}})();
+(function(){const c0=cbSheet;cbSheet=function(f){c0(f);const s=st(),F=P[cur].fields;if(!F.perTsubo||!s.f.perTsubo)return;const r=document.getElementById('cbr_perTsubo');if(!r)return;const v=s.f.perTsubo.v;
+ r.querySelector('.cbl b').textContent='席の取り方（1坪あたりの席数）';
+ r.insertAdjacentHTML('afterbegin','');r.querySelector('.cbl').insertAdjacentHTML('afterend',`<div class="seatst">${SEAT_ST.map(([k,t,n,d])=>`<button data-seat="${n}" class="${Math.abs(v-n)<0.05?'on':''}"><b>${t}</b><small>${n}席/坪</small></button>`).join('')}</div><p class="cbn">${(SEAT_ST.find(x=>Math.abs(v-x[2])<0.05)||[0,'',0,'選ぶと下の数字が変わります。−／＋で細かく直せます。'])[3]}。厨房・トイレを含めた広さで数えます。物件の比較の「席の目安」に使います。</p>`);
+ r.querySelectorAll('[data-seat]').forEach(b=>b.onclick=()=>{const before=cbSum().val;applyEdit('perTsubo',+b.dataset.seat,'you');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc})}})();
+(function(){const c=document.createElement('style');c.textContent=`
+.cbhome{border:2px solid var(--green)}.cbhh{display:flex;align-items:center;gap:12px}.cbhh .cbi{flex:none;width:40px;height:40px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
+.cbhh b{display:block;font-size:16px;color:var(--green)}.cbhh small{font-size:12px;color:var(--sub)}
+.cbhv{margin-top:10px;background:var(--lime2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.cbhv small{font-size:12px;color:var(--sub)}.cbhv b{font-size:22px}.cbhv span{font-size:12px;color:var(--sub);line-height:1.5}
+.cbhome .btn{margin-top:10px}
+.seatst{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.seatst button{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:9px 4px;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
+.seatst b{font-size:14px}.seatst small{font-size:11.5px;color:var(--sub)}.seatst button.on{background:var(--green);border-color:var(--green);color:#fff}.seatst button.on small{color:#fff;opacity:.85}`;document.head.appendChild(c)})();
 
 </script>
 </body>
