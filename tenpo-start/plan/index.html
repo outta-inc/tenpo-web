@@ -2449,6 +2449,11 @@ function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')
  return h+`<details class="fold" data-fold="plan" ${s.fo?'open':''}><summary>計算の中身を見る</summary><div class="card"><table class="pltb">${L.map((x,i)=>`<tr class="${i===L.length-1?'tot':''}"><td><b>${x[0]}</b>${x[1]?`<small>${x[1]}</small>`:''}</td><td>${x[2]<0?'−':''}${man(Math.abs(x[2]))}</td></tr>`).join('')}</table><p class="small" style="margin:8px 0 0">数字は「計算のもと」で変えられます。</p></div></details>`}})();
 (function(){const c=document.createElement('style');c.textContent='.pltb{width:100%;border-collapse:collapse;font-size:13.5px}.pltb td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:top}.pltb td:last-child{text-align:right;white-space:nowrap;font-weight:700}.pltb small{display:block;font-size:11.5px;color:var(--sub)}.pltb tr.tot td{border-bottom:0;font-size:15px}.flh>b{white-space:nowrap;flex:none}.flh>span{min-width:0}';document.head.appendChild(c)})();
 
+/* 2026-11-23 ヘッダー：業態と日付をやめ、店名と開店までの日数（押すと直せる） */
+function header(sub,title){const s=st(),k=s.k||{};let d='';if(s.open){const n=Math.round((new Date(s.open+'T00:00:00')-tdNow())/864e5);d=n>0?`開店まで<b>${n}</b>日`:n===0?'今日が開店日':`開店から${-n}日`}
+ return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><span class="hdi"><button class="hdn ${k.name?'':'emp'}" data-kk="name" data-kt="text">${k.name?esc(k.name):'お店の名前はこれから'}</button><button class="hdd ${s.open?'':'emp'}" data-kk="open" data-kt="date">${d||'開店日を決める ›'}</button></span>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
+(function(){const c=document.createElement('style');c.textContent='.hdi{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:46vw;margin-right:8px}.hdi button{background:none;border:0;padding:0;font:inherit;text-align:right;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hdi .hdn{font-size:13.5px;font-weight:700;color:var(--ink)}.hdn.emp{color:var(--sub);font-weight:500;font-size:12.5px}.hdd{font-size:11.5px;color:var(--sub);margin-top:1px}.hdd b{color:var(--green);font-size:13px;margin:0 1px}.hdd.emp{color:var(--green);font-weight:700}';document.head.appendChild(c)})();
+
 </script>
 </body>
 </html>
