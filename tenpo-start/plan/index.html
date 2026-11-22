@@ -2298,7 +2298,7 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;let prev=cbSum().val;
  if(focus){const el=document.getElementById('cbg_'+focus);if(el)setTimeout(()=>el.scrollIntoView({block:'start'}),60)}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!b)return;e.preventDefault();e.stopPropagation();cbSheet(b.dataset.cb||null)},true);
 /* 入口：続けていけるか・物件の比較・開業資金 */
-(function(){const v0=viaCard;viaCard=function(){const s=st();let h=v0();if(cur!=='b'&&!s.ow)h=`<div class="card cbask"><h2>あなたも、お店で働きますか？</h2><p class="lead">あなたの給料は人件費に入っていません。働くかどうかと、毎月要る額で、続けるのに要る人数が大きく変わります。</p><button class="btn dark" data-cb="own">答えて、計算に入れる</button></div>`+h;return h+cbBtn('','客単価・回転数・原価・あなたの給料などを、1枚で')}})();
+(function(){const v0=viaCard;viaCard=function(){const s=st();let h=v0();cbBtn('','客単価・回転数・原価・あなたの給料などを、1枚で')+h;if(cur!=='b'&&!s.ow)h=`<div class="card cbask"><h2>あなたも、お店で働きますか？</h2><p class="lead">あなたの給料は人件費に入っていません。働くかどうかと、毎月要る額で、続けるのに要る人数が大きく変わります。</p><button class="btn dark" data-cb="own">答えて、計算に入れる</button></div>`+h;return h}})();
 (function(){const p0=ppSheet;ppSheet=function(){p0();const bx=document.querySelector('#sheet .ppbase');if(bx)bx.insertAdjacentHTML('afterend',cbBtn('cust','この人数のもと（客単価・回転数・あなたの給料など）'))}})();
 (function(){const m0=moneySheet;moneySheet=function(){m0();const se=document.querySelectorAll('#sheet .sec')[2];if(se)se.insertAdjacentHTML('beforeend',cbBtn('cost','毎月出ていくお金のもと（原価・経費・あなたの給料）'))}})();
 /* 1つずつ直す画面の試算も、回せる額ではなく要る人数で */
@@ -2329,6 +2329,43 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!
 .cbask{border:1.5px solid var(--gold);background:#fffaf0}`;document.head.appendChild(c)})();
 
 function cbLive(f){const o=st().ow;return o&&cur!=='b'?(o.work?o.pay:0):(f.keep||0)}
+
+/* 2026-11-23 計算のもとを見つけやすく／1坪あたりの席数を「ゆったり・ふつう・詰めて」で選ぶ */
+const SEAT_ST=[['loose','ゆったり',1.0,'ソファや大きめの机。長く座ってもらうお店'],['mid','ふつう',1.5,'2人席と4人席が中心'],['tight','詰めて',2.0,'カウンター中心。席を多く取る']];
+(function(){const h0=homeTab;homeTab=function(){let h=h0();const c=cbSum();const card=`<div class="card cbhome"><div class="cbhh"><span class="cbi">${CB_ICON}</span><div><b>計算のもと</b><small>すべての数字は、ここの数字から出ています</small></div></div><div class="cbhv"><small>${c.lab}</small><b>${c.big}</b><span>${c.sub}</span></div><button class="btn dark" data-cb="">計算のもとを見る・直す</button></div>`;
+ const i=h.indexOf('<div class="card hml">');return i<0?h+card:h.slice(0,i)+card+h.slice(i)}})();
+(function(){
+const r1=v=>Math.round(v*10)/10,food=()=>cur!=='c';
+/* 数字の代わりに選ぶ「お店のやり方」。値は業態の最初の値からの幅か、だれにでも同じ値 */
+const CH={
+ perTsubo:{lab:'席の取り方',opts:o=>[['ゆったり',1.0,'ソファや大きめの机。長く座ってもらうお店'],['ふつう',o.v,'2人席と4人席が中心'],['詰めて',2.0,'カウンター中心。席を多く取る']],note:'厨房・トイレを含めた広さで数えます。物件の比較の「席の目安」に使います。'},
+ turns:{lab:'1日に、席が何回うまるか',opts:o=>[['ゆっくり過ごしてもらう',r1(o.v*0.7),'1組が長くいる。読書や打ち合わせのお客さん'],['ふつう',o.v,'いまの計画の見込み'],['次々に入れ替わる',r1(o.v*1.4),'駅前・お昼どき・テイクアウトも多い']]},
+ days:{lab:'月に何日開けるか',opts:o=>[['週2日休む',22,'休みをしっかり取る'],['週1日休む',26,'多くのお店がこの形'],['ほぼ毎日',30,'休みは月に1日ほど']]},
+ costRate:{lab:o=>food()?'材料にかける割合（原価率）':'材料にかける割合',opts:o=>[['抑える',o.v-5,'仕入れを工夫して安く'],['ふつう',o.v,'この業態のよくある割合'],['こだわる',o.v+5,'いい材料を使う']]},
+ otherRate:{lab:'光熱費・消耗品・カード手数料など（売上に対して）',opts:o=>[['少なめ',o.v-2,'小さなお店・火をあまり使わない'],['ふつう',o.v,'よくある割合'],['多め',o.v+3,'火や機械をたくさん使う・キャッシュレスが多い']]},
+ extra:{lab:'あなた以外に、お店に立つ人',opts:o=>[['1人で回す',0,'あなた1人。席や品数は少なめに'],['もう1人',1,'忙しい時に手伝ってもらう'],['2人',2,'あなたが接客や外の仕事に回れる']]},
+ staffH:{lab:'その人が1日に入る時間',opts:o=>[['忙しい時だけ',3,'お昼や夜のピークだけ'],['半日',5,'仕込みか片付けも手伝ってもらう'],['通しで',8,'開店から閉店まで']]},
+ util:{lab:'予約がどのくらい埋まるか',opts:o=>[['始めのころ',40,'開店から数か月はこのくらいの店が多い'],['ふつう',60,'常連さんがついてきたころ'],['よく埋まる',80,'予約が取りにくいくらい']]}
+};
+const REN={price:o=>cur==='c'?'1回の料金':'1人あたりの金額（客単価）',seats:()=>'席の数',wage:()=>'人に払う時給',loan:()=>'借りたお金の毎月の返済',labor:()=>'人件費（月）',beds:()=>'ベッドの数'};
+const GH={cust:'お客さんの入り方と売上',cost:'材料と経費',ppl:'人',size:'広さと席'};
+const c0=cbSheet;cbSheet=function(f){c0(f);const s=st(),F=P[cur].fields;
+ const sh=document.querySelector('#sheet .shl');if(sh)sh.textContent='数字の代わりに、お店のやり方を選んでください。選ぶと、上の「要る数」がすぐ変わります。細かく直したい時は −／＋ で。';
+ Object.entries(GH).forEach(([g,t])=>{const h=document.querySelector('#cbg_'+g+' .cbh');if(h)h.textContent=t});
+ Object.entries(REN).forEach(([k,fn])=>{const b=document.querySelector('#cbr_'+k+' .cbl b');if(b&&F[k])b.textContent=fn(F[k])});
+ Object.entries(CH).forEach(([k,c])=>{const r=document.getElementById('cbr_'+k);if(!r||!F[k]||!s.f[k])return;const o=F[k],v=s.f[k].v,opts=c.opts(o).map(x=>[x[0],Math.min(o.max,Math.max(o.min,x[1])),x[2]]),hit=opts.find(x=>Math.abs(v-x[1])<1e-6);
+  r.querySelector('.cbl b').textContent=typeof c.lab==='function'?c.lab(o):c.lab;
+  r.querySelector('.cbl').insertAdjacentHTML('afterend',`<div class="seatst">${opts.map(([t,n])=>`<button data-chk="${k}" data-chv="${n}" class="${hit&&hit[1]===n?'on':''}"><b>${t}</b><small>${fmtV(k,n)}</small></button>`).join('')}</div><p class="cbn">${hit?hit[2]+'。':'いまは、選んだ形から少し変えた数字です。'}${c.note||''}</p><p class="cbfine">細かく直す</p>`)});
+ const lr=document.querySelector('#cbr_loan .cbx');if(lr)lr.insertAdjacentHTML('afterbegin','<button class="lk" data-x="money">借りる額から、開業資金で計算する ›</button>');
+ document.querySelectorAll('#sheet [data-chk]').forEach(b=>b.onclick=()=>{const before=cbSum().val;applyEdit(b.dataset.chk,+b.dataset.chv,'you');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc})}
+const c=document.createElement('style');c.textContent='.cbfine{font-size:11.5px;color:var(--sub);margin:8px 0 -2px}.seatst button b{font-size:13px;line-height:1.35;text-align:center}';document.head.appendChild(c)})();
+(function(){const c=document.createElement('style');c.textContent=`
+.cbhome{border:2px solid var(--green)}.cbhh{display:flex;align-items:center;gap:12px}.cbhh .cbi{flex:none;width:40px;height:40px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
+.cbhh b{display:block;font-size:16px;color:var(--green)}.cbhh small{font-size:12px;color:var(--sub)}
+.cbhv{margin-top:10px;background:var(--lime2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.cbhv small{font-size:12px;color:var(--sub)}.cbhv b{font-size:22px}.cbhv span{font-size:12px;color:var(--sub);line-height:1.5}
+.cbhome .btn{margin-top:10px}
+.seatst{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.seatst button{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:9px 4px;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
+.seatst b{font-size:14px}.seatst small{font-size:11.5px;color:var(--sub)}.seatst button.on{background:var(--green);border-color:var(--green);color:#fff}.seatst button.on small{color:#fff;opacity:.85}`;document.head.appendChild(c)})();
 
 </script>
 </body>
