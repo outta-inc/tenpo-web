@@ -313,6 +313,8 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .nrow em.pl{font-size:14px;font-weight:700;color:var(--green);white-space:nowrap}
 .btn.ln,a.btn.ln{background:#06C755;border-color:#06C755;color:#fff}.alt button.ln{border-color:#06C755;color:#058c3d;font-weight:700}
 .lnb{background:#eaf8ef;border-radius:14px;padding:14px;margin-top:14px}.lnb>b{font-size:15px;color:#058c3d}.lnb ol{margin:8px 0 0;padding-left:20px;font-size:13.5px;line-height:1.9}.lnb p{font-size:12.5px;color:var(--sub);line-height:1.7;margin:8px 0 0}
+.smpb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 76px);z-index:30;display:flex;align-items:center;gap:10px;background:#3a2f12;color:#fff;border-radius:99px;padding:7px 8px 7px 14px;font-size:12.5px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.22);white-space:nowrap}
+.smpb button{border:0;border-radius:99px;background:#fff;color:#3a2f12;font:inherit;font-size:12.5px;font-weight:700;padding:6px 12px;min-height:32px}
 </style>
 </head>
 <body>
@@ -2019,6 +2021,71 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-decide]');
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ask]');if(b)askSheet(b.dataset.ask)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-x]');if(!b)return;if(b.dataset.x==='recipe')recipeSheet();else if(b.dataset.x==='money'){moneySheet()}else hireSheet()});
 document.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.fold){st().fo=e.target.open;save()}},true);
+/* ===== サンプルで埋める（2026-11-22）。?sample=1 で開く。元の内容は端末に控え、「元に戻す」で戻す ===== */
+const SMPK=KEY+':before-sample',SMPI=IV.STORAGE_KEY+':before-sample';
+function smpBar(){let b=document.getElementById('smpb');if(!S._smp){if(b)b.remove();return}
+ if(!b){b=document.createElement('div');b.id='smpb';b.className='smpb';b.innerHTML='<span>サンプルを表示中</span><button id="smpx">元に戻す</button>';document.body.appendChild(b);b.querySelector('#smpx').onclick=smpAsk}}
+function smpAsk(){let has=false;try{has=localStorage.getItem(SMPK)!=null}catch(e){}
+ if(S._smp)openSheet(`<h3>サンプルを外して、元に戻す</h3><p class="shl">${has?'サンプルを入れる前の内容に戻します。サンプルの内容は消えます。':'この端末には、サンプルを入れる前の控えがありません。サンプルを入れた端末で開いて、戻してください。'}</p>${has?'<button class="btn dark" id="smp_back">元に戻す</button>':''}<button class="btn ghost" data-act2="close">閉じる</button>`);
+ else openSheet(`<h3>サンプルで埋めた状態を見る</h3><p class="shl">カフェ（10席・1人1,500円）の例を、ヒアリングから9つの中まで、全部の欄に入れます。使い切った時の見え方を確かめるためのものです。</p>
+ <ul class="rows"><li><span>いまの内容</span><b>この端末に控えます</b></li><li><span>戻し方</span><b>画面の「元に戻す」</b></li>${S._acc?'<li><span>アカウント</span><b>サンプルに置き換わります</b></li>':''}</ul>
+ <p class="emp">${S._acc?'登録しているので、アカウントの内容もサンプルになります。元の内容は、この端末の控えから戻せます。ほかの端末からは戻せません。':'数字・名前・連絡先は、どれも例です。'}</p>
+ <button class="btn dark" id="smp_go">サンプルを入れる</button><button class="btn ghost" data-act2="close">やめる</button>`);
+ const g=document.getElementById('smp_go');if(g)g.onclick=()=>{closeSheet();smpFill()};const k=document.getElementById('smp_back');if(k)k.onclick=smpBack}
+function smpBack(){let a=null,i=null;try{a=localStorage.getItem(SMPK);i=localStorage.getItem(SMPI)}catch(e){}if(a==null){toast('控えが見つかりません');return}
+ const acc=S._acc,id=S._id,con=IVS&&IVS.consultation;S=JSON.parse(a)||{};if(acc)S._acc=acc;if(id)S._id=id;delete S._smp;
+ try{if(i){const v=JSON.parse(i);if(con)v.consultation=con;localStorage.setItem(IV.STORAGE_KEY,JSON.stringify(v))}else localStorage.removeItem(IV.STORAGE_KEY);
+  localStorage.setItem(KEY,JSON.stringify(S));localStorage.removeItem(SMPK);localStorage.removeItem(SMPI)}catch(e){}
+ S._smpBack=1;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}location.replace(location.pathname)}
+function smpFill(){
+ if(!S._smp){try{localStorage.setItem(SMPK,JSON.stringify(S));const r=localStorage.getItem(IV.STORAGE_KEY);if(r!=null)localStorage.setItem(SMPI,r);else localStorage.removeItem(SMPI)}catch(e){toast('控えを残せなかったので、やめました');return}}
+ const keepS={};['_acc','_id','_accLater'].forEach(k=>{if(S[k]!=null)keepS[k]=S[k]});const con=IVS&&IVS.consultation;
+ S={...keepS,_smp:1};cur='a';
+ IVS=IV.createInterview('IV-SAMPLE',ivNow());if(con)IVS.consultation=con;
+ const A={businessType:'cafe',salesModel:'seated',experience:'worked',purpose:'平日の昼食と、午後の休憩。近くに住む人や働く人が、1人でも入りやすいお店',mainProduct:'コーヒーと、温かいサンドイッチ',capacity:10,averageSpendYen:1500,peakStaff:2,propertyStage:'viewing',
+  priorities:{mustKeep:'1人でも落ち着いて過ごせること。作りたての温かさ',canAdjust:'駅からの距離。広さは10坪前後まで'},openingTarget:'来年の春',area:'住宅街の駅から歩いて5分まで',businessHours:'10時〜18時',workingHours:'9時〜19時（準備と片付けを含む）',daysOffPerWeek:1,
+  operators:'自分と、昼の時間にアルバイト1人',helperHoursPerDay:3,ownFundsYen:3000000,desiredMonthlyTakeHomeYen:250000,shopName:'サンプル珈琲店',motive:'会社員のころ、昼に1人で落ち着ける店が近くになかった。自分の住む町に、そういう場所を作りたい',
+  guestsPerDay:20,candidateRentYen:180000,borrowPlan:'yes',worry:'家賃を払って、続けていけるか',existingEvidence:'（例）'};
+ for(let n=0;n<3;n++)for(const q of [...IV.questionsFor(IVS),...IV.questionsFor(IVS,{optional:true})]){if(IVS.answers[q.id]||A[q.id]==null)continue;try{IVS=IV.setAnswer(IVS,q.id,A[q.id],'answered',ivNow())}catch(e){}}
+ S._ivDone=1;ivSave();ivPlan();
+ const s=st(),k=s.k=s.k||{},T=tdNow(),D=n=>iso(addDays(T,n)),id=(()=>{let n=0;return()=>'smp'+(++n)})();
+ Object.assign(k,{a2:'カウンター4席と、2人がけのテーブル3つ',a7:'ドリンクづくり',a9:'賃料',must:'1人でも落ち着いて過ごせること。作りたての温かさ',flex:'駅からの距離。広さは10坪前後まで',
+  name:'サンプル珈琲店',mood:'落ち着いた・ナチュラル',color:'白と木の色',ref:'（例）駅前の喫茶店。カウンターの高さと照明の明るさ',items:'ロゴ・メニュー表・看板・ショップカード',
+  hours:'10時〜18時',holiday:'週1日',when:'来年の春',late:'出さない',eisei:'これから取る',who:'自分と、昼の時間にアルバイト1人',work:'9時〜19時（準備と片付けを含む）',
+  ownR:'300万円ほど',own:3000000,borrow:5000000,naisoB:3000000,area:'住宅街の駅から歩いて5分まで',scene:'平日の昼食と、午後の休憩'});
+ s.kA=[...new Set([...(s.kA||[]),...Object.keys(k)])];s.open=D(150);
+ for(const[fk,x]of Object.entries(s.f))if(x.src==='tmp')x.src='you';
+ s.obs=s.obs||{};if(s.f.turns){s.f.turns.src='est';s.obs.turns={obs:'60分で入店6人・通行人118人（例）',est:'1日20人ほど → 2回転'}}
+ s.rentSeen=180000;s._viaSeen=1;s._h1=1;s.later=[];
+ s.pp=[{id:id(),n:'（例）駅から3分・1階',rent:180000,tsubo:10,memo:'居抜き。前は喫茶店。排気と給排水はそのまま使えそう'},{id:id(),n:'（例）駅から7分・1階',rent:140000,tsubo:9,memo:'スケルトン。人通りは少なめ。内装の費用がかかる'},{id:id(),n:'（例）商店街の中・2階',rent:120000,tsubo:12,memo:'階段のみ。看板を出せる場所を確かめる'}];
+ s.meas=[{name:'（例）駅から3分の物件の前',sec:3600,c:{in:6,out:5,to:2,pass:118,gu:1},qmax:2,bk:{},inPH:6,passPH:118,rate:5.1,day:0,clock:'12:10'},{name:'（例）近くのカフェの前',sec:1800,c:{in:7,out:6,to:3,pass:84,gu:0},qmax:3,bk:{},inPH:14,passPH:168,rate:8.3,day:0,clock:'15:05'}];
+ s.m={unM:3,seiM:3,bukken:1500000,naiso:3000000,kiki:1200000,junbi:400000};s.pay={bukken:-3,naiso:-2,kiki:-1,junbi:0,bm:-2};
+ s.qt=[{id:id(),cat:'naiso',n:'（例）A工務店',amt:3000000,memo:'居抜きを生かす案。工期3週間',pick:true},{id:id(),cat:'naiso',n:'（例）B設計',amt:3800000,memo:'カウンターを作り直す案。工期5週間'},{id:id(),cat:'naiso',n:'（例）C内装',amt:3300000,memo:'照明と床を替える案'},
+  {id:id(),cat:'kiki',n:'（例）厨房機器の店（中古中心）',amt:1200000,memo:'エスプレッソマシン・冷蔵庫・製氷機',pick:true},{id:id(),cat:'kiki',n:'（例）メーカーの新品',amt:1900000,memo:'保証3年'},{id:id(),cat:'bukken',n:'（例）駅から3分・1階',amt:1500000,memo:'保証金6か月・礼金・仲介手数料・前家賃',pick:true},{id:id(),cat:'junbi',n:'（例）開店前の仕入れと備品',amt:400000,memo:'豆・食材・包材・ショップカード',pick:true}];
+ s.buy=[{id:id(),n:'エスプレッソマシン（中古）',b:450000,a:420000,got:true},{id:id(),n:'冷蔵庫・冷凍庫',b:300000,a:310000,got:true},{id:id(),n:'製氷機',b:150000},{id:id(),n:'ホットサンドメーカー 2台',b:60000,a:58000,got:true},{id:id(),n:'椅子10脚・テーブル3台',b:180000},{id:id(),n:'レジと決済の端末',b:60000}];
+ s.ct=[{id:id(),n:'（例）A不動産 山田さん',role:'不動産',tel:'03-0000-0000',memo:'駅から3分・1階の担当',wait:'床の図面と、重飲食の可否の返事',logs:[{d:D(-6),t:'内見した。排気の経路を聞いた'},{d:D(-2),t:'図面を頼んだ'}]},
+  {id:id(),n:'（例）A工務店 佐藤さん',role:'内装・工事',tel:'03-0000-0001',memo:'見積もり300万円',wait:'',logs:[{d:D(-4),t:'内見に同行してもらった'},{d:D(-1),t:'見積もりを受け取った'}]},
+  {id:id(),n:'（例）保健所の窓口',role:'保健所・消防',tel:'03-0000-0002',memo:'図面を持って事前相談',wait:'',logs:[{d:D(-3),t:'事前相談をした。手洗いの数を確かめた'}]},
+  {id:id(),n:'（例）公庫の担当の方',role:'公庫・銀行',tel:'03-0000-0003',memo:'創業の融資の相談',wait:'面談の日の連絡',logs:[{d:D(-5),t:'事前相談をした。計画書を渡した'}]},
+  {id:id(),n:'（例）コーヒー豆の焙煎所',role:'仕入れ',tel:'03-0000-0004',memo:'週1回の配達。試しの豆をもらった',wait:'',logs:[{d:D(-1),t:'卸の値段を聞いた'}]}];
+ s.rc=[{n:'温かいサンドイッチ',price:850,cost:280,memo:'パンを焼く。具材を温める。盛り付ける。'},{n:'ドリップコーヒー',price:500,cost:90,memo:'豆15g。'},{n:'カフェラテ',price:600,cost:150,memo:'豆18g、牛乳200ml。'},{n:'本日のスープ',price:450,cost:130,memo:'前日に仕込む。1日10食まで。'},{n:'焼き菓子',price:350,cost:110,memo:'週2回まとめて焼く。'}];
+ s.ap=[{n:'（例）Aさん',from:'Instagram',st:3},{n:'（例）Bさん',from:'貼り紙',st:2},{n:'（例）Cさん',from:'紹介',st:1},{n:'（例）Dさん',from:'求人サイト',st:4}];
+ s.pre={date:D(143),who:'家族と友人8人。12時と13時に4人ずつ',ck:{0:true,1:true,2:true},fix:[{t:'伝票を置く場所がない',d:true},{t:'サンドイッチが重なると、提供まで12分かかる'},{t:'入口から、注文する場所が分かりにくい'}]};
+ s.road={};s.ts={};const R=roadData(),done=['hours','money','kouko0','naiken','sekou','hoken0','shobo0','keiyaku','acct'];
+ R.forEach(p=>p.items.forEach(i=>{if(i.need[0]==='no'||i.auto)return;if(done.includes(i.id))s.road[i.id]=D(-3)}));
+ Object.assign(s.ts,{yuushi:{st:'wait',who:'自分',note:'面談の日の連絡を待っている',due:D(10)},kouji:{st:'doing',who:'（例）A工務店',note:'図面の最後の確認',due:D(40)},eisei:{st:'doing',who:'自分',note:'講習を申し込んだ',due:D(21)},shiire:{st:'todo',who:'自分',note:'',due:D(100)},saiyo:{st:'doing',who:'自分',note:'1人は採用。もう1人、面接の日を決める',due:D(105)},insta:{st:'todo',who:'自分',note:'',due:D(60)}});
+ s.td=[{id:id(),t:'カウンターの高さを決める',due:D(7),who:'自分',note:'参考の喫茶店で測る',st:'doing'},{id:id(),t:'ロゴの案を3つもらう',due:D(14),who:'デザインの人',note:'',st:'wait'},{id:id(),t:'サンドイッチの試作（具材3種）',due:D(3),who:'自分',note:'原価を量る',st:'todo'},{id:id(),t:'火災保険の見積もりを頼む',due:D(-1),who:'自分',note:'',st:'todo'},{id:id(),t:'店名を決める',due:D(-10),who:'自分',note:'',st:'done'}];
+ const mk=(c,t)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="300" height="220" fill="${c}"/><text x="288" y="206" text-anchor="end" font-size="14" fill="#fff" font-family="sans-serif">${t}</text></svg>`);
+ s.ph=[['bukken','#7c8a80','外観（例）'],['bukken','#9a8f7d','厨房（例）'],['ref','#b08a5a','参考の内装（例）'],['ref','#5f7d8c','参考の看板（例）'],['menu','#b5654a','看板メニュー（例）'],['mise','#6f8f7a','工事の途中（例）']].map(([f,c,t],i)=>({id:1e12+i,f,d:mk(c,t)}));s.cover=s.ph[0].id;
+ s.docs=[{f:'boshu',n:'募集資料（例）.pdf',size:420000},{f:'boshu',n:'平面図（例）.pdf',size:310000},{f:'mitsu',n:'内装の見積もり（例）.pdf',size:280000},{f:'mitsu',n:'厨房機器の見積もり（例）.pdf',size:150000},{f:'todoke',n:'賃貸借契約書（例）.pdf',size:900000}];
+ s.events=[];['ヒアリングの答えから、最初の計画を受け取った','募集で見た家賃を18万円と入れた','店の前で数えた（例）','見積もりを選んだ。開業資金に入れた','レシピを5品入れた','スタッフを1人、採用に決めた','プレオープンの段取りを残した'].forEach(t=>log(t));
+ s.tab='home';s.area=null;save();window.scrollTo(0,0);render();smpBar();toast('サンプルを入れました')}
+(function(){if(!PUB)return;const q=location.search,m=/[?&]sample=(1|back)\b/.exec(q);if(S._smpBack){delete S._smpBack;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.accSched)window.accSched();setTimeout(()=>toast('元に戻しました'),300)}
+ smpBar();if(!m)return;try{history.replaceState(null,'',location.pathname)}catch(e){}
+ setTimeout(()=>{if(m[1]==='back'&&!S._smp){toast('サンプルは入っていません');return}smpAsk()},600)})();
+/* アプリの中からの入口：左上のロゴを、続けて5回押す（ホーム画面に置いたアプリでは番地を打てないため） */
+let smpN=0,smpT=0;document.addEventListener('click',e=>{if(!PUB||!e.target.closest('.top .lgi'))return;const n=Date.now();smpN=n-smpT<700?smpN+1:1;smpT=n;if(smpN>=5){smpN=0;smpAsk()}});
+
 </script>
 </body>
 </html>
