@@ -170,7 +170,7 @@ details summary{list-style:none;cursor:pointer}details summary::-webkit-details-
 .blk{display:grid;grid-template-columns:1fr 1fr;gap:8px}.blk button{border:1.5px dashed #b9c3bd;background:#fff;border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:2px;color:var(--ink)}
 .blk button .ic{color:var(--green2);margin-bottom:4px}.blk b{font-size:14px}.blk small{font-size:11.5px;color:var(--sub)}.blk button.full{border-style:solid;border-color:var(--green2);background:var(--lime2)}
 .fold{border-top:1px solid var(--line);padding:10px 0}.fh{display:flex;align-items:center;gap:8px}.fh b{flex:1;font-size:13.5px}
-.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.thumbs button{position:relative;border:none;padding:0;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#eee}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}.thumbs button{position:relative;border:none;padding:0;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#eee}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .thumbs em{position:absolute;left:3px;top:3px;background:var(--green);color:#fff;font-size:9.5px;font-style:normal;border-radius:4px;padding:0 4px}
 .frow{display:flex;align-items:center;gap:6px;width:100%;border:none;background:none;padding:7px 0;font-size:12.5px;text-align:left;color:var(--ink)}.frow span{flex:1}.frow small{color:var(--sub)}.frow .ic{color:var(--green2);margin:0}
 .mtop{display:flex;align-items:center;justify-content:center;gap:14px}.mtop .mtime{margin:6px 0;font-size:36px}.mtop .btn{margin:0}
@@ -482,6 +482,15 @@ button.frow{min-height:44px}
  body.lock .toast{left:calc(220px + (100vw - 220px - 460px)/2)}
  .shh::before{display:none}
 }
+
+/* ===== 2026-11-23 行の形をそろえる：一覧の行は、どれも nsrow と同じ高さ・文字・矢印 ===== */
+.nrow,.kr,.sheet .kr,button.frow{min-height:56px;padding:10px 0;gap:10px;font-size:14.5px;line-height:1.45}
+.nt2 b,.nt2 small+b{font-size:14.5px;line-height:1.45}.nt2 small{font-size:12px;line-height:1.5}
+.nrow>em:last-child,.kr::after,.sheet .kr[data-brk]::after,.sheet .kr[data-kk]::after{font-style:normal;color:#a9a294;font-size:18px}
+.kl,.sheet .kl{color:var(--ink);font-size:14.5px}.kv,.sheet .kv{font-size:14.5px}
+button.frow{border-top:1px solid var(--line);font-size:14.5px}button.frow:first-of-type{border-top:0}button.frow .ic{flex:none}button.frow small{font-size:12px}
+button.frow::after{content:"›";color:#a9a294;font-size:18px;margin-left:4px}
+div.frow{min-height:44px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
 </style>
 </head>
 <body>
