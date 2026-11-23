@@ -1130,21 +1130,7 @@ function measSheet(){const s=st();s.meas=s.meas||[];if(M&&M.t)clearInterval(M.t)
    else{saveCheck('evening','ok',`${Math.round(rec.sec/60)}分で通行人${rec.c.pass}人`,null,'self');closeSheet();render();toast('内見チェックに記録しました')}}}}
 
 /* ===== 伴走：いま一緒に進めること・ここまでの歩み ===== */
-function buddy(v){const s=st();s.meas=s.meas||[];let m;
- if(cur==='b'){const C=checksB(),open=C.filter(c=>c.block&&s.checks[c.id]?.st!=='ok').length,rec=Object.keys(s.checks).length;
-  if(!s.sup)m=['内見する物件の募集資料を、一緒に見ましょう','賃料と現況が分かると、チェックと収支がその物件向けになります。','募集資料の内容を入れる','data-act="sup"'];
-  else if(!rec)m=[`${esc(s.sup.when)}の内見では、この${C.length}つを確かめましょう`,'決めるのに必要な項目から並べてあります。現地でそのまま記録できます。','内見チェックを開く','data-tab="check"'];
-  else if(open)m=[`あと${open}つ分かれば、決められます`,'仲介担当者に聞く文を、1通にまとめてあります。','次に確かめることを見る','data-tab="check"'];
-  else m=['確認はそろいました。収支を見て決めましょう','家賃を入れた手元に残る額が出ています。','計画を見る','data-tab="plan"']}
- else{const r=calc(),tk=Object.keys(P[cur].fields).find(q=>P[cur].fields[q].task&&P[cur].fields[q].task!=='util'&&s.f[q].src!=='est');
-  if(r.cap<=0)m=['このままだと毎月足りません。どこを変えるか、一緒に探しましょう',`家賃を払う前に${man(-r.cap)}の不足です。動かしやすい数字から並べてあります。`,'動かせる数字を見る','data-tab="check"'];
-  else if(tk&&!s.meas.length)m=['店の前で10分、数えてみませんか',`「${P[cur].fields[tk].label}」はまだ${srcLabel(tk)}です。ここが結果を一番動かします。`,'その場で数える','data-act="meas"'];
-  else if(!s.open)m=['開店したい時期は、決まっていますか','日付が入ると、届出や申し込みの期限を逆算してお知らせできます。','目標日を入れる','data-kk="open" data-kt="date"'];
-  else{s.road=s.road||{};const it=roadData().flatMap(p=>p.items).find(i=>i.need[0]!=='no'&&!i.auto&&!s.road[i.id]);
-   m=it?[`次は「${it.t}」です`,`窓口は${it.who}。済んだら印を付けてください。`,'開店までを見る','data-tab="road"']:['やることは、ひととおり済んでいます','','開店までを見る','data-tab="road"']}}
- const ev=s.events.slice(-4).reverse();
- return `<div class="card buddy"><div class="bh"><span class="bav">${ic('people',16)}</span>いま一緒に進めること</div><h2>${m[0]}</h2>${m[1]?`<p class="lead">${m[1]}</p>`:''}<button class="btn dark" ${m[3]}>${m[2]}</button>${s.worry?`<button class="wl2" data-tab="${/集客|お客|人通り/.test(s.worry)?'check':/採用|スタッフ|手続き|許可|届/.test(s.worry)||s.worry==='人'?'road':'plan'}">気になっていること「${esc(s.worry.length>22?s.worry.slice(0,22)+'…':s.worry)}」は、ここから ›</button>`:''}</div>
- <div class="card"><div class="kh">${ic('flag',20)}<h2>ここまでの歩み</h2><span class="kc">${s.events.length}件</span></div><ul class="tl">${ev.map(e=>`<li><span>${dLabel(e.day).split('（')[0]}</span><div>${e.text}</div></li>`).join('')}</ul></div>`}
+
 
 /* ===== 依頼の文が自然にできあがる → 自分で送る／いなければテンポスタート事務局に頼む ===== */
 const LINE_ID='@949loqzo';/* 事務局の公式LINEのID（@から）。入れると、その公式LINEのトークが文入りで開く */
@@ -1253,17 +1239,7 @@ function openSheet(html){document.body.classList.add('lock');try{const hd=docume
  document.addEventListener('touchend',end);document.addEventListener('touchcancel',end)})();
 function closeSheet(){document.body.classList.remove('lock');if(S[cur])delete S[cur]._ret;if(M&&M.t){clearInterval(M.t);M.t=null}document.getElementById('sheet').classList.remove('on');document.getElementById('mask').classList.remove('on')}
 function editSheet(k){return numSheet(k)}
-function editSheetOld(k){const o=P[cur].fields[k],x=st().f[k];const lab=cur==='b'?'家賃を払う前に残る額':'家賃を払う前に残る額';
- openSheet(`<h3>${o.label}</h3><p class="small">${srcLabel(k)}${o.note?'（'+o.note+'）':''}</p>${o.why?`<p class="small" style="color:var(--ink)">${o.why}</p>`:''}${o.how&&x.src!=='ans'?`<p class="small"><b>確かめ方：</b>${o.how}</p>`:''}
- <div class="field"><label>値（${o.unit}）</label><input type="number" id="ev" value="${x.v}" step="${o.step}" min="${o.min}" max="${o.max}"><input type="range" id="er" value="${x.v}" step="${o.step}" min="${o.min}" max="${o.max}"></div>
- <div class="box res" id="epv"></div>${x.src==='tmp'?`<button class="btn dark" data-decide="${k}">この数字に決める</button><button class="btn ghost" data-act="apply" data-k="${k}">仮のまま、試しに計算する</button>`:`<button class="btn dark" data-act="apply" data-k="${k}">この値で計算し直す</button>`}
- ${x.v!==o.v||x.src!==o.src?`<button class="btn ghost" data-act="reset" data-k="${k}">最初の値（${fmtV(k,o.v)}・${SRC[o.src]}）に戻す</button>`:''}`);
- const ev=document.getElementById('ev'),er=document.getElementById('er');
- const rr=cur==='b'?null:refRent();
- const pv=()=>{const v=parseFloat(ev.value);if(isNaN(v))return;const box=document.getElementById('epv');
-  if(rr){const s=st(),x=s.f[k],old=x.v;x.v=v;const n=hmNeed(rr.rent);x.v=old;const b=hmNeed(rr.rent);if(n&&b){const d=n.need-b.need;box.innerHTML=`<div class="q">家賃 ${man(rr.rent)} で続けるのに要る数</div><div class="a">1日 ${n.need}${n.unit}</div><p>いまより ${d>0?'+':''}${d}${n.unit}</p>`;return}}
-  const m=metric({[k]:v}),b=metric();box.innerHTML=`<div class="q">${lab}</div><div class="a">${man(m)}</div><p>いまより ${m>=b?'+':''}${man(m-b)}</p>`};
- ev.oninput=()=>{er.value=ev.value;pv()};er.oninput=()=>{ev.value=er.value;pv()};pv()}
+
 function applyEdit(k,v,src,quiet){const x=st().f[k],o=P[cur].fields[k],old=x.v;if(isNaN(v))return;x.v=v;if(src)x.src=src;if(!quiet)log(`${o.label}を ${fmtV(k,old)} → ${fmtV(k,v)} に変えた（${srcLabel(k)}）`)}
 function supSheet(){const p=st().sup||{};
  openSheet(`<h3>募集資料の内容を入れる</h3><p class="small">①では聞いていない分だけです。</p>
@@ -1953,7 +1929,7 @@ function tdToggle(id){const s=st(),x=tdAll().find(y=>y.id===id);if(!x)return;
  else{if(tdAll().find(y=>y.id===id).st==='done'&&!s.road[x.rid]){toast('答えた内容から、済みになっています');return}if(s.road[x.rid])delete s.road[x.rid];else{s.road[x.rid]=iso(tdNow());log(`「${esc(x.t)}」を済みにした`)}}
  save();render()}
 /* ---- 開店までの道具 ---- */
-const QC=[['naiso','内装・設備の工事'],['kiki','厨房機器・家具・レジ'],['bukken','物件を借りるお金'],['junbi','開店前の仕入れ・備品・告知']];
+
 
 const qtSheet=()=>moneySheet('sum');
 const PM={bukken:-3,naiso:-2,kiki:-1,junbi:0};
@@ -1966,7 +1942,7 @@ function payBody(){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};s.pay=s.pa
   rows+=`<div class="lrow"><div class="lm"><b>${lab(n)}</b><small>${[inn?`入る ${man(inn)}（借りるお金）`:'',out?`出る ${man(out)}（${MI.filter(x=>mo(x[0])===n&&m[x[0]]).map(x=>x[1]).join('・')}）`:''].filter(Boolean).join('／')||'動きなし'}</small></div><span class="tag ${bal<0?'ng':'ok'}">残り ${man(bal)}</span></div>`}
  return `<p class="cbn">いつ、いくら出ていくかを月ごとに並べます。合計が足りていても、支払う順番で足りなくなる月がないかを見ます。</p>
  <div class="sec"><div class="grp">はじめに持っているお金</div><div class="lrow"><div class="lm"><b>自己資金</b></div><span class="tag ${k.own?'ok':'unk'}">${k.own?man(k.own):'未定'}</span></div>
- <div class="lrow"><div class="lm"><b>借りるお金が入る月</b><small>${k.borrow?man(k.borrow):'金額は未定（開業資金で入れられます）'}</small></div>${sel('bm',bm)}</div></div>
+ <div class="lrow"><div class="lm"><b>借りるお金が入る月</b><small>${k.borrow?man(k.borrow):'金額は未定（「合計で見る」で入れられます）'}</small></div>${sel('bm',bm)}</div></div>
  <div class="sec"><div class="grp">支払う月（仮。契約や見積もりで確かめて直します）</div>${MI.map(x=>`<div class="lrow"><div class="lm"><b>${x[1]}</b><small>${m[x[0]]?man(m[x[0]]):'金額は未定'}</small></div>${sel(x[0],mo(x[0]))}</div>`).join('')}</div>
  <div class="sec"><div class="grp">月ごとの動き</div>${rows}</div>
  <div class="box res"><div class="q">${miss?`入っている分だけで並べています（金額が未定：${miss}つ）`:'開店の月までの見通し'}</div><div class="a">${neg?`${lab(neg[0])}に ${man(neg[1])} 足りません`:`開店の月に残るのは ${man(bal)}`}</div>
@@ -2032,7 +2008,7 @@ const STGC={
  apply:{h:'契約の前に、確かめておきます',d:'申し込んだ物件を、契約の前に確かめる時期です。契約は、あとから戻しにくい判断です。',done:'確かめることに印を付けて、契約したら「契約した」を押します。',
   trip:[['不動産会社に、何を聞けばいいか分からない','確かめることから、そのまま送れる文ができます。','data-stga="1"','契約の前に確かめること','契約の前に確かめることを相談したい'],
    ['工事にいくらかかるか、分からない','契約の前に、内装会社に見積もりを頼むと、開業資金の大きな未定が埋まります。','data-sv="naiso"','見積もりを頼む文','工事の見積もりの取り方を相談したい'],
-   ['お金を借りられるか、不安','開業資金の合計と、自分で用意できるお金から、借りる額の目安が出ます。','data-x="money"','開業資金を見る','借入のことを相談したい']]},
+   ['お金を借りられるか、不安','開業資金の合計と、自分で用意できるお金から、借りる額の目安が出ます。','data-x="money"','お金を見る','借入のことを相談したい']]},
  contract:{h:'物件が決まりました。開店までの段取りです',d:'契約から工事が終わるまで。手続き・工事・支払いの順番を整える時期です。',done:'工事が終わりに近づいたら、次の「開店の準備中」へ進みます。',
   trip:[['工事の打ち合わせで、何を決めればいいか','入れてきた内容から、内装会社に渡す文ができます。席の数・厨房の形・予算が先です。','data-sv="naiso"','内装会社への依頼の文','工事の打ち合わせを相談したい'],
    ['支払いが重なって、不安','いつ、いくら出ていくかを月ごとに並べると、足りない月が先に分かります。','data-tl="tool:pay"','支払いの予定表','支払いの順番を相談したい'],
@@ -2058,7 +2034,7 @@ function mustSheet(){const s=st(),k=s.k=s.k||{},w=k.mw||{};openSheet(`<h3>思い
  $i('mw_ok').onclick=()=>{const t=mk();if(!t){toast('どれか1つ書いてください');return}k.mw={a:$i('mw_a').value.trim(),b:$i('mw_b').value.trim(),c:$i('mw_c').value.trim()};k.must=t;s.kA=s.kA||[];if(!s.kA.includes('must'))s.kA.push('must');log(`大切にしたいことを書いた：「${esc(t)}」`);save();render();closeSheet();toast('言葉にしました')}}
 /* お金のざっくり（構想中） */
 function moneyRough(){const s=st(),m=s.m||{},r=calc(),pk=(s.pp||[]).find(x=>x.id===s.pick),N=fundNeed(pk,Object.assign({unM:3,seiM:3},m),r),und=['bukken','naiso','kiki','junbi'].filter(q=>!(q==='bukken'&&pk&&ppInit(pk))&&!(m[q]>0)).length,own=(s.k||{}).own;
- return `<div class="card"><p class="hmk">お金のざっくり</p>${N.t1>0?`<b class="stgb">開けるまで ${man(N.t1)}${und?`（未定が${und}つ）`:''}</b>`:'<b class="stgb">開けるまでのお金：まだ入れていません</b>'}<p class="lead">続けるためのお金（運転資金と生活費・仮で3か月分）${man(N.t2)}${own?`・自分で用意できるお金 ${man(own)}`:''}。相場は出しません。分かる所から入れます。</p><button class="btn ghost sm" data-x="money">開業資金を見る・入れる</button></div>`}
+ return `<div class="card"><p class="hmk">お金のざっくり</p>${N.t1>0?`<b class="stgb">開けるまで ${man(N.t1)}${und?`（未定が${und}つ）`:''}</b>`:'<b class="stgb">開けるまでのお金：まだ入れていません</b>'}<p class="lead">続けるためのお金（運転資金と生活費・仮で3か月分）${man(N.t2)}${own?`・自分で用意できるお金 ${man(own)}`:''}。相場は出しません。分かる所から入れます。</p><button class="btn ghost sm" data-x="money">お金を見る・入れる</button></div>`}
 /* 工事の進め方（物件が決まった） */
 function buildSteps(){const st0=st(),bs=st0.bs||{},L=[['plan','内装会社と、図面と見積もりを決める','席の数・厨房の形・予算から。見積もりは同じ項目で並べて比べます。','data-tl="tool:qt"','見積もりを入れる'],['ask','工事の前に、図面を持って保健所と消防署に相談する','流し・手洗い・換気・消火器など、後から直すと高くつく所を先に聞きます。中身は窓口で確かめます。','data-tab="road"','やることで窓口を見る'],['start','着工','工事の間に、仕入れ先・メニュー・採用を進めます。','',''],['eq','設備と家具が入る','買う物リストで、予算と実際を見ます。','data-tl="tool:buy"','買う物リスト'],['end','引き渡し・検査','保健所の検査を受けて、営業の許可を受けます。日取りは早めに相談します。','data-tab="road"','やることを見る']];
  return `<div class="card"><h2>工事の進め方</h2><p class="lead">よくある順番です。業者と窓口で、あなたのお店の順番を確かめてください。済んだら丸を押します。</p>${L.map(([id,t,d,at,lb],i)=>`<div class="lrow"><button class="tdc ${bs[id]?'done':''}" data-bs="${id}" aria-label="済み"></button><div class="lm" style="cursor:default"><b class="${bs[id]?'tdd':''}">${i+1}. ${t}</b><small>${d}</small>${at?`<button class="lk" ${at} style="padding:4px 0 0">${lb} ›</button>`:''}</div></div>`).join('')}</div>`}
@@ -2110,7 +2086,7 @@ function applySheet(){const s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(!p){op
  <div class="card"><div class="kh"><h2>確かめること</h2><span class="kc">済み ${dn}/${C.length}</span></div>${C.map(([id,t])=>`<div class="lrow"><button class="tdc ${p.pre[id]?'done':''}" data-appre="${id}" aria-label="確かめた"></button><button class="lm tdm" data-appre="${id}"><b class="${p.pre[id]?'tdd':''}">${esc(t)}</b></button></div>`).join('')}
  <button class="btn ghost" data-pf="ask:${p.id}">聞くことを文にする</button></div>
  <div class="card"><h2>決める前の、最後の確認</h2>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:''}${n?`<p class="lead">この物件で続けるには、1日に${n.need}${n.unit}が要ります。いまの見込みは1日${n.have}${n.unit}。${n.gap>=0?`毎月 ${man(n.gap)} 残る計算です。`:`毎月 ${man(-n.gap)} 足りません。`}（仮）</p>`:''}${ppCmp(p,1)}
- <div class="alt"><button data-pf="open:${p.id}">この場所での形を見る</button><button data-x="money">開業資金を見る</button></div></div>
+ <div class="alt"><button data-pf="open:${p.id}">この場所での形を見る</button><button data-x="money">お金を見る</button></div></div>
  <button class="btn dark" data-stgmv="contract">契約した</button><button class="btn ghost" data-stgmv="search">申し込みをやめて、探し直す</button>`)}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-stg]');if(b){stgSheet();return}
  b=e.target.closest('[data-stgset]');if(b){const g=b.dataset.stgset;closeSheet();stgSet(g,'you');toast(`段階を「${STGL[g]}」にしました`);return}
@@ -2176,9 +2152,9 @@ function buySheet(){const s=st();s.buy=s.buy||[];const tb=s.buy.reduce((a,x)=>a+
  ${s.buy.length?`<ul class="rows"><li><span>予算の合計</span><b>${man(tb)}</b></li><li><span>買った分の合計</span><b>${man(ta)}</b></li><li><span>まだ買っていない</span><b>${left}件</b></li></ul>`:''}
  ${s.buy.map(x=>`<div class="lrow"><button class="tdc ${x.got?'done':''}" data-tl="buygot:${x.id}" aria-label="買った"></button><div class="lm"><b class="${x.got?'tdd':''}">${esc(x.n)}</b><small>予算 ${yen(x.b||0)}${x.got&&x.a?`・実際 ${yen(x.a)}`:''}</small></div><button class="lk" data-tl="buydel:${x.id}">消す</button></div>`).join('')||'<p class="emp">まだありません。</p>'}
  <details class="addf" ${s.buy.length?'':'open'}><summary>＋ 買う物を足す</summary><div class="f2"><div class="field"><label>物の名前</label><input id="buy_n" placeholder="例：冷蔵庫"></div><div class="field"><label>予算（円）</label><input id="buy_b" type="number" inputmode="numeric"></div></div><button class="btn dark" id="buy_add">足す</button></details>
- ${tb?`<button class="btn ghost" id="buy_cap">予算の合計を、開業資金の「厨房機器・家具・レジ」に入れる</button>`:''}`);
+ ${tb?`<button class="btn ghost" id="buy_cap">予算の合計を、お金の「厨房機器・家具・レジ」に入れる</button>`:''}`);
  $i('buy_add').onclick=()=>{const n=$i('buy_n').value.trim();if(!n){toast('名前を入れてください');return}s.buy.push({id:uid(),n,b:+$i('buy_b').value||0});save();render();buySheet()};
- if($i('buy_cap'))$i('buy_cap').onclick=()=>{s.m=s.m||{unM:3,seiM:3};s.m.kiki=tb;log('買う物リストの合計を、開業資金に入れた');save();render();toast('開業資金に入れました')}}
+ if($i('buy_cap'))$i('buy_cap').onclick=()=>{s.m=s.m||{unM:3,seiM:3};s.m.kiki=tb;log('買う物リストの合計を、開業資金に入れた');save();render();toast('お金の「厨房機器・家具・レジ」に入れました')}}
 const PRE0=['入店から注文まで、迷わず進めるか','注文から提供までの時間を測る','会計の流れと、レジ・決済の動き','片付けと、次のお客さんの案内','注文が重なった時に、どこが詰まるか'];
 function preSheet(){const s=st();s.pre=s.pre||{date:'',who:'',ck:{},fix:[]};const p=s.pre;
  openSheet(`<h3>プレオープンの段取り</h3><p class="shl">開店の前に、身近な人に来てもらって1回通します。直す所を見つけるための日です。</p>
@@ -2192,8 +2168,7 @@ function osSheet(){const s=st();const rows=[['メニューとレシピ',(s.rc||[
  openSheet(`<h3>開店したあとへ</h3><p class="shl">開店したあとは、毎日の運営（シフト・日報・在庫・売上）に仕事が移ります。ここまでに入れた内容は、TENPO/OSの運営アプリに引き継げます。</p>
  <div class="grp">引き継げる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b>${x[1]}</b></li>`).join('')}</ul>
  <p class="emp">引き継ぎは、事務局と相談しながら進めます。開店の1か月前ごろに声をかけてください。</p><button class="btn dark" data-ask="開店後の運営アプリ（TENPO/OS）への引き継ぎを相談したい">事務局に相談する</button><button class="btn ghost" data-act="close">閉じる</button>`)}
-function toolsCard(){const s=st(),n=k=>(s[k]||[]).length;const R=[['money','yen','お金','開業資金・見積もり・月ごとの支払いの予定',n('qt')?`見積もり${n('qt')}件`:''],['ct','people','連絡先と、やり取り','頼んだこと・返事待ち',n('ct')?n('ct')+'件':''],['pp','place','物件の比較','物件の資料を撮って、物件ごとに要る人数を見る',n('pp')?n('pp')+'件':''],['buy','ans','買う物リスト','予算と実際の金額',n('buy')?n('buy')+'件':''],['pre','flag','プレオープンの段取り','開店の前に1回通す',s.pre&&s.pre.date?md(s.pre.date):''],['os','shop','開店したあとへ','運営アプリへの引き継ぎ','']];
- return `<div class="card"><div class="kh">${ic('files',20)}<h2>開店までの道具</h2></div>${R.map(r=>`<button class="nrow" data-tl="tool:${r[0]}"><span class="nic">${ic(r[1],18)}</span><span class="nt2"><b>${r[2]}</b><small>${r[3]}</small></span>${r[4]?`<span class="tag doc">${r[4]}</span>`:''}<em>›</em></button>`).join('')}</div>`}
+
 const TOOL={money:()=>moneySheet('sum'),pay:paySheet,qt:qtSheet,ct:ctSheet,pp:ppSheet,buy:buySheet,pre:preSheet,os:osSheet};
 /* ---- できること ---- */
 function guideSheet(){const has=PUB?!!S._u:true;const G=[['shop','お店','5項目のメモ、やること、開店までの道具。開いたら、まずここ。'],['plan','計画','月の売上と、考えている場所で続けるのに1日何人要るか。数字は「計算のもと」で選んで変えられます。'],['check','確かめる','今日の1つ。店の前で数える道具で、仮の数字を自分の数字に替えます。'],['road','開店まで','やること、開店までの道具（物件の比較・支払いの予定表など）、手続きの窓口と期限。'],['files','フォルダ','写真と書類を、1か所に。']];
@@ -2305,7 +2280,7 @@ function smpFill(){
  const keepS={};['_acc','_id','_accLater'].forEach(k=>{if(S[k]!=null)keepS[k]=S[k]});const con=IVS&&IVS.consultation;
  S={...keepS,_smp:1};cur='a';
  IVS=IV.createInterview('IV-SAMPLE',ivNow());if(con)IVS.consultation=con;
- const A={businessType:'cafe',salesModel:'seated',experience:'worked',purpose:'平日の昼食と、午後の休憩。近くに住む人や働く人が、1人でも入りやすいお店',mainProduct:'コーヒーと、温かいサンドイッチ',capacity:10,averageSpendYen:1500,peakStaff:2,propertyStage:'viewing',
+ const A={category:'seated',businessType:'cafe',selfWork:'yes',openingWhen:'m6',salesModel:'seated',experience:'worked',purpose:'平日の昼食と、午後の休憩。近くに住む人や働く人が、1人でも入りやすいお店',mainProduct:'コーヒーと、温かいサンドイッチ',capacity:10,averageSpendYen:1500,peakStaff:2,propertyStage:'viewing',
   priorities:{mustKeep:'1人でも落ち着いて過ごせること。作りたての温かさ',canAdjust:'駅からの距離。広さは10坪前後まで'},openingTarget:'来年の春',area:'住宅街の駅から歩いて5分まで',businessHours:'10時〜18時',workingHours:'9時〜19時（準備と片付けを含む）',daysOffPerWeek:1,
   operators:'自分と、昼の時間にアルバイト1人',helperHoursPerDay:3,ownFundsYen:3000000,desiredMonthlyTakeHomeYen:250000,shopName:'サンプル珈琲店',motive:'会社員のころ、昼に1人で落ち着ける店が近くになかった。自分の住む町に、そういう場所を作りたい',
   guestsPerDay:20,candidateRentYen:180000,borrowPlan:'yes',worry:'家賃を払って、続けていけるか',existingEvidence:'（例）'};
@@ -2398,7 +2373,7 @@ function ppSheet(){pickSync();save();const s=st();s.pp=s.pp||[];const r=cur==='b
    物件の画面で試した数字は、その物件だけの物。希望（幅・やらないこと）は内見のあとに1回のタップで直す ===== */
 function wishOf(){const s=st();s.wish=s.wish||{};s.wish.no=s.wish.no||{};return s.wish}
 const pfSeatShop=()=>cur==='a'||cur==='d';
-function ppTry(p){const t=p.try||{},o={};if(t.seats)o.seats=t.seats;return o}
+
 function pfOpenH(){const t=String((st().k||{}).hours||'').replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)),m=t.match(/(\d{1,2})\s*(?:時|:|：)/);return m?+m[1]:null}
 /* 元の希望と、この物件で試した形。物件の比較と「この場所での形」で、同じ数字を出す */
 function pfLunchDef(f,gap){const va=1-(f.costRate+f.otherRate)/100,lp=Math.max(1000,Math.round(f.price*0.25/100)*100),per=Math.max(100,Math.round(lp*va/100)*100),times=8,add=5000;return{lp,times,add,ppl:Math.max(1,Math.ceil((Math.max(0,-gap)+times*add)/per/times))}}
@@ -2636,7 +2611,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-fundpp]');
 
 
 /* ===== 2026-11-23 計算のもと：係数を1枚で見て直す／あなたの給料とお店に残す額を分ける ===== */
-const CB_G=[['cust','お客さんと売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work']],['cost','原価と経費',['costRate','otherRate','loan']],['ppl','人',['extra','staffH','wage','labor','share']],['size','広さ',['perTsubo']]];
+
 /* ホーム：計算のもとのカード */
 function homeCalcCard(){const c=cbSum();return `<div class="card cbhome"><div class="cbhh"><span class="cbi">${CB_ICON}</span><div><b>計算のもと</b><small>すべての数字は、ここの数字から出ています</small></div></div><div class="cbhv"><small>${c.lab}</small><b>${c.big}</b><span>${c.sub}</span>${c.gap?`<em class="${c.gapOk?'ok':'ng'}">${c.gap}</em>`:''}</div><button class="btn dark" data-cb="">計算のもとを見る・直す</button></div>`}
 /* 続けていけるか：働くかの問い → 計算のもとの入口 → 答え（家賃の出どころは考えている物件の名前で） */
@@ -2763,7 +2738,7 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;pickSync();const seatShop=c
  ${grp('cust',bandOn()?`お客さんの入り方と売上（${n1}）`:'お客さんの入り方と売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work'])}
  ${bandG}
  ${offOk()?`<div class="cbg" id="cbg_off"><div class="cbh">店内以外の売り方${s.off&&(s.off.tk||s.off.dv)?'<span class="cbnew" style="background:var(--green)">入れています</span>':''}</div><p class="cbn">持ち帰りやデリバリーで売る分です。店内と同じ日に売る計算です。売らないなら、このままで大丈夫です。</p>${offRows()}</div>`:''}
- ${grp('cost','材料と経費',['costRate','otherRate','loan'],'<button class="lk" data-x="money">借りる額から、開業資金で計算する ›</button>')}
+ ${grp('cost','材料と経費',['costRate','otherRate','loan'],'<button class="lk" data-x="money">借りる額は「お金」で入れる ›</button>')}
  ${grp('ppl','人',['extra','staffH','wage','labor','share'])}
  ${!seatShop?grp('size','広さ',['perTsubo']):''}
  <div class="alt"><button data-ask="計算のもとの数字の決め方を相談したい">数字の決め方を、事務局に相談する</button></div>`);
@@ -2780,7 +2755,7 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;pickSync();const seatShop=c
  sheet.querySelectorAll('[data-cbw]').forEach(b=>b.onclick=()=>{const wk=b.dataset.cbw==='1';s.ow=s.ow||{pay:s.f.keep?s.f.keep.v:250000,mgr:280000,left:0};s.ow.work=wk;owSync();log(wk?'自分もお店で働く、と決めた':'お店を人に任せる、と決めた');save();render();back()});
  sheet.querySelectorAll('[data-cbo]').forEach(b=>b.onclick=()=>{const q=b.dataset.cbo,sc=sheet.scrollTop,L={pay:'あなたの給料（毎月）',mgr:'店長に払う給料（毎月）',left:'お店に残したい額（毎月）'}[q];
   nsOpen({t:L,short:L,unit:'万円',v:Math.round((s.ow[q]||0)/10000),step:1,min:0,max:100,fmt:v=>v?`${v}万円`:'なし',ch:q==='left'?[['なし',0,'残す額は決めない'],['3万円',3,'少しずつ貯める'],['10万円',10,'設備の買い替えや返済の余裕に']]:null,
-   lead:q==='pay'?'生活に毎月要る額です。開業資金の「生活費」にも使います。':q==='left'?'貯え・設備の買い替え・返済の余裕のぶん。':'',eff:v=>{const o=s.ow[q];s.ow[q]=v*10000;owSync();const h=nsEffect({});s.ow[q]=o;owSync();return h},
+   lead:q==='pay'?'生活に毎月要る額です。お金の「生活費」にも使います。':q==='left'?'貯え・設備の買い替え・返済の余裕のぶん。':'',eff:v=>{const o=s.ow[q];s.ow[q]=v*10000;owSync();const h=nsEffect({});s.ow[q]=o;owSync();return h},
    set:v=>{s.ow[q]=v*10000;owSync();log(`${L}を ${v?v+'万円':'なし'} にした`)},back:()=>{cbSheet();$i('sheet').scrollTop=sc}})});
  sheet.querySelectorAll('[data-cbpk]').forEach(b=>b.onclick=()=>{const p=pp.find(x=>x.id===b.dataset.cbpk);if(!p||s.pick===p.id)return;s.pick=p.id;s.rentSeen=p.rent;delete s._noPick;log(`「${esc(p.n)}」の家賃 ${man(p.rent)} で考えることにした`);save();render();back()});
  sheet.querySelectorAll('[data-cbgo]').forEach(b=>b.onclick=()=>{const el=sheet.querySelector(`[data-ns="${b.dataset.cbgo}"]`);if(el){el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.add('cbflash');setTimeout(()=>el.classList.remove('cbflash'),1600)}});
