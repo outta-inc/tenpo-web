@@ -170,7 +170,7 @@ details summary{list-style:none;cursor:pointer}details summary::-webkit-details-
 .blk{display:grid;grid-template-columns:1fr 1fr;gap:8px}.blk button{border:1.5px dashed #b9c3bd;background:#fff;border-radius:14px;padding:12px;text-align:left;display:flex;flex-direction:column;gap:2px;color:var(--ink)}
 .blk button .ic{color:var(--green2);margin-bottom:4px}.blk b{font-size:14px}.blk small{font-size:11.5px;color:var(--sub)}.blk button.full{border-style:solid;border-color:var(--green2);background:var(--lime2)}
 .fold{border-top:1px solid var(--line);padding:10px 0}.fh{display:flex;align-items:center;gap:8px}.fh b{flex:1;font-size:13.5px}
-.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}.thumbs button{position:relative;border:none;padding:0;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#eee}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}.thumbs button{position:relative;border:none;padding:0;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#eee}.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .thumbs em{position:absolute;left:3px;top:3px;background:var(--green);color:#fff;font-size:9.5px;font-style:normal;border-radius:4px;padding:0 4px}
 .frow{display:flex;align-items:center;gap:6px;width:100%;border:none;background:none;padding:7px 0;font-size:12.5px;text-align:left;color:var(--ink)}.frow span{flex:1}.frow small{color:var(--sub)}.frow .ic{color:var(--green2);margin:0}
 .mtop{display:flex;align-items:center;justify-content:center;gap:14px}.mtop .mtime{margin:6px 0;font-size:36px}.mtop .btn{margin:0}
@@ -1205,13 +1205,13 @@ function blockSheet(i){const x=karteData()[i],a=x.items.filter(kFilled).length;
 const PF=[['bukken','物件・内見'],['ref','参考にしたいお店'],['menu','メニュー・料理'],['mise','工事・できあがり']],DF=[['boshu','募集資料・図面'],['mitsu','見積もり'],['todoke','届出・契約']];
 let UPF=null;
 function filesTab(){const s=st();s.ph=s.ph||[];s.docs=s.docs||[];s.meas=s.meas||[];
- let h=`<div class="card"><div class="kh">${ic('files',20)}<h2>写真</h2><span class="kc">${s.ph.length}枚</span></div><p class="lead">撮った写真をためておくと、内装やデザインの依頼に付けられます。お店の表紙にもできます。</p>
+ let h=`<div class="card"><div class="kh">${ic('files',20)}<h2>写真</h2><span class="kc">${s.ph.length}枚</span></div>
  ${PF.map(([f,l])=>{const ps=s.ph.filter(x=>x.f===f);return `<div class="fold"><div class="fh"><b>${l}</b><span class="kc">${ps.length}</span><button class="edit" data-up="${f}">＋ 写真</button></div>${ps.length?`<div class="thumbs">${ps.map(x=>`<button data-ph="${x.id}"><img src="${x.d}" alt="">${s.cover===x.id?'<em>表紙</em>':''}</button>`).join('')}</div>`:''}</div>`}).join('')}
  ${s.ph.length?'':'<button class="btn ghost sm" data-act="phdemo">（試作用）例の写真を入れる</button>'}</div>
  <div class="card"><div class="kh">${ic('files',20)}<h2>データ</h2><span class="kc">${s.docs.length+s.meas.length}件</span></div><p class="lead">書類と、アプリの中でできた記録が、ここにたまります。</p>
  ${DF.map(([f,l])=>{const ds=s.docs.filter(x=>x.f===f);return `<div class="fold"><div class="fh"><b>${l}</b><span class="kc">${ds.length}</span><button class="edit" data-updoc="${f}">＋ ファイル</button></div>${ds.map(x=>`<div class="frow">${ic('files',15)}<span>${esc(x.n)}</span><small>${Math.max(1,Math.round(x.size/1024))}KB</small></div>`).join('')}</div>`}).join('')}
  <div class="fold"><div class="fh"><b>店の前で数えた記録</b><span class="kc">${s.meas.length}</span><button class="edit" data-act="meas">＋ 数える</button></div>${s.meas.map(m=>`<div class="frow">${ic('clock',15)}<span>${esc(m.name)}・${Math.round(m.sec/60)}分</span><small>入店${m.c.in}・通行${m.c.pass}</small></div>`).join('')}</div>
- <div class="fold"><div class="fh"><b>できあがった文</b><span class="kc">4</span></div>${Object.keys(SERV).map(id=>{const [f,n]=bCount(id);return `<button class="frow" data-sv="${id}">${ic(SERV[id].icon,15)}<span>${SERV[id].t}</span><small>${f}/${n}</small></button>`}).join('')}</div>
+ <div class="fold"><button class="frow" data-svl="1">${ic('who',15)}<span>頼むときの文</span><small>${Object.keys(SERV).length}つ</small></button></div>
  <p class="small" style="margin-top:10px">試作では、写真は小さくしてこの端末の中だけに置いています。書類は名前だけを記録します。</p></div>`;
  return h}
 function phSheet(id){const s=st(),x=s.ph.find(q=>q.id===id);if(!x)return;
@@ -2796,14 +2796,14 @@ function shopTab(v){const s=st(),k=s.k||{},p=P[cur];s.ph=s.ph||[];const c=cbSum(
   <div class="nsrows">${row('ans',k.must?'思いの言葉を直す':'思いを言葉にする','3つに答えると1つの文になります','data-mustw="1"')}${row('shop','5項目のメモ','来てほしい場面・中心の商品・仕事に使える時間 など','data-memo5="1"')}${row('flag','お店の細かいこと','お店の感じ・営業・人と資格・お金・物件',`data-blks="1"`,`${kf}/${kn}`)}</div></div>
  <div class="card"><h2 class="nsh">数字${(()=>{const n=Object.keys(s.f).filter(q=>s.f[q].src==='tmp'&&P[cur].fields[q]&&q!=='rentRate'&&P[cur].fields[q].min!=null).length;return n?`<em>仮が${n}つ</em>`:''})()}</h2>
   <div class="nsrows">${(NS_KEY[cur]||[]).map(nsRow).join('')}${bandOn()?row('',`${n2}の時間帯`,`${n2}だけで毎月 ${man(r.b2.sales)}・1日${r.b2.have}${cur==='t'?'件':'人'}`,'data-cb="band"'):''}${(()=>{const o=r.off;return o?row('','店内以外の売り方',`${[st().off.tk?'持ち帰り':'',st().off.dv?'デリバリー':''].filter(Boolean).join('・')}で毎月 ${man(o.sales)}・1日${o.orders}件`,'data-cb="off"'):''})()}${row('',bandOn()||cur==='b'||cur==='c'?'ほかの数字':`ほかの数字・${n2}の時間帯`,`原価・経費・人・あなたの取り分・家賃${offOk()&&!r.off?'・持ち帰りやデリバリー':''}`,'data-cb=""')}</div></div>
- <div class="card"><h2 class="nsh">お金・物件・写真</h2><div class="nsrows">
+ <div class="card"><h2 class="nsh">お金・物件・写真・歩み</h2><div class="nsrows">
   ${row('yen','お金',t1>0?`開けるまで ${man(t1)}・見積もり・支払いの時期`:'開けるまでのお金と、続けるためのお金','data-x="money"')}
   ${cur==='b'?'':row('place','物件',L('pp')?`${L('pp')}件${pk?`・いまは「${esc(pk.n)}」で計算`:''}`:'まだありません','data-tl="tool:pp"')}
   ${row('files','写真と書類',`${s.ph.length}枚`,'data-tab="files"')}
   ${food?row('ans','メニューとレシピ',L('rc')?`${L('rc')}品`:'売値と材料費から、原価率が出ます','data-x="recipe"'):''}
   ${row('people','採用',L('ap')?`応募者${L('ap')}人`:'人手 → 募集 → 応募者','data-x="hire"')}
-  ${row('who','頼むときの文','内装会社・公庫・税理士・募集など7つ','data-svl="1"')}</div></div>
- <div class="card"><h2 class="nsh">ここまでの歩み<em>${(s.events||[]).length}件</em></h2><ul class="tl">${ev.map(e=>`<li><span>${dLabel(e.day).split('（')[0]}</span><div>${e.text}</div></li>`).join('')}</ul>${(s.events||[]).length>3?`<div class="nsrows">${row('','全部見る','','data-hist="1"')}</div>`:''}</div>`;
+  ${row('who','頼むときの文','内装会社・公庫・税理士・募集など7つ','data-svl="1"')}
+  ${(s.events||[]).length?row('flag','ここまでの歩み',`${ev[0]?dLabel(ev[0].day).split('（')[0]+'・'+ev[0].text:''}`,'data-hist="1"',`${s.events.length}件`):''}</div></div>`;
  return h+(PUB?`<p class="ftn" style="text-align:center">この端末のこのブラウザに保存されます。${S._id?`<br>相談番号 ${S._id}`:''}<br><button class="lk" data-ivopen="1">ヒアリングの答えを見る・直す</button>${accFoot()}</p>`:'')}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-memo5]');if(b){openSheet(`<h3>5項目のメモ</h3>${memo5()}`);return}
  b=e.target.closest('[data-blks]');if(b){const D=karteData();openSheet(`<h3>お店の細かいこと</h3><p class="shl">分かっている所から入れてください。入れた分だけ、お店の姿と頼むときの文ができていきます。</p><div class="card" style="padding-top:4px;padding-bottom:4px">${D.map((x,i)=>{const a=x.items.filter(kFilled).length;return `<button class="nsrow" data-blk="${i}"><span class="nic">${ic(x.icon,18)}</span><span class="tx"><b>${x.t}</b></span><span class="v">${a}/${x.items.length}</span><i>›</i></button>`}).join('')}</div>`);return}
@@ -2878,11 +2878,7 @@ function planTop(v){if(cur==='b')return planTopB(v);
  rows.push([rr?'毎月の差':'家賃を払う前に残る',rr?(last>=0?'ここまで引いて残る':'ここまで引くと足りない'):'ここまで引いた残り',last,last>=0?'res':'bad']);
  h+=`<div class="card"><h2>お金の流れ</h2><p class="lead">1か月で、こう動く見通しです。</p>${rows.map(x=>`<div class="fl"><div class="flh"><span><b>${x[0]}</b><small>${x[1]}</small></span><b class="${x[3]==='bad'?'neg':''}">${x[3]==='bad'?'−':''}${man(Math.abs(x[2]))}</b></div><div class="flb"><i class="${x[3]}" style="width:${Math.max(2,Math.min(100,Math.abs(x[2])/r.sales*100))}%"></i></div></div>`).join('')}
   ${ow?'':`<button class="lk" data-cb="own">あなたの取り分を、給料とお店に残す額に分ける ›</button>`}</div>`;
- /* 計算のもと（やり方で選ぶ）への入口と、まだ仮のもの */
- const ten=Object.keys(F).filter(k=>s.f[k]&&s.f[k].src==='tmp'&&k!=='rentRate'&&k!=='keep').sort((a,b)=>(F[b].range?1:0)-(F[a].range?1:0));
- h+=`<div class="card"><h2>計算のもと</h2><p class="lead">席の取り方・席が何回うまるか・月に何日開けるかなど、お店のやり方を選ぶと数字が決まります。</p>
-  ${ten.length?`<p class="small" style="margin:0 0 4px">まだ仮のもの</p><div class="pills">${ten.slice(0,6).map(k=>`<span class="pill">${F[k].label}</span>`).join('')}</div>`:''}${cbBtn('','客単価・回転数・あなたの給料など')}</div>`;
- /* もし厳しかったら：要る人数か、家賃の前に残る額で */
+/* もし厳しかったら：要る人数か、家賃の前に残る額で */
  const sens=sensitivity().slice(0,3);
  if(sens.length){const at=(k,val)=>{const x=s.f[k],old=x.v;x.v=val;const o=rr?hmNeed(rr.rent):null,c=calc().cap;x.v=old;return{o,c}};
   h+=`<div class="card"><h2>もし、思ったより厳しかったら</h2><p class="lead">悪いほうに振れたときも、先に見ておきましょう。</p>${sens.map(x=>{const a=at(x.k,x.worstV);const lab=F[x.k].label;
