@@ -242,7 +242,7 @@ body.pub{background:var(--bg)}body.pub .top{top:0}
 .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
 body.lock{overflow:hidden}
 .fade{animation:f .35s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.tdc{width:26px;height:26px;border-radius:50%;border:2px solid #c9cdc8;background:#fff;flex:none;padding:0;position:relative}.tdc.done{background:var(--green);border-color:var(--green)}.tdc.done::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}.tdc.wait{border-color:var(--tmp);border-style:dashed}.tdc.doing{border-color:var(--green)}
+.tdc{width:30px;height:30px;border-radius:50%;border:2px solid #c9cdc8;background:#fff;flex:none;padding:0;position:relative}.tdc.done{background:var(--green);border-color:var(--green)}.tdc.done::after{content:"";position:absolute;left:10px;top:5px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}.tdc.wait{border-color:var(--tmp);border-style:dashed}.tdc.doing{border-color:var(--green)}
 .tdg{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;color:var(--sub);margin:18px 0 2px}.tdg small{font-weight:500}.tdx{background:var(--lime2);border-radius:12px;padding:10px 12px;margin:12px 0;font-size:13px;line-height:1.7}.tdx .wl{display:flex;gap:6px;align-items:flex-start}.tdx .btn{margin-top:8px;display:flex;width:100%;justify-content:center}.tdx .sr{display:block}.tdf summary{font-size:13px;color:var(--sub);padding:10px 0;min-height:44px;display:flex;align-items:center;cursor:pointer}.shf0{margin-top:16px}
 .tdm{background:none;border:none;text-align:left;padding:0;color:var(--ink);font:inherit}.tdd{text-decoration:line-through;color:var(--sub);font-weight:500}
 .top .biz{margin-left:auto}.hbtn{margin-left:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;padding:0;flex:none}
@@ -498,6 +498,7 @@ div.frow{min-height:44px;padding:8px 0;border-top:1px solid var(--line);font-siz
 .ppnd{font-size:13px;font-weight:700;border-radius:99px;padding:3px 10px;white-space:nowrap;background:var(--lime2);color:var(--green)}.ppnd.mid{background:#F6EBD2;color:#8a6510}.ppnd.ng{background:#FBEDE6;color:#A9562A}
 .ppd .ppi{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
 .ppd .pph>b{display:none}.ppd .pph{justify-content:flex-end;min-height:0}
+.acc1{padding:6px 16px 10px}.acc1 .nsrow{border:0}.acc1 .lk{display:block;margin:0 auto}
 </style>
 </head>
 <body>
@@ -1877,8 +1878,9 @@ async function accConsult(topic,body,nth){if(!PUB||!S._acc||!ACCU)return false;t
 function askGate(){if(!PUB||S._acc)return false;openSheet(`<h3>事務局への相談は、登録した方が使えます</h3><p class="shl">登録は無料です。登録すると、ここまでの内容がそのまま事務局に伝わるので、最初から説明し直さなくて済みます。</p><button class="btn dark" data-accopen="1">無料で登録して、相談する</button><button class="btn ghost" data-act="close">あとで</button>`);return true}
 function accOut(){const fin=()=>{delete S._acc;delete S._accP;ACCU=null;ACCMSG=null;save();closeSheet();render();toast('ログアウトしました。内容は、この端末に残っています')};(SB?SB.auth.signOut().catch(()=>{}):Promise.resolve()).then(fin)}
 function accCard(tab){if(S._acc||!S._u||!['shop','plan','home'].includes(tab))return'';const s=st();if(s.events.length<3&&s.day<1)return'';if(S._accLater!=null&&s.day-S._accLater<3)return'';
+ if(tab!=='home')return `<div class="card soft acc1"><button class="nsrow" data-accopen="1"><span class="tx"><b>無料で登録して、この計画を続ける</b><small>ここまでの内容を引き継いで、別の端末でも開けます</small></span><i>›</i></button><button class="lk" data-acclater="1">あとで登録する</button></div>`;
  return `<div class="card soft"><h2>この計画を続ける</h2><p class="lead">ここまでの回答と、自分で残した変更を引き継げます。別の端末でも、続きから開けます。</p><button class="btn dark" data-accopen="1">無料で登録して、この計画を続ける</button><button class="lk" data-acclater="1" style="display:block;margin:6px auto 0">あとで登録する</button></div>`}
-const accFoot=()=>S._acc?`<br>${ACCMSG?esc(ACCMSG):'登録済みです。この計画は、アカウントに残っています。'}<br><button class="lk" data-accout="1">ログアウト</button>${ACCMSG&&!ACCU?' <button class="lk" data-accopen="login">ログインする</button>':''}`:`<br><button class="lk" data-accopen="1">無料で登録して、この計画を続ける</button>`;
+const accFoot=()=>S._acc?`<br>${ACCMSG?esc(ACCMSG):'登録済みです。この計画は、アカウントに残っています。'}<br><button class="lk" data-accout="1">ログアウト</button>${ACCMSG&&!ACCU?' <button class="lk" data-accopen="login">ログインする</button>':''}`:(accCard((st()||{}).tab||'home')?'':`<br><button class="lk" data-accopen="1">無料で登録して、この計画を続ける</button>`);
 if(PUB){document.addEventListener('click',e=>{const b=e.target.closest('[data-accopen],[data-accgo],[data-acclater],[data-accout]');if(!b)return;const D=b.dataset;
   if(D.accopen){accSheet(D.accopen==='login');return}if(D.accgo){accGo(D.accgo);return}
   if(D.acclater){S._accLater=S._u?st().day:0;save();render();return}
@@ -2081,8 +2083,8 @@ function actSheet(){const s=st(),a=s.act||{},f=vals(),u=cur==='c'?'件':cur==='t
 function stgTop(){const s=st(),g=stgOf(),c=STGC[g],L=x=>(s[x]||[]).length,food=cur!=='c',k=s.k||{},rc0=roadCount(),pk=(s.pp||[]).find(x=>x.id===s.pick);let b='';
  if(g==='idea'){const R=hmState().R;
   b=`<div class="card stgc"><p class="hmk">あなたのお店</p><b class="stgb">${R.concept[1]}</b>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead">だれに来てほしいか、何を守りたいかを言葉にしておくと、物件を見る時の軸になります。</p>'}<div class="alt"><button data-mustw="1">${k.must?'言葉を直す':'思いを言葉にする'}</button><button data-hm="area:concept">お店の形を見る</button></div></div>
-  <div class="card stgc"><p class="hmk">気になる物件</p>${L('pp')?`<b class="stgb">${L('pp')}件</b>`:'<b class="stgb">まだありません</b><p class="lead">ネットで見た募集で大丈夫です。マイソクの写真か、家賃と広さだけでも入れられます。</p>'}<button class="btn dark" data-tl="tool:pp">${L('pp')?'物件の比較を開く':'募集を1つ入れてみる'}</button><p class="ftn">物件を入れると、あなたのお店がその場所で続けられるかと、守れる所・変える所が出ます。</p></div>${moneyRough()}`}
- if(g==='search')b=`<div class="card">${hrow('place','物件の比較と、この場所での形','物件を入れると、1日に何人要るかと、試せる案が出ます','data-tl="tool:pp"',L('pp')?L('pp')+'件':'')}${hrow('clock','店の前で数える','人通りと入る人を数えて、見込みを確かめる','data-act="meas"',L('meas')?L('meas')+'回':'')}${hrow('who','内装会社に、内見へ来てもらう','その時に送る文ができます','data-sv="naiso"')}</div>${k.must?`<div class="card soft"><p class="hmk">物件を見る時の軸</p><p class="stgq">「${esc(k.must)}」</p></div>`:''}${homeCalcCard()}`;
+  <div class="card stgc"><p class="hmk">気になる物件</p>${L('pp')?`<b class="stgb">${L('pp')}件</b>`:'<b class="stgb">まだありません</b><p class="lead">ネットで見た募集で大丈夫です。マイソクの写真か、家賃と広さだけでも入れられます。</p>'}<button class="btn dark" data-tl="tool:pp">${L('pp')?'物件の比較を開く':'募集を1つ入れてみる'}</button><button class="btn ghost" data-mscam="1">マイソクを撮る・選ぶ</button><p class="ftn">物件を入れると、あなたのお店がその場所で続けられるかと、守れる所・変える所が出ます。</p></div>${moneyRough()}`}
+ if(g==='search')b=`<div class="card">${hrow('files','マイソクを撮る・選ぶ','家賃と広さを読み取って、そのまま比較に足します','data-mscam="1"')}${hrow('place','物件の比較と、この場所での形','物件を入れると、1日に何人要るかと、試せる案が出ます','data-tl="tool:pp"',L('pp')?L('pp')+'件':'')}${hrow('clock','店の前で数える','人通りと入る人を数えて、見込みを確かめる','data-act="meas"',L('meas')?L('meas')+'回':'')}${hrow('who','内装会社に、内見へ来てもらう','その時に送る文ができます','data-sv="naiso"')}</div>${k.must?`<div class="card soft"><p class="hmk">物件を見る時の軸</p><p class="stgq">「${esc(k.must)}」</p></div>`:''}${homeCalcCard()}`;
  if(g==='apply')b=`<div class="card">${pk?`<p class="hmk">申し込む物件</p><b class="stgb">${esc(pk.n)}　家賃 ${man(pk.rent)}</b>`:'<p class="lead">申し込む物件を、物件の比較で選んでください。</p>'}${hrow('check','契約の前に確かめること','用途・営業できる時間・出る時の決まりなど','data-stga="1"',pk&&pk.pre?Object.values(pk.pre).filter(Boolean).length+'件 済み':'')}${hrow('yen','この物件での開業資金と、借りる額','合計と、公庫に相談する時の目安','data-x="money"')}${hrow('who','工事の見積もりを取る','内装会社に送る文ができます','data-sv="naiso"')}</div>`;
  if(g==='contract')b=`<div class="card">${hrow('check','手続き','保健所・消防署・税務署など。順番と期限','data-tab="road"',`${rc0[0]}/${rc0[1]}`)}${hrow('who','工事の見積もり','お金の中で、項目ごとに並べて選ぶ','data-tl="tool:qt"',L('qt')?L('qt')+'件':'')}${hrow('yen','月ごとの支払いの予定','いつ、いくら出ていくか','data-tl="tool:pay"')}</div>${buildSteps()}`;
  if(g==='prep')b=prepList();
@@ -2904,6 +2906,11 @@ function pickSync(){const s=st(),pp=s.pp||[];if(s.stg==='idea'&&s.stgBy!=='you'&
 
 
 
+
+/* ホームから、すぐマイソクを撮る・選ぶ（物件の比較を開かずに） */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mscam]');if(!b)return;e.preventDefault();let i=document.getElementById('ms_g');
+ if(!i){i=document.createElement('input');i.type='file';i.accept='image/*,application/pdf';i.multiple=true;i.hidden=true;i.id='ms_g';document.body.appendChild(i);i.onchange=ev=>{const f=[...ev.target.files].slice(0,3);i.value='';msStart(f)}}
+ i.click()},true);
 </script>
 </body>
 </html>
