@@ -366,6 +366,8 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .cbsum em{font-style:normal;font-weight:700;opacity:1}
 .cbsum em.ok{color:#cfe9d4}.cbsum em.ng{color:#ffd9cf}
 .cbhv em{font-style:normal;font-weight:700;font-size:13px;margin-top:2px}.cbhv em.ok{color:var(--ok)}.cbhv em.ng{color:var(--bad)}
+.seatst button{min-height:44px}
+.cbsrc.need{background:#F6E3D6;color:#A9562A}.cbhint.ng{background:#FBEDE6;color:#A9562A}
 .cbhint{font-size:12.5px;line-height:1.65;color:var(--chk);background:var(--chkbg);border-radius:10px;padding:8px 10px;margin:8px 0 0}
 .cbpl{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
 .cbpl button{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:9px 10px;font:inherit;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
@@ -612,7 +614,9 @@ function calc(over){const f=vals(over),s=st();let r={f};
  if(cur==='c'){r.simul=Math.min(f.beds,f.staff);r.slots=Math.floor(f.hours*60/(f.dur+f.gap));r.cap1=r.simul*r.slots;r.perDay=r.cap1*f.util/100;r.sales=r.perDay*f.price*f.days;r.labor=r.simul>1?r.sales*(r.simul-1)/r.simul*f.share/100:0}
  r.sales1=r.sales;r.labor1=r.labor;r.b2=null;const b2=(cur==='a'||cur==='d'||cur==='t')&&s.band2&&!(over&&over._nob)?s.band2:null;
  if(b2){const n2=cur==='t'?b2.orders:f.seats*b2.turns,sales2=n2*b2.price*b2.days;r.b2={sales:sales2,cost:sales2*b2.cost/100,add:b2.add*b2.days,have:Math.round(n2)};r.sales+=sales2;r.labor+=r.b2.add}
- r.cost=r.sales1*f.costRate/100+(r.b2?r.b2.cost:0);r.other=r.sales*f.otherRate/100;
+ r.off=null;const OF=offOk()&&s.off&&!(over&&over._nooff)?s.off:null;
+ if(OF){const o={sales:0,cost:0,fee:0,add:0,orders:0,ch:{}};['tk','dv'].forEach(c=>{const x=OF[c];if(!x||(c==='dv'&&x.fee==null))return;const sl=x.orders*x.price*f.days,y={sales:sl,cost:sl*x.cost/100,fee:sl*(x.fee||0)/100,add:x.add*f.days,orders:x.orders};o.ch[c]=y;['sales','cost','fee','add','orders'].forEach(q=>o[q]+=y[q])});if(Object.keys(o.ch).length){r.off=o;r.sales+=o.sales;r.labor+=o.add}}
+ r.cost=r.sales1*f.costRate/100+(r.b2?r.b2.cost:0)+(r.off?r.off.cost:0);r.other=r.sales*f.otherRate/100+(r.off?r.off.fee:0);
  if(cur==='b'){r.pre=r.sales-r.cost-r.other-r.labor-f.loan;r.rent=s.sup?s.sup.rent+s.sup.common:null;r.profit=r.rent!=null?r.pre-r.rent:null}
  else{r.cap=r.sales-r.cost-r.other-r.labor-f.loan-f.keep;r.ref=r.sales*f.rentRate/100;r.limit=Math.min(r.cap,r.ref)}
  return r}
@@ -1868,6 +1872,7 @@ function tdAll(){const s=st();s.road=s.road||{};s.ts=s.ts||{};s.td=s.td||[];cons
  roadData().forEach(ph=>{const wn=ph.when||'',sg=/12〜9/.test(wn)?['idea','search','apply']:/9〜6/.test(wn)?['apply','contract']:/6〜4/.test(wn)?['contract']:/開店後/.test(wn)?['open']:['prep'];const m=(ph.when||'').match(/(\d+)か月前/),pd=/開店後/.test(ph.when||'')?14:m?-m[1]*30:null;
   ph.items.filter(i=>i.need[0]!=='no').forEach(i=>{const x=s.ts[i.id]||{},off=typeof i.dl==='number'?i.dl:pd;
    out.push({stg:sg,id:'r:'+i.id,rid:i.id,t:i.t,who:x.who||i.who||'自分',due:x.due||(open&&off!=null?iso(addDays(open,off)):null),auto:!x.due,st:(i.auto||s.road[i.id])?'done':(x.st||'todo'),note:x.note||'',hint:typeof i.dl==='string'?i.dl:''})})});
+ if(offOk()&&s.off&&(s.off.tk||s.off.dv)){const nm=[s.off.tk?'持ち帰り':'',s.off.dv?'デリバリー':''].filter(Boolean).join('・'),x=s.ts.off_hk||{};out.push({stg:['contract','prep'],id:'r:off_hk',rid:'off_hk',xr:1,t:`${nm}を売るのに、いまの営業許可で足りるかを保健所に聞く`,who:x.who||'自分',due:x.due||(open?iso(addDays(open,-60)):null),auto:!x.due,st:s.road.off_hk?'done':(x.st||'todo'),note:x.note||'',hint:'工事の前の相談の時に一緒に'})}
  s.td.forEach(x=>out.push({id:'m:'+x.id,mid:x.id,t:x.t,who:x.who||'自分',due:x.due||null,st:x.st||'todo',note:x.note||'',mine:1}));
  (s.ct||[]).filter(c=>c.wait).forEach(c=>out.push({id:'c:'+c.id,cid:c.id,t:`${c.n}：${c.wait}`,who:c.n,due:null,st:'wait',contact:1}));
  return out}
@@ -1895,7 +1900,7 @@ function tdEdit(id,isNew){const s=st(),x=isNew?{id:'',t:'',who:'自分',due:'',s
  <div class="field"><label>だれがやるか</label><input id="td_who" value="${esc(x.who)}" placeholder="例：自分・家族・内装会社"></div>
  <div class="field"><label>メモ</label><textarea id="td_note" rows="2">${esc(x.note)}</textarea></div>
  <button class="btn dark" id="td_save">${isNew?'足す':'この内容にする'}</button>
- ${x.rid?`<button class="btn ghost" data-tab="road" data-act2="close">くわしい説明を「開店まで」で見る</button>`:''}${x.mine&&!isNew?`<button class="lk" id="td_del">このやることを消す</button>`:''}`);
+ ${x.rid&&!x.xr?`<button class="btn ghost" data-tab="road" data-act2="close">くわしい説明を「開店まで」で見る</button>`:''}${x.mine&&!isNew?`<button class="lk" id="td_del">このやることを消す</button>`:''}`);
  let stv=x.st;document.querySelectorAll('#td_st button').forEach(b=>b.onclick=()=>{stv=b.dataset.v;document.querySelectorAll('#td_st button').forEach(y=>y.classList.toggle('on',y===b))});
  $i('td_save').onclick=()=>{const due=$i('td_due').value||null,who=$i('td_who').value.trim()||'自分',note=$i('td_note').value.trim();
   if(x.mine){const t=$i('td_t').value.trim();if(!t){toast('やることを書いてください');return}
@@ -1964,7 +1969,7 @@ const HML={concept:['お店の形です。分かっている所からで大丈�
 /* 1日に来る人（持ち帰りは会計の件数、サロンは予約の件数）と、1人あたりの月の売上 */
 function hmPeople(r){const f=r.f;if(cur==='a'||cur==='d')return{have:Math.round(f.seats*f.turns),unit:'人',per:f.price*f.days};if(cur==='t')return{have:Math.round(r.orders),unit:'件',per:f.price*f.days};if(cur==='c')return{have:Math.round(r.perDay*10)/10,unit:'件',per:f.price*f.days};return null}
 /* その家賃の場所で、あなたの取り分まで残すのに要る1日の人数 */
-function hmNeed(rent,over){if(cur==='b'||!(rent>0))return null;const r=calc(over),f=r.f,pp=hmPeople(r);if(!pp||!(pp.per>0))return null;const lv=cur==='c'&&r.simul>1?(r.simul-1)/r.simul*f.share/100:0,va=1-(f.costRate+f.otherRate)/100-lv;if(va<=0)return null;const c2=r.b2?r.b2.sales*(1-f.otherRate/100)-r.b2.cost-r.b2.add:0,ns=Math.max(0,((lv?0:r.labor1)+f.loan+f.keep+rent-c2)/va);return{r,f,need:Math.ceil(ns/pp.per),have:pp.have,unit:pp.unit,ns,gap:r.cap-rent}}
+function hmNeed(rent,over){if(cur==='b'||!(rent>0))return null;const r=calc(over),f=r.f,pp=hmPeople(r);if(!pp||!(pp.per>0))return null;const lv=cur==='c'&&r.simul>1?(r.simul-1)/r.simul*f.share/100:0,va=1-(f.costRate+f.otherRate)/100-lv;if(va<=0)return null;const c2=(r.b2?r.b2.sales*(1-f.otherRate/100)-r.b2.cost-r.b2.add:0)+(r.off?r.off.sales*(1-f.otherRate/100)-r.off.cost-r.off.fee-r.off.add:0),ns=Math.max(0,((lv?0:r.labor1)+f.loan+f.keep+rent-c2)/va);return{r,f,need:Math.ceil(ns/pp.per),have:pp.have,unit:pp.unit,ns,gap:r.cap-rent}}
 function hmState(){const s=st(),f=vals(),p=P[cur],rc0=roadCount(),rd=rc0[0],rn=rc0[1],m=s.m||{},mn=Object.keys(m).filter(x=>x!=='unM'&&x!=='seiM'&&m[x]>0).length,L=x=>(s[x]||[]).length,B=cur==='b',n=B?null:hmNeed(s.rentSeen);
  const R={concept:['done',`${p.biz}${f.seats&&(cur==='a'||cur==='d')?`・${(s.wish&&s.wish.seats&&s.wish.seats.max>f.seats)?`${s.wish.seats.min}〜${s.wish.seats.max}席（内見で広げた）`:`${f.seats}席`}`:''}${f.price?`・1${cur==='c'?'回':'人'}${yen(f.price)}`:''}`],
   place:B?['doing','候補の物件を、いまのお店と比べる']:s.rentSeen?['doing',`見た家賃 ${man(s.rentSeen)}${L('pp')?`・候補${L('pp')}件`:''}`]:['todo','エリアと、そこの家賃を入れる所から'],
@@ -2581,7 +2586,7 @@ function cbBtn(g,sub){return `<button class="cbtn" data-cb="${g||''}"><span clas
 function refRent(){const s=st(),pp=s.pp||[],p=pp.find(x=>x.id===s.pick);if(p)return{rent:p.rent,n:p.n};if(s.rentSeen)return{rent:s.rentSeen,n:'募集で見た家賃'};return null}
 function owSync(){const s=st();if(cur==='b'||!s.ow||!s.f.keep)return;const o=s.ow,v=(o.work?o.pay:o.mgr)+(o.left||0);s.f.keep.v=v;s.f.keep.src='you'}
 function cbSum(){if(cur==='b'){const r=calc();return{big:man(r.pre),lab:'家賃を払う前に残る額',sub:'いまのお店の数字から'}}const rr=refRent(),r=calc(),u=hmPeople(r);
- if(rr){const n=hmNeed(rr.rent);if(n)return{big:`1日 ${n.need}${n.unit}`,lab:'続けるのに要る数',sub:`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算<br>いまの見込みは${bandOn()?bandNm()[0]+'の':''}1日${n.have}${n.unit}${bandOn()&&n.r.b2?`（${bandNm()[1]}は1日${n.r.b2.have}${cur==='t'?'件':'人'}で計算）`:''}`,gap:n.gap>=0?`毎月 ${man(n.gap)} 残る（仮）`:`毎月 ${man(-n.gap)} 足りない（仮）`,gapOk:n.gap>=0,val:n.need}}
+ if(rr){const n=hmNeed(rr.rent);if(n)return{big:`1日 ${n.need}${n.unit}`,lab:'続けるのに要る数',sub:`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算<br>いまの見込みは${bandOn()?bandNm()[0]+'の':''}1日${n.have}${n.unit}${bandOn()&&n.r.b2?`（${bandNm()[1]}は1日${n.r.b2.have}${cur==='t'?'件':'人'}で計算）`:''}${n.r.off&&n.r.off.orders>0?`<br>店内以外の売り方（1日${n.r.off.orders}件）も入れて計算`:''}`,gap:n.gap>=0?`毎月 ${man(n.gap)} 残る（仮）`:`毎月 ${man(-n.gap)} 足りない（仮）`,gapOk:n.gap>=0,val:n.need}}
  return{big:man(r.cap),lab:'家賃を払う前に残る額',sub:`1日${u?u.have+u.unit:''}・月の売上 ${man(r.sales)}。家賃を入れると、要る人数で出ます`,val:null}}
 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!b)return;e.preventDefault();e.stopPropagation();cbSheet(b.dataset.cb||null)},true);
@@ -2643,6 +2648,32 @@ function b2Rows(back){if(!(cur==='a'||cur==='d'||cur==='t'))return '';const s=st
  if(!b)return `<button class="nsrow" data-b2add="1"><span class="tx"><b>＋ ${n2}の時間帯を足す</b><small>${n2}と${n1}で、金額や人数が違う時に。${n1}だけなら、このままで大丈夫です</small></span><i>›</i></button>`;
  const r=calc(),R=[['price',yen(b.price)],[cur==='t'?'orders':'turns',cur==='t'?`${b.orders}件`:`${b.turns}回`],['days',`月${b.days}日`],['cost',`${b.cost}%`],['add',yen(b.add)]];
  return `<p class="nsg">${n2}の時間帯<small>${n2}だけで毎月の売上 ${man(r.b2.sales)}・1日${r.b2.have}${cur==='t'?'件':'人'}</small></p>${R.map(([q,v])=>`<button class="nsrow" data-b2="${q}"><span class="tx"><b>${n2}の${B2F[q][0]}</b></span><span class="v">${v}</span><span class="cbsrc tmp">仮</span><i>›</i></button>`).join('')}<button class="lk" data-b2del="1">${n2}の時間帯をやめる</button>`}
+/* 店内以外の売り方（持ち帰り・デリバリー） */
+const offOk=()=>cur==='a'||cur==='d'||cur==='t';
+const OFF_N={tk:'持ち帰り',dv:'デリバリー'},OFF_CH=()=>cur==='t'?['dv']:['tk','dv'];
+const OFF_F={orders:['1日の件数','件',1,0,500],price:['1件の金額','円',100,100,30000],cost:['材料と容器にかける割合','%',1,0,90],fee:['手数料','%',1,0,70],add:['1日あたりの追加の人件費など','円',1000,0,100000]};
+function offFmt(q,v){return v==null?'まだ':q==='price'||q==='add'?yen(v):`${v}${OFF_F[q][1]}`}
+/* 1件あたりに残る額（材料と容器・手数料・経費・追加の人件費を引いて） */
+function offPer(c){const x=(st().off||{})[c],f=vals();if(!x||(c==='dv'&&x.fee==null))return null;return Math.round(x.price*(1-x.cost/100-(x.fee||0)/100-f.otherRate/100)-(x.orders>0?x.add/x.orders:x.add))}
+function offAdd(c){const s=st(),f=vals();s.off=s.off||{};
+ const pr=cur==='t'?f.price:Math.min(f.price,Math.max(600,Math.round(f.price*0.25/100)*100));
+ s.off[c]={orders:0,price:pr,cost:Math.min(90,f.costRate+5),fee:c==='dv'?null:0,add:0,you:[]};
+ log(`店内以外の売り方に「${OFF_N[c]}」を足した（仮の数字で計算）`);save();render()}
+function offSheet(c,q,back){const s=st(),x=s.off&&s.off[c],d=OFF_F[q];if(!x||!d)return;const nm=OFF_N[c];
+ nsOpen({t:`${nm}の${d[0]}`,short:`${nm}の${d[0]}`,unit:d[1],v:x[q]??0,step:d[2],min:d[3],max:d[4],fmt:v=>offFmt(q,v),
+  ch:q==='orders'?[['少し',3,'店内のついでに受ける'],['ふつう',10,'持ち帰り用の品を決めて売る'],['多め',25,'店の売上の柱の1つにする']]:null,
+  lead:q==='orders'?'分からなければ「少し」から。':q==='fee'?'使うサービスと契約の形で、割合が変わります。契約する前に、そのサービスの条件を確かめて入れてください。入れるまで、デリバリーは計算に入れていません。':q==='cost'?'持ち帰りやデリバリーは、容器・袋・カトラリーの分だけ店内より高くなります。':q==='add'?'包む・受け渡す・電話を受ける人を足すなら、その1日分。店内の人で回すなら0円で大丈夫です。':'',
+  eff:v=>{const o=x[q];x[q]=v;const h=nsEffect({});x[q]=o;return h},
+  set:v=>{x[q]=v;x.you=x.you||[];if(!x.you.includes(q))x.you.push(q);log(`${nm}の${d[0]}を ${offFmt(q,v)} にした`)},back})}
+function offRows(){if(!offOk())return '';const s=st(),O=s.off||{},r=calc(),on=OFF_CH().filter(c=>O[c]),off=OFF_CH().filter(c=>!O[c]);
+ let h=on.map(c=>{const x=O[c],y=r.off&&r.off.ch[c],per=offPer(c),ks=['orders','price','cost'].concat(c==='dv'?['fee']:[],['add']);
+  return `<p class="nsg">${OFF_N[c]}<small>${y?`${OFF_N[c]}だけで毎月の売上 ${man(y.sales)}・1日${x.orders}件`:'手数料が入るまで、計算に入れていません'}</small></p>
+  ${ks.map(q=>`<button class="nsrow" data-offq="${c}:${q}"><span class="tx"><b>${OFF_F[q][0]}</b></span><span class="v">${offFmt(q,x[q])}</span>${q==='fee'&&x.fee==null?'<span class="cbsrc need">まだ</span>':`<span class="cbsrc ${(x.you||[]).includes(q)?'you':'tmp'}">${(x.you||[]).includes(q)?'あなた':'仮'}</span>`}<i>›</i></button>`).join('')}
+  ${per==null?'':`<p class="cbhint ${per>0?'':'ng'}">${per>0?`1件売ると、${yen(per)}残る計算です。`:`1件売るごとに ${yen(-per)} 減る計算です。金額か、材料と容器の割合${c==='dv'?'・手数料':''}を見直してください。`}</p>`}
+  <button class="lk" data-offdel="${c}">${OFF_N[c]}をやめる</button>`}).join('');
+ h+=off.map(c=>`<button class="nsrow" data-offadd="${c}"><span class="tx"><b>＋ ${OFF_N[c]}を足す</b><small>${c==='tk'?'店内と別に、包んで売る分':'配達のサービスを使って売る分'}</small></span><i>›</i></button>`).join('');
+ if(on.length)h+=`<details class="cbw"><summary>成り立つには</summary><p>・店内が忙しい時間と重なると、店内のお客さんを待たせます。だれが、いつ作るかを決めておきます。<br>・持ち帰り用に、時間がたってもおいしい品を選びます。<br>・売り始める前に、いまの営業許可で足りるかを保健所に聞きます（やることに入れました）。${O.dv?'<br>・デリバリーの手数料は、契約の形で変わります。':''}</p></details>`;
+ return h}
 /* 数字の行（どの画面でも同じ形） */
 function nsRow(k){const s=st(),o=P[cur].fields[k],x=s.f[k];if(!o||!x||o.min==null||typeof x.v!=='number')return '';return `<button class="nsrow" data-ns="${k}"><span class="tx"><b>${nsLab(k)}</b></span><span class="v">${fmtV(k,x.v)}</span><span class="cbsrc ${x.src}">${NS_SRC[x.src]||''}</span><i>›</i></button>`}
 const NS_SRC={ex:'実績',you:'あなた',ans:'答え',tmp:'仮',est:'推定',obs:'実測',calc:'計算'};
@@ -2668,6 +2699,7 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;pickSync();const seatShop=c
  ${place}${owG}
  ${grp('cust',bandOn()?`お客さんの入り方と売上（${n1}）`:'お客さんの入り方と売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work'])}
  ${bandG}
+ ${offOk()?`<div class="cbg" id="cbg_off"><div class="cbh">店内以外の売り方${s.off&&(s.off.tk||s.off.dv)?'<span class="cbnew" style="background:var(--green)">入れています</span>':''}</div><p class="cbn">持ち帰りやデリバリーで売る分です。店内と同じ日に売る計算です。売らないなら、このままで大丈夫です。</p>${offRows()}</div>`:''}
  ${grp('cost','材料と経費',['costRate','otherRate','loan'],'<button class="lk" data-x="money">借りる額から、開業資金で計算する ›</button>')}
  ${grp('ppl','人',['extra','staffH','wage','labor','share'])}
  ${!seatShop?grp('size','広さ',['perTsubo']):''}
@@ -2677,6 +2709,9 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;pickSync();const seatShop=c
  const back=()=>{const sc=sheet.scrollTop;cbSheet();$i('sheet').scrollTop=sc};
  sheet.querySelectorAll('[data-ns]').forEach(b=>b.onclick=()=>{const sc=sheet.scrollTop;numSheet(b.dataset.ns,()=>{cbSheet();$i('sheet').scrollTop=sc})});
  sheet.querySelectorAll('[data-b2]').forEach(b=>b.onclick=()=>{const sc=sheet.scrollTop;b2Sheet(b.dataset.b2,()=>{cbSheet();$i('sheet').scrollTop=sc})});
+ sheet.querySelectorAll('[data-offq]').forEach(b=>b.onclick=()=>{const[c,q]=b.dataset.offq.split(':'),sc=sheet.scrollTop;offSheet(c,q,()=>{cbSheet();$i('sheet').scrollTop=sc})});
+ sheet.querySelectorAll('[data-offadd]').forEach(b=>b.onclick=()=>{const c=b.dataset.offadd,sc=sheet.scrollTop;offAdd(c);const fin=()=>{cbSheet();$i('sheet').scrollTop=sc};offSheet(c,'orders',c==='dv'?()=>offSheet('dv','fee',fin):fin)});
+ sheet.querySelectorAll('[data-offdel]').forEach(b=>b.onclick=()=>{const c=b.dataset.offdel;delete s.off[c];log(`${OFF_N[c]}をやめた`);save();render();back();toast(`${OFF_N[c]}をやめました`)});
  sheet.querySelectorAll('[data-b2add]').forEach(b=>b.onclick=()=>{b2Add();back()});
  sheet.querySelectorAll('[data-b2del]').forEach(b=>b.onclick=()=>{const[,m]=bandNm();delete s.band2;log(`${m}の時間帯をやめた`);save();render();back();toast(`${m}の時間帯をやめました`)});
  sheet.querySelectorAll('[data-cbw]').forEach(b=>b.onclick=()=>{const wk=b.dataset.cbw==='1';s.ow=s.ow||{pay:s.f.keep?s.f.keep.v:250000,mgr:280000,left:0};s.ow.work=wk;owSync();log(wk?'自分もお店で働く、と決めた':'お店を人に任せる、と決めた');save();render();back()});
@@ -2702,7 +2737,7 @@ function shopTab(v){const s=st(),k=s.k||{},p=P[cur];s.ph=s.ph||[];const c=cbSum(
  <div class="card"><h2 class="nsh">あなたのお店</h2>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead" style="margin:4px 0 0">だれに来てほしいか、何を守りたいかを言葉にしておくと、物件を見る時の軸になります。</p>'}
   <div class="nsrows">${row('ans',k.must?'思いの言葉を直す':'思いを言葉にする','3つに答えると1つの文になります','data-mustw="1"')}${row('shop','5項目のメモ','来てほしい場面・中心の商品・仕事に使える時間 など','data-memo5="1"')}${row('flag','お店の細かいこと','お店の感じ・営業・人と資格・お金・物件',`data-blks="1"`,`${kf}/${kn}`)}</div></div>
  <div class="card"><h2 class="nsh">数字${(()=>{const n=Object.keys(s.f).filter(q=>s.f[q].src==='tmp'&&P[cur].fields[q]&&q!=='rentRate'&&P[cur].fields[q].min!=null).length;return n?`<em>仮が${n}つ</em>`:''})()}</h2>
-  <div class="nsrows">${(NS_KEY[cur]||[]).map(nsRow).join('')}${bandOn()?row('',`${n2}の時間帯`,`${n2}だけで毎月 ${man(r.b2.sales)}・1日${r.b2.have}${cur==='t'?'件':'人'}`,'data-cb="band"'):''}${row('',bandOn()||cur==='b'||cur==='c'?'ほかの数字':`ほかの数字・${n2}の時間帯`,'原価・経費・人・あなたの取り分・家賃','data-cb=""')}</div></div>
+  <div class="nsrows">${(NS_KEY[cur]||[]).map(nsRow).join('')}${bandOn()?row('',`${n2}の時間帯`,`${n2}だけで毎月 ${man(r.b2.sales)}・1日${r.b2.have}${cur==='t'?'件':'人'}`,'data-cb="band"'):''}${(()=>{const o=r.off;return o?row('','店内以外の売り方',`${[st().off.tk?'持ち帰り':'',st().off.dv?'デリバリー':''].filter(Boolean).join('・')}で毎月 ${man(o.sales)}・1日${o.orders}件`,'data-cb="off"'):''})()}${row('',bandOn()||cur==='b'||cur==='c'?'ほかの数字':`ほかの数字・${n2}の時間帯`,`原価・経費・人・あなたの取り分・家賃${offOk()&&!r.off?'・持ち帰りやデリバリー':''}`,'data-cb=""')}</div></div>
  <div class="card"><h2 class="nsh">お金・物件・写真</h2><div class="nsrows">
   ${row('yen','お金',t1>0?`開けるまで ${man(t1)}・見積もり・支払いの時期`:'開けるまでのお金と、続けるためのお金','data-x="money"')}
   ${cur==='b'?'':row('place','物件',L('pp')?`${L('pp')}件${pk?`・いまは「${esc(pk.n)}」で計算`:''}`:'まだありません','data-tl="tool:pp"')}
