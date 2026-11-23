@@ -353,15 +353,30 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .cbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin-top:12px;padding:13px 14px;border-radius:14px;border:1.5px solid var(--green);background:#fff;color:var(--ink);font:inherit;box-sizing:border-box}
 .cbtn .cbi{flex:none;width:38px;height:38px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
 .cbtn .cbt{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}.cbtn b{font-size:15px;color:var(--green)}.cbtn small{font-size:12px;color:var(--sub);line-height:1.5}.cbtn em{font-style:normal;color:var(--green);font-size:20px}
-.cbsum{position:sticky;top:64px;z-index:2;background:var(--green);color:#fff;border-radius:14px;padding:12px 14px;margin-top:12px;display:flex;flex-direction:column;gap:2px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.cbsum small{font-size:12px;opacity:.85}.cbsum b{font-size:24px;display:flex;align-items:baseline;gap:8px}.cbsum span{font-size:12px;opacity:.85;line-height:1.5}
+.cbstick{position:sticky;top:64px;z-index:3;background:#fff;margin:0 -20px;padding:10px 20px 8px}
+.cbsum{background:var(--green);color:#fff;border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.cbsum>div{flex:none;display:flex;flex-direction:column}
+.cbsum>span{flex:1;min-width:0}
+.cbsum em{font-style:normal;font-weight:700;opacity:1}
+.cbsum em.ok{color:#cfe9d4}.cbsum em.ng{color:#ffd9cf}
+.cbhv em{font-style:normal;font-weight:700;font-size:13px;margin-top:2px}.cbhv em.ok{color:var(--ok)}.cbhv em.ng{color:var(--bad)}
+.cbhint{font-size:12.5px;line-height:1.65;color:var(--chk);background:var(--chkbg);border-radius:10px;padding:8px 10px;margin:8px 0 0}
+.cbpl{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
+.cbpl button{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:9px 10px;font:inherit;text-align:left;display:flex;flex-direction:column;gap:2px;min-width:0}
+.cbpl button b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cbpl button small{font-size:12px;color:var(--sub)}
+.cbpl button.on{background:var(--green);border-color:var(--green);color:#fff}.cbpl button.on small{color:#fff;opacity:.85}
+.cbfd{margin-top:6px}.cbfd>summary{font-size:12.5px;color:var(--green);cursor:pointer;padding:4px 0;list-style:none}.cbfd>summary::-webkit-details-marker{display:none}.cbfd>summary::after{content:" ›"}.cbfd[open]>summary::after{content:" ⌄"}
+.cbflash{animation:cbfl 1.6s ease}@keyframes cbfl{0%,60%{background:#fff6dc}100%{background:transparent}}
+button.cbtmp{display:block;width:100%;text-align:left;border:0;font:inherit}
+.cbsum small{font-size:12px;opacity:.85}.cbsum b{font-size:22px;display:flex;align-items:baseline;gap:6px;white-space:nowrap}.cbsum span{font-size:11.5px;opacity:.9;line-height:1.5}
 .cbsum i{font-style:normal;font-size:13px;padding:2px 8px;border-radius:99px;background:#fff}.cbsum i.up{color:var(--bad)}.cbsum i.dn{color:var(--ok)}
 .cbtmp{font-size:12.5px;color:var(--tmp);background:var(--tmpbg);border-radius:10px;padding:8px 12px;margin:10px 0 0;line-height:1.6}
 .cbg{border:1.5px solid var(--line);border-radius:14px;padding:4px 14px 10px;margin-top:12px;background:#fff}.cbg.need{border-color:var(--gold);background:#fffaf0}
 .cbh{font-weight:700;font-size:14.5px;padding:10px 0 4px;display:flex;align-items:center;gap:8px}.cbnew{font-size:11.5px;font-weight:700;color:#fff;background:var(--gold);border-radius:99px;padding:2px 8px}
 .cbn{font-size:12.5px;color:var(--sub);line-height:1.65;margin:4px 0 6px}
 .cbr{padding:10px 0;border-top:1px solid var(--line)}.cbg .cbr:first-of-type{border-top:0}
-.cbl{display:flex;align-items:center;justify-content:space-between;gap:8px}.cbl b{font-size:14px}
+.cbl{display:flex;align-items:center;justify-content:space-between;gap:8px}.cbl b{font-size:14px;line-height:1.45}
 .cbsrc{font-size:11px;border-radius:99px;padding:2px 8px;white-space:nowrap;background:var(--lime2);color:var(--sub)}.cbsrc.tmp{background:var(--tmpbg);color:var(--tmp)}.cbsrc.you,.cbsrc.ans{background:var(--okbg);color:var(--ok)}.cbsrc.ex,.cbsrc.obs{background:var(--chkbg);color:var(--chk)}
 .cbs{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .cbm{width:52px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-size:22px;color:var(--green);font-weight:700;line-height:1}
@@ -371,7 +386,7 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .cbseg{margin-top:6px}
 .cbchips{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.cbchips button{height:42px;border-radius:10px;border:1.5px solid var(--line);background:#fff;font:inherit;font-size:13.5px}.cbchips button.on{background:var(--green);border-color:var(--green);color:#fff}
 .cbask{border:1.5px solid var(--gold);background:#fffaf0}
-.cbfine{font-size:11.5px;color:var(--sub);margin:8px 0 -2px}.seatst button b{font-size:13px;line-height:1.35;text-align:center}
+.cbfine{font-size:11.5px;color:var(--sub);margin:8px 0 -2px}.seatst button b{font-size:13px;line-height:1.35;text-align:center;word-break:keep-all;overflow-wrap:anywhere}
 .cbhome{border:2px solid var(--green)}.cbhh{display:flex;align-items:center;gap:12px}.cbhh .cbi{flex:none;width:40px;height:40px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center}
 .cbhh b{display:block;font-size:16px;color:var(--green)}.cbhh small{font-size:12px;color:var(--sub)}
 .cbhv{margin-top:10px;background:var(--lime2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}.cbhv small{font-size:12px;color:var(--sub)}.cbhv b{font-size:22px}.cbhv span{font-size:12px;color:var(--sub);line-height:1.5}
@@ -2415,7 +2430,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-fundpp]');
 /* ===== 2026-11-23 計算のもと：係数を1枚で見て直す／あなたの給料とお店に残す額を分ける ===== */
 const CB_G=[['cust','お客さんと売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work']],['cost','原価と経費',['costRate','otherRate','loan']],['ppl','人',['extra','staffH','wage','labor','share']],['size','広さ',['perTsubo']]];
 /* ホーム：計算のもとのカード */
-function homeCalcCard(){const c=cbSum();return `<div class="card cbhome"><div class="cbhh"><span class="cbi">${CB_ICON}</span><div><b>計算のもと</b><small>すべての数字は、ここの数字から出ています</small></div></div><div class="cbhv"><small>${c.lab}</small><b>${c.big}</b><span>${c.sub}</span></div><button class="btn dark" data-cb="">計算のもとを見る・直す</button></div>`}
+function homeCalcCard(){const c=cbSum();return `<div class="card cbhome"><div class="cbhh"><span class="cbi">${CB_ICON}</span><div><b>計算のもと</b><small>すべての数字は、ここの数字から出ています</small></div></div><div class="cbhv"><small>${c.lab}</small><b>${c.big}</b><span>${c.sub}</span>${c.gap?`<em class="${c.gapOk?'ok':'ng'}">${c.gap}</em>`:''}</div><button class="btn dark" data-cb="">計算のもとを見る・直す</button></div>`}
 /* 続けていけるか：働くかの問い → 計算のもとの入口 → 答え（家賃の出どころは考えている物件の名前で） */
 function viaCard(){const s=st();let h=viaMain();const p=(s.pp||[]).find(x=>x.id===s.pick);
  if(p&&p.rent===s.rentSeen)h=h.replace('<span>募集で見た家賃<small>自分で入れた額</small></span>',`<span>考えている物件の家賃<small>${esc(p.n)}</small></span>`);
@@ -2426,33 +2441,69 @@ function cbBtn(g,sub){return `<button class="cbtn" data-cb="${g||''}"><span clas
 function refRent(){const s=st(),pp=s.pp||[],p=pp.find(x=>x.id===s.pick);if(p)return{rent:p.rent,n:p.n};if(s.rentSeen)return{rent:s.rentSeen,n:'募集で見た家賃'};return null}
 function owSync(){const s=st();if(cur==='b'||!s.ow||!s.f.keep)return;const o=s.ow,v=(o.work?o.pay:o.mgr)+(o.left||0);s.f.keep.v=v;s.f.keep.src='you'}
 function cbSum(){if(cur==='b'){const r=calc();return{big:man(r.pre),lab:'家賃を払う前に残る額',sub:'いまのお店の数字から'}}const rr=refRent(),r=calc(),u=hmPeople(r);
- if(rr){const n=hmNeed(rr.rent);if(n)return{big:`1日 ${n.need}${n.unit}`,lab:'続けるのに要る数',sub:`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算・いまの計画は${n.have}${n.unit}`,val:n.need}}
+ if(rr){const n=hmNeed(rr.rent);if(n)return{big:`1日 ${n.need}${n.unit}`,lab:'続けるのに要る数',sub:`家賃 ${man(rr.rent)}（${esc(rr.n)}）で計算<br>いまの見込みは1日${n.have}${n.unit}`,gap:n.gap>=0?`毎月 ${man(n.gap)} 残る（仮）`:`毎月 ${man(-n.gap)} 足りない（仮）`,gapOk:n.gap>=0,val:n.need}}
  return{big:man(r.cap),lab:'家賃を払う前に残る額',sub:`1日${u?u.have+u.unit:''}・月の売上 ${man(r.sales)}。家賃を入れると、要る人数で出ます`,val:null}}
-function cbSheet(focus){const s=st(),F=P[cur].fields;let prev=cbSum().val;
+function cbSheet(focus){const s=st(),F=P[cur].fields;let prev=cbSum().val;pickSync();
+ const r1=v=>Math.round(v*10)/10,food=cur!=='c',seatShop=cur==='a'||cur==='d';
+ /* 数字の代わりに選ぶ「お店のやり方」 */
+ const CH={
+  perTsubo:{lab:'席の取り方',opts:o=>[['ゆったり',1.0,'ソファや大きめの机。長く座ってもらうお店'],['ふつう',o.v,'2人席と4人席が中心'],['詰めて',2.0,'カウンター中心。席を多く取る']]},
+  turns:{lab:'1日に、席が何回うまるか',opts:o=>[['ゆっくり',r1(o.v*0.7),'1組が長くいる。コースや、読書・打ち合わせのお客さん'],['ふつう',o.v,'いまの計画の見込み'],['入れ替わる',r1(o.v*1.4),'駅前・お昼どき・テイクアウトも多い']]},
+  days:{lab:'月に何日開けるか',opts:o=>[['週2日休む',22,'休みをしっかり取る'],['週1日休む',26,'多くのお店がこの形'],['ほぼ毎日',30,'休みは月に1日ほど']]},
+  costRate:{lab:food?'材料にかける割合（原価率）':'材料にかける割合',opts:o=>[['抑える',o.v-5,'仕入れを工夫して安く'],['ふつう',o.v,'この業態のよくある割合'],['こだわる',o.v+5,'いい材料を使う']]},
+  otherRate:{lab:'光熱費・消耗品・手数料など',opts:o=>[['少なめ',o.v-2,'小さなお店・火をあまり使わない'],['ふつう',o.v,'よくある割合'],['多め',o.v+3,'火や機械をたくさん使う・キャッシュレスが多い']],note:'売上に対する割合です。'},
+  extra:{lab:'あなた以外に、お店に立つ人',opts:o=>[['1人で回す',0,'あなた1人。席や品数は少なめに'],['もう1人',1,'忙しい時に手伝ってもらう'],['2人',2,'あなたが接客や外の仕事に回れる']]},
+  staffH:{lab:'その人が1日に入る時間',opts:o=>[['忙しい時だけ',3,'お昼や夜のピークだけ'],['半日',5,'仕込みか片付けも手伝ってもらう'],['通しで',8,'開店から閉店まで']]},
+  util:{lab:'予約がどのくらい埋まるか',opts:o=>[['始めのころ',40,'開店から数か月はこのくらいの店が多い'],['ふつう',60,'常連さんがついてきたころ'],['よく埋まる',80,'予約が取りにくいくらい']]}};
+ const REN={price:cur==='c'?'1回の料金':'1人あたりの金額（客単価）',seats:'席の数',wage:'人に払う時給',loan:'借りたお金の毎月の返済',labor:'人件費（月）',beds:'ベッドの数'};
  const tag=k=>{const x=s.f[k];return `<span class="cbsrc ${x.src}">${SRC[x.src]||''}</span>`};
- const row=k=>{const o=F[k],x=s.f[k];if(!o||!x||o.min==null||typeof x.v!=='number')return'';const ch=x.v!==o.v;
-  return `<div class="cbr" id="cbr_${k}"><div class="cbl"><b>${o.label}</b>${tag(k)}</div><div class="cbs"><button class="cbm" data-cbk="${k}" data-d="-1" aria-label="減らす">−</button><span class="cbv">${fmtV(k,x.v)}</span><button class="cbm" data-cbk="${k}" data-d="1" aria-label="増やす">＋</button></div>
-  <div class="cbx">${o.why?`<details><summary>なぜこの数字？</summary><p>${o.why}${o.how?`<br><b>確かめ方：</b>${o.how}`:''}</p></details>`:''}${ch?`<button class="lk" data-cbr="${k}">最初の値（${fmtV(k,o.v)}）に戻す</button>`:''}</div></div>`};
+ const pp=s.pp||[],pk=pp.find(x=>x.id===s.pick),w=s.wish||{},sw=w.seats&&s.f.seats&&w.seats.max>s.f.seats.v?w.seats:null;
+ const seatHint=()=>{if(!seatShop||!s.f.perTsubo)return '';const a=[];if(pk&&pk.tsubo)a.push(`「${esc(pk.n)}」（${pk.tsubo}坪）なら、席の目安は約${Math.round(pk.tsubo*s.f.perTsubo.v)}席`);if(sw)a.push(`席数の希望は${sw.min}〜${sw.max}席（内見で広げた）`);if(pk&&pk.try&&pk.try.seats)a.push(`「${esc(pk.n)}」では${pk.try.seats}席で試しています（その物件だけ）`);return a.length?`<p class="cbhint">${a.join('<br>')}</p>`:''};
+ const stepper=k=>{const x=s.f[k];return `<div class="cbs"><button class="cbm" data-cbk="${k}" data-d="-1" aria-label="減らす">−</button><span class="cbv">${fmtV(k,x.v)}</span><button class="cbm" data-cbk="${k}" data-d="1" aria-label="増やす">＋</button></div>`};
+ const why=k=>{const o=F[k],x=s.f[k],ch=x.v!==o.v;return `${o.why?`<details class="cbw"><summary>なぜこの数字？</summary><p>${o.why}${o.how?`<br><b>確かめ方：</b>${o.how}`:''}</p></details>`:''}${ch?`<button class="lk" data-cbr="${k}">最初の値（${fmtV(k,o.v)}）に戻す</button>`:''}`};
+ const row=k=>{const o=F[k],x=s.f[k];if(!o||!x||o.min==null||typeof x.v!=='number')return'';const c=CH[k],lab=c?c.lab:(REN[k]||o.label);
+  if(!c)return `<div class="cbr" id="cbr_${k}"><div class="cbl"><b>${lab}</b>${tag(k)}</div>${stepper(k)}${k==='seats'?seatHint():''}<div class="cbx">${k==='loan'?'<button class="lk" data-x="money">借りる額から、開業資金で計算する ›</button>':''}${why(k)}</div></div>`;
+  const opts=c.opts(o).map(q=>[q[0],Math.min(o.max,Math.max(o.min,q[1])),q[2]]),hit=opts.find(q=>Math.abs(x.v-q[1])<1e-6);
+  return `<div class="cbr" id="cbr_${k}"><div class="cbl"><b>${lab}</b>${tag(k)}</div><div class="seatst">${opts.map(([t,n])=>`<button data-chk="${k}" data-chv="${n}" class="${hit&&hit[1]===n?'on':''}"><b>${t}</b><small>${fmtV(k,n)}</small></button>`).join('')}</div>
+   <p class="cbn">${hit?hit[2]+'。':`いまは ${fmtV(k,x.v)}（選んだ形から少し変えた数字）。`}${c.note||''}</p>${k==='perTsubo'?seatHint():''}
+   <details class="cbfd"${hit?'':' open'}><summary>細かく直す</summary>${stepper(k)}<div class="cbx">${why(k)}</div></details></div>`};
+ const grp=(id,t,ks,lead)=>{const rs=ks.map(row).join('');return rs?`<div class="cbg" id="cbg_${id}"><div class="cbh">${t}</div>${lead||''}${rs}</div>`:''};
+ /* どの家賃で計算するか（物件の比較とつながる） */
+ const place=cur==='b'?'':`<div class="cbg" id="cbg_place"><div class="cbh">どの家賃で計算するか</div>
+  ${pp.length?`<div class="cbpl">${!pk&&s.rentSeen?`<button class="on" disabled><b>募集で見た家賃</b><small>${man(s.rentSeen)}</small></button>`:''}${pp.map(p=>`<button data-cbpk="${p.id}" class="${s.pick===p.id?'on':''}"><b>${esc(p.n)}</b><small>${man(p.rent)}${p.tsubo?`・${p.tsubo}坪`:''}</small></button>`).join('')}</div>
+   <p class="cbn">物件を選ぶと、その家賃と広さで、上の「要る数」と開業資金を出します。物件だけで席や昼を試す時は、物件の「この場所での形」で（計画の本体は変わりません）。</p>`
+  :`<p class="cbn">${s.rentSeen?`募集で見た家賃 ${man(s.rentSeen)} で計算しています。`:'まだ家賃が入っていません。'}物件を比較に足すと、ここで選べます。</p>`}
+  <button class="btn ghost sm" data-cbpp="1">物件の比較を開く</button>
+  ${seatShop?row('perTsubo'):''}</div>`;
  const ow=s.ow,owG=cur==='b'?'':`<div class="cbg ${ow?'':'need'}" id="cbg_own"><div class="cbh">あなたの取り分${ow?'':'<span class="cbnew">まず、ここから</span>'}</div>
   <p class="cbn">あなたの給料は、人件費に入っていません。お店が毎月出せるかを、ここで入れた額で計算します。</p>
   <div class="seg cbseg" id="cb_work"><button data-v="1" class="${ow&&ow.work?'on':''}">自分もお店で働く</button><button data-v="0" class="${ow&&!ow.work?'on':''}">人に任せる</button></div>
-  ${ow?`<div class="cbr"><div class="cbl"><b>${ow.work?'あなたの給料（毎月）':'店長に払う給料（毎月）'}</b><span class="cbsrc you">あなたの入力</span></div><div class="cbs"><button class="cbm" data-cbo="${ow.work?'pay':'mgr'}" data-d="-1">−</button><span class="cbv">${man(ow.work?ow.pay:ow.mgr)}</span><button class="cbm" data-cbo="${ow.work?'pay':'mgr'}" data-d="1">＋</button></div><div class="cbx"><p class="cbn">${ow.work?'生活に毎月要る額です。開業資金の「生活費」にも使います。':'人に任せる時は、店長の給料をここに入れます。'}</p></div></div>
-  <div class="cbr"><div class="cbl"><b>それとは別に、お店に残したい額（毎月）</b><span class="cbsrc you">あなたの入力</span></div><div class="cbchips">${[0,30000,50000,100000].map(v=>`<button data-cbl="${v}" class="${(ow.left||0)===v?'on':''}">${v?man(v):'なし'}</button>`).join('')}</div><div class="cbx"><p class="cbn">貯え・設備の買い替え・返済の余裕のぶん。</p></div></div>`:'<p class="cbn">どちらかを押すと、金額を入れる欄が出ます。</p>'}</div>`;
- const tmpN=Object.keys(s.f).filter(k=>s.f[k].src==='tmp'&&F[k]&&k!=='rentRate').length;
- openSheet(`<h3>計算のもと</h3><p class="shl">「1日に何人要るか」「要るお金」は、下の数字から出しています。−と＋で動かすと、上の答えがすぐ変わります。</p>
- <div class="cbsum" id="cbsum"></div>
- ${tmpN?`<p class="cbtmp">仮置きの数字が${tmpN}つあります。分かった所から、あなたの数字に替えてください。</p>`:''}
- ${owG}
- ${CB_G.map(([g,t,ks])=>{const rs=ks.map(row).join('');return rs?`<div class="cbg" id="cbg_${g}"><div class="cbh">${t}</div>${rs}</div>`:''}).join('')}
+  ${ow?`<div class="cbr"><div class="cbl"><b>${ow.work?'あなたの給料（毎月）':'店長に払う給料（毎月）'}</b><span class="cbsrc you">あなたの入力</span></div><div class="cbs"><button class="cbm" data-cbo="${ow.work?'pay':'mgr'}" data-d="-1">−</button><span class="cbv">${man(ow.work?ow.pay:ow.mgr)}</span><button class="cbm" data-cbo="${ow.work?'pay':'mgr'}" data-d="1">＋</button></div><p class="cbn">${ow.work?'生活に毎月要る額です。開業資金の「生活費」にも使います。':'人に任せる時は、店長の給料をここに入れます。'}</p></div>
+  <div class="cbr"><div class="cbl"><b>それとは別に、お店に残したい額</b><span class="cbsrc you">あなたの入力</span></div><div class="cbchips">${[0,30000,50000,100000].map(v=>`<button data-cbl="${v}" class="${(ow.left||0)===v?'on':''}">${v?man(v):'なし'}</button>`).join('')}</div><p class="cbn">毎月。貯え・設備の買い替え・返済の余裕のぶん。</p></div>`:'<p class="cbn">どちらかを押すと、金額を入れる欄が出ます。</p>'}</div>`;
+ const tmpK=Object.keys(s.f).filter(k=>s.f[k].src==='tmp'&&F[k]&&k!=='rentRate'&&F[k].min!=null);
+ openSheet(`<h3>計算のもと</h3><p class="shl">お店のやり方を選ぶと、「要る数」がすぐ変わります。ここは計画の本体の数字で、すべての物件の見立てに使います。</p>
+ <div class="cbstick" id="cbstick"><div class="cbsum" id="cbsum"></div></div>
+ ${tmpK.length?`<button class="cbtmp" data-cbgo="${tmpK[0]}">仮置きの数字が${tmpK.length}つあります。分かった所から、あなたの数字に替えてください ›</button>`:''}
+ ${place}${owG}
+ ${grp('cust','お客さんの入り方と売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work'])}
+ ${grp('cost','材料と経費',['costRate','otherRate','loan'])}
+ ${grp('ppl','人',['extra','staffH','wage','labor','share'])}
+ ${!seatShop?grp('size','広さ',['perTsubo']):''}
  <div class="alt"><button data-ask="計算のもとの数字の決め方を相談したい">数字の決め方を、事務局に相談する</button></div>
  <button class="btn ghost" data-act="close">閉じる</button>`);
- const sum=()=>{const c=cbSum(),d=prev!=null&&c.val!=null?c.val-prev:0;document.getElementById('cbsum').innerHTML=`<small>${c.lab}</small><b>${c.big}${d?`<i class="${d>0?'up':'dn'}">${d>0?'+'+d:'−'+(-d)}</i>`:''}</b><span>${c.sub}</span>`};
- document.querySelectorAll('#sheet [data-cbk]').forEach(b=>b.onclick=()=>{const k=b.dataset.cbk,o=F[k],x=s.f[k],before=cbSum().val;const st2=k==='price'?(cur==='c'?500:50):k==='wage'?50:k==='loan'||k==='labor'?10000:o.step;let v=Math.round((x.v+(+b.dataset.d)*st2)*1000)/1000;v=Math.min(o.max,Math.max(o.min,v));if(v===x.v)return;applyEdit(k,v,'you');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
- document.querySelectorAll('#sheet [data-cbr]').forEach(b=>b.onclick=()=>{const k=b.dataset.cbr,o=F[k],before=cbSum().val;applyEdit(k,o.v,o.src);save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
- document.querySelectorAll('#cb_work button').forEach(b=>b.onclick=()=>{const before=cbSum().val,w=b.dataset.v==='1';s.ow=s.ow||{pay:s.f.keep?s.f.keep.v:250000,mgr:280000,left:0};s.ow.work=w;owSync();log(w?'自分もお店で働く、と決めた':'お店を人に任せる、と決めた');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
- document.querySelectorAll('#sheet [data-cbo]').forEach(b=>b.onclick=()=>{const q=b.dataset.cbo,before=cbSum().val;s.ow[q]=Math.max(0,Math.min(1000000,(s.ow[q]||0)+(+b.dataset.d)*10000));owSync();save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
- document.querySelectorAll('#sheet [data-cbl]').forEach(b=>b.onclick=()=>{const before=cbSum().val;s.ow.left=+b.dataset.cbl;owSync();save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc});
- window.cbPrev=v=>{prev=v;sum()};sum();if(window.cbChoices)cbChoices();
+ const sheet=document.getElementById('sheet'),hh=sheet.querySelector('.shh'),sk=document.getElementById('cbstick');if(hh&&sk)sk.style.top=hh.offsetHeight+'px';
+ const sum=()=>{const c=cbSum(),d=prev!=null&&c.val!=null?c.val-prev:0;document.getElementById('cbsum').innerHTML=`<div><small>${c.lab}</small><b>${c.big}${d?`<i class="${d>0?'up':'dn'}">${d>0?'+'+d:'−'+(-d)}</i>`:''}</b></div><span>${c.sub}${c.gap?`<br><em class="${c.gapOk?'ok':'ng'}">${c.gap}</em>`:''}</span>`};
+ const again=before=>{save();render();const sc=sheet.scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc};
+ sheet.querySelectorAll('[data-cbk]').forEach(b=>b.onclick=()=>{const k=b.dataset.cbk,o=F[k],x=s.f[k],before=cbSum().val;const st2=k==='price'?(cur==='c'?500:50):k==='wage'?50:k==='loan'||k==='labor'?10000:o.step;let v=Math.round((x.v+(+b.dataset.d)*st2)*1000)/1000;v=Math.min(o.max,Math.max(o.min,v));if(v===x.v)return;applyEdit(k,v,'you');const op=b.closest('details');again(before);if(op){const d=document.querySelector(`#cbr_${k} details.cbfd`);if(d)d.open=true}});
+ sheet.querySelectorAll('[data-chk]').forEach(b=>b.onclick=()=>{const before=cbSum().val;applyEdit(b.dataset.chk,+b.dataset.chv,'you');again(before)});
+ sheet.querySelectorAll('[data-cbr]').forEach(b=>b.onclick=()=>{const k=b.dataset.cbr,o=F[k],before=cbSum().val;applyEdit(k,o.v,o.src);again(before)});
+ sheet.querySelectorAll('#cb_work button').forEach(b=>b.onclick=()=>{const before=cbSum().val,wk=b.dataset.v==='1';s.ow=s.ow||{pay:s.f.keep?s.f.keep.v:250000,mgr:280000,left:0};s.ow.work=wk;owSync();log(wk?'自分もお店で働く、と決めた':'お店を人に任せる、と決めた');again(before)});
+ sheet.querySelectorAll('[data-cbo]').forEach(b=>b.onclick=()=>{const q=b.dataset.cbo,before=cbSum().val;s.ow[q]=Math.max(0,Math.min(1000000,(s.ow[q]||0)+(+b.dataset.d)*10000));owSync();again(before)});
+ sheet.querySelectorAll('[data-cbl]').forEach(b=>b.onclick=()=>{const before=cbSum().val;s.ow.left=+b.dataset.cbl;owSync();again(before)});
+ sheet.querySelectorAll('[data-cbpk]').forEach(b=>b.onclick=()=>{const before=cbSum().val,p=pp.find(x=>x.id===b.dataset.cbpk);if(!p||s.pick===p.id)return;s.pick=p.id;s.rentSeen=p.rent;delete s._noPick;log(`「${esc(p.n)}」の家賃 ${man(p.rent)} で考えることにした`);again(before)});
+ sheet.querySelectorAll('[data-cbpp]').forEach(b=>b.onclick=()=>ppSheet());
+ sheet.querySelectorAll('[data-cbgo]').forEach(b=>b.onclick=()=>{const el=document.getElementById('cbr_'+b.dataset.cbgo);if(el){el.scrollIntoView({block:'center',behavior:'smooth'});el.classList.add('cbflash');setTimeout(()=>el.classList.remove('cbflash'),1600)}});
+ window.cbPrev=v=>{prev=v;sum()};sum();
  if(focus){const el=document.getElementById('cbg_'+focus);if(el)setTimeout(()=>el.scrollIntoView({block:'start'}),60)}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cb]');if(!b)return;e.preventDefault();e.stopPropagation();cbSheet(b.dataset.cb||null)},true);
 /* 入口：続けていけるか・物件の比較・開業資金 */
@@ -2468,31 +2519,7 @@ function cbLive(f){const o=st().ow;return o&&cur!=='b'?(o.work?o.pay:0):(f.keep|
 /* 2026-11-23 計算のもとを見つけやすく／1坪あたりの席数を「ゆったり・ふつう・詰めて」で選ぶ */
 
 
-(function(){
-const r1=v=>Math.round(v*10)/10,food=()=>cur!=='c';
-/* 数字の代わりに選ぶ「お店のやり方」。値は業態の最初の値からの幅か、だれにでも同じ値 */
-const CH={
- perTsubo:{lab:'席の取り方',opts:o=>[['ゆったり',1.0,'ソファや大きめの机。長く座ってもらうお店'],['ふつう',o.v,'2人席と4人席が中心'],['詰めて',2.0,'カウンター中心。席を多く取る']],note:'厨房・トイレを含めた広さで数えます。物件の比較の「席の目安」に使います。'},
- turns:{lab:'1日に、席が何回うまるか',opts:o=>[['ゆっくり過ごしてもらう',r1(o.v*0.7),'1組が長くいる。読書や打ち合わせのお客さん'],['ふつう',o.v,'いまの計画の見込み'],['次々に入れ替わる',r1(o.v*1.4),'駅前・お昼どき・テイクアウトも多い']]},
- days:{lab:'月に何日開けるか',opts:o=>[['週2日休む',22,'休みをしっかり取る'],['週1日休む',26,'多くのお店がこの形'],['ほぼ毎日',30,'休みは月に1日ほど']]},
- costRate:{lab:o=>food()?'材料にかける割合（原価率）':'材料にかける割合',opts:o=>[['抑える',o.v-5,'仕入れを工夫して安く'],['ふつう',o.v,'この業態のよくある割合'],['こだわる',o.v+5,'いい材料を使う']]},
- otherRate:{lab:'光熱費・消耗品・カード手数料など（売上に対して）',opts:o=>[['少なめ',o.v-2,'小さなお店・火をあまり使わない'],['ふつう',o.v,'よくある割合'],['多め',o.v+3,'火や機械をたくさん使う・キャッシュレスが多い']]},
- extra:{lab:'あなた以外に、お店に立つ人',opts:o=>[['1人で回す',0,'あなた1人。席や品数は少なめに'],['もう1人',1,'忙しい時に手伝ってもらう'],['2人',2,'あなたが接客や外の仕事に回れる']]},
- staffH:{lab:'その人が1日に入る時間',opts:o=>[['忙しい時だけ',3,'お昼や夜のピークだけ'],['半日',5,'仕込みか片付けも手伝ってもらう'],['通しで',8,'開店から閉店まで']]},
- util:{lab:'予約がどのくらい埋まるか',opts:o=>[['始めのころ',40,'開店から数か月はこのくらいの店が多い'],['ふつう',60,'常連さんがついてきたころ'],['よく埋まる',80,'予約が取りにくいくらい']]}
-};
-const REN={price:o=>cur==='c'?'1回の料金':'1人あたりの金額（客単価）',seats:()=>'席の数',wage:()=>'人に払う時給',loan:()=>'借りたお金の毎月の返済',labor:()=>'人件費（月）',beds:()=>'ベッドの数'};
-const GH={cust:'お客さんの入り方と売上',cost:'材料と経費',ppl:'人',size:'広さと席'};
-window.cbChoices=function(){const s=st(),F=P[cur].fields;
- const sh=document.querySelector('#sheet .shl');if(sh)sh.textContent='数字の代わりに、お店のやり方を選んでください。選ぶと、上の「要る数」がすぐ変わります。細かく直したい時は −／＋ で。';
- Object.entries(GH).forEach(([g,t])=>{const h=document.querySelector('#cbg_'+g+' .cbh');if(h)h.textContent=t});
- Object.entries(REN).forEach(([k,fn])=>{const b=document.querySelector('#cbr_'+k+' .cbl b');if(b&&F[k])b.textContent=fn(F[k])});
- Object.entries(CH).forEach(([k,c])=>{const r=document.getElementById('cbr_'+k);if(!r||!F[k]||!s.f[k])return;const o=F[k],v=s.f[k].v,opts=c.opts(o).map(x=>[x[0],Math.min(o.max,Math.max(o.min,x[1])),x[2]]),hit=opts.find(x=>Math.abs(v-x[1])<1e-6);
-  r.querySelector('.cbl b').textContent=typeof c.lab==='function'?c.lab(o):c.lab;
-  r.querySelector('.cbl').insertAdjacentHTML('afterend',`<div class="seatst">${opts.map(([t,n])=>`<button data-chk="${k}" data-chv="${n}" class="${hit&&hit[1]===n?'on':''}"><b>${t}</b><small>${fmtV(k,n)}</small></button>`).join('')}</div><p class="cbn">${hit?hit[2]+'。':'いまは、選んだ形から少し変えた数字です。'}${c.note||''}</p><p class="cbfine">細かく直す</p>`)});
- const lr=document.querySelector('#cbr_loan .cbx');if(lr)lr.insertAdjacentHTML('afterbegin','<button class="lk" data-x="money">借りる額から、開業資金で計算する ›</button>');
- document.querySelectorAll('#sheet [data-chk]').forEach(b=>b.onclick=()=>{const before=cbSum().val;applyEdit(b.dataset.chk,+b.dataset.chv,'you');save();render();const sc=document.getElementById('sheet').scrollTop;cbSheet();cbPrev(before);document.getElementById('sheet').scrollTop=sc})}
-})();
+
 
 /* ===== 2026-11-23 家賃を決める画面の作り直し：候補から選ぶ／マイソクを撮る／まだ無ければ見た額を入れる。選ぶとすぐ「1日に何人」 ===== */
 function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')&&f.perTsubo?Math.round(f.seats/f.perTsubo*10)/10:null;
