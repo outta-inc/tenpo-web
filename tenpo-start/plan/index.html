@@ -676,7 +676,8 @@ function ppCall(){const n=(st().pp||[]).length;return `<div class="ppc"><b>気�
 function chip(k,label){const x=st().f[k],o=P[cur].fields[k];return `<button class="chip ${x.src}" data-edit="${k}"><span class="v">${fmtV(k,x.v)}</span><span class="t">${label??o.label}${label===''?'':'・'}${srcLabel(k)}</span></button>`}
 const cchip=(v,l)=>`<span class="chip calc"><span class="v">${v}</span><span class="t">${l}・計算</span></span>`;
 const legend=(o)=>`<div class="legend"><span class="a">①の回答</span><span class="m">仮置き（押して変えられる）</span>${P[cur].exist?'<span class="x">いまのお店の実績</span>':''}${o?'<span class="o">実測</span><span class="e">推定</span>':''}</div>`;
-function backCard(){const s=st();if(s.day<1)return'';if(PUB){if(s.events.some(e=>e.day===s.day)||s._seen===s.day)return'';const ld=Math.max(0,...s.events.map(e=>e.day));const lastP=s.events.filter(e=>e.day===ld);s._seenNext=s.day;
+/* おかえりなさいのカードは、出さない（11/24 松尾さん：大事でない・崩れていた） */
+function backCard(){return '';const s=st();if(s.day<1)return'';if(PUB){if(s.events.some(e=>e.day===s.day)||s._seen===s.day)return'';const ld=Math.max(0,...s.events.map(e=>e.day));const lastP=s.events.filter(e=>e.day===ld);s._seenNext=s.day;
   if(s.day-ld<7)return face('おかえりなさい',`前回は${lastP.length}つ、進みました`,'続きからで大丈夫です。','','',`<ul class="bk">${lastP.slice(-4).map(e=>`<li>${e.text}</li>`).join('')}</ul>`);
   return face('おかえりなさい','少し間があきましたね。ここからで大丈夫です','止まっていた所から、そのまま続けられます。手が止まる理由があれば、聞かせてください。','','',`<div class="alt"><button data-ask="何から進めればいいか分からない">事務局に相談する</button></div>`)}
  const last=s.events.filter(e=>e.day===s.day-1);
@@ -1222,10 +1223,10 @@ const TABS=[['home','ホーム'],['shop','お店'],['road','やること'],['ask
 const TTL={home:['',''],ask:['',''],shop:['お店','あなたのお店'],files:['フォルダ','写真とデータをためる場所'],plan:['計画','売上と、家賃を払う前に残る額'],check:['確かめること','結果を動かす順に'],place:['物件','探すときの物差しと候補'],road:['',''],ans:['カルテ','あなたのお店について、分かっていること']};
 
 function tabbar(tab,n){if(!TABS.some(x=>x[0]===tab))tab='home';return `<nav class="tabbar">${TABS.map(([k,l])=>`<button data-tab="${k}" class="${k===tab?'on':''}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg><span>${l}</span>${k==='check'&&n?`<em>${n}</em>`:''}</button>`).join('')}</nav>`}
-function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:renderC,d:renderD}[cur]();v.check=cur==='b'?v.check+measCard():measCard()+v.check;v.files=filesTab();if(!s._h1){s._h1=1;s.tab='home';s.area=null}const tab=s.tab||'home';const bk=['plan','check','files'].includes(tab)?`<button class="bk" data-hm="${s.area?'area:'+s.area:'home'}">‹ ${s.area?HM.find(x=>x[0]===s.area)[1]:'ホーム'}</button>`:'';
+function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:renderC,d:renderD}[cur]();v.check=cur==='b'?v.check+measCard():measCard()+v.check;v.files=filesTab();if(!s._h1){s._h1=1;s.tab='home';s.area=null}const tab=s.tab||'home';const gbk=s._fg===tab&&!s.area?`<button class="bk" data-tl="guide:">‹ このアプリでできること</button>`:'';const bk=['plan','check','files'].includes(tab)?`<button class="bk" data-hm="${s.area?'area:'+s.area:'home'}">‹ ${s.area?HM.find(x=>x[0]===s.area)[1]:'ホーム'}</button>`:'';
  const n=v.nCheck??Math.min(4,sensitivity().length);let body;
  if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry&&s.worry.length<=12?`気になっている「${esc(s.worry)}」のことから、一緒に見ていきます。`:s.worry?'気になっていることから、一緒に見ていきます。':''}順番どおりでなくて、分かっている所からでかまいません。`,'','',`<div class="alt"><button data-tl="guide:">このアプリでできること</button></div>`):'')+backCard()+shopTab(v);else if(tab==='home')body=s.area?areaPage(s.area,v):homeTab();else if(tab==='ask')body=askTab();else if(tab==='plan')body=bk+planTop(v);else if(tab==='check'&&cur!=='b')body=bk+checkTop();else if(tab==='road')body=todoTab();else body=bk+tabFace(tab,v)+v[tab];
- return header(dLabel(s.day),(tab==='shop'||tab==='home')?'':(TTL[tab]||[''])[0])+`<div class="wrap">${body}${PUB?accCard(tab):''}</div>`+tabbar(tab,n)}
+ return header(dLabel(s.day),(tab==='shop'||tab==='home')?'':(TTL[tab]||[''])[0])+`<div class="wrap">${gbk}${body}${PUB?accCard(tab):''}</div>`+tabbar(tab,n)}
 
 /* ===== シート ===== */
 /* 下から上がる画面：題は上に残り、中身だけが動く。同じ題のまま開き直した時は、読んでいた位置を保つ。題のあたりを下へ引くと閉じる */
@@ -2071,7 +2072,7 @@ function stgTop(){const s=st(),g=stgOf(),c=STGC[g],L=x=>(s[x]||[]).length,food=c
   b=`<div class="card stgc"><p class="hmk">最初の1か月の振り返り</p>${ac?`<b class="stgb">実際は1日${a.guests}${ac.unit}・${pfGap(ac.gapA)}計算</b><p class="lead">計画では1日${ac.planG}${ac.unit}・${pfGap(ac.gapP)}計算でした。（仮）</p>`:'<p class="lead">開けてから分かった数字を入れると、計画との違いが出ます。その数字が、次の判断と2店舗目の計画の土台になります。</p>'}<button class="btn dark" data-actsh="1">${ac?'振り返りを直す':'実際の数字を入れる'}</button></div>
   <div class="card">${hrow('flag','開店したあとへ','開けてからの準備','data-tl="tool:os"')}${food?hrow('ans','メニューと原価','実際の材料費で、原価率を見直す','data-x="recipe"',L('rc')?L('rc')+'品':''):hrow('yen','料金','1回の料金を見る・直す','data-edit="price"')}</div>${homeCalcCard()}`}
  const i=STG.findIndex(x=>x[0]===g);
- return `<div class="hmh"><h1>${c.h}</h1><p>${c.d}</p></div>${b}${stgTrip(g)}${c.done?`<div class="stgn"><b>次へ進む目印</b>${c.done} <button class="lk" data-stg="1">段階を選び直す ›</button></div>`:`<p class="stgn"><button class="lk" data-stg="1">段階を選び直す ›</button></p>`}`}
+ return `<div class="hmh"><h1>${c.h}</h1><p>${c.d}</p></div>${b}${stgTrip(g)}`}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-mustw]');if(b){mustSheet();return}
  b=e.target.closest('[data-actsh]');if(b){actSheet();return}
  b=e.target.closest('[data-bs]');if(b){const s=st();s.bs=s.bs||{};const id=b.dataset.bs;s.bs[id]=!s.bs[id];if(s.bs[id])log(`工事の進め方：「${b.parentElement.querySelector('b').textContent.replace(/^\d+\. /,'')}」を済みにした`);save();render();return}
@@ -2171,13 +2172,11 @@ function osSheet(){const s=st();const rows=[['メニューとレシピ',(s.rc||[
 
 const TOOL={money:()=>moneySheet('sum'),pay:paySheet,qt:qtSheet,ct:ctSheet,pp:ppSheet,buy:buySheet,pre:preSheet,os:osSheet};
 /* ---- できること ---- */
-function guideSheet(){const has=PUB?!!S._u:true;const G=[['shop','お店','5項目のメモ、やること、開店までの道具。開いたら、まずここ。'],['plan','計画','月の売上と、考えている場所で続けるのに1日何人要るか。数字は「計算のもと」で選んで変えられます。'],['check','確かめる','今日の1つ。店の前で数える道具で、仮の数字を自分の数字に替えます。'],['road','開店まで','やること、開店までの道具（物件の比較・支払いの予定表など）、手続きの窓口と期限。'],['files','フォルダ','写真と書類を、1か所に。']];
+function guideSheet(){const has=PUB?!!S._u:true;const G=[['home','ホーム','いまの段階ですること。この時期によくあるつまずきと、次の一歩。'],['shop','お店','決めたことと数字の置き場。続けるのに要る数、お金、物件の比較、写真、メニュー、頼むときの文。'],['road','やること','いつまでに何をするか。いまの段階／全部／返事待ちで見られます。'],['ask','相談','LINEで事務局に相談できます（無料）。']];
  openSheet(`<h3>TENPO/STARTでできること</h3><p class="shl">お店を開くまでの準備を、1つの場所で進められます。無料です。分からない所は、いつでも事務局に相談できます。</p>
- <div class="grp">流れ</div><ol class="gl"><li><b>質問に答える</b><span>分かることだけで大丈夫。未定のまま進めます。</span></li><li><b>5項目のメモと計画を見る</b><span>答えから、あなたのお店の下書きができます。</span></li><li><b>やることを1つずつ進める</b><span>開店の目標日から、期限の目安が付きます。</span></li><li><b>登録すると、続きから開ける</b><span>別の端末でも同じ計画を開けます。登録しなくても使えます。</span></li></ol>
- <div class="grp">下のメニュー</div>${G.map(g=>`<button class="nrow" ${has?`data-tab="${g[0]}" data-act2="close"`:''}><span class="nic">${ic(g[0]==='road'?'flag':g[0],18)}</span><span class="nt2"><b>${g[1]}</b><small>${g[2]}</small></span>${has?'<em>›</em>':''}</button>`).join('')}
- <div class="grp">お店の中の道具</div><p class="shl" style="margin:0">お金（開業資金・見積もり・支払いの予定）／物件の比較／メニューとレシピ／採用／連絡先と、やり取り／買う物リスト／頼むときの文（内装会社・公庫・税理士など）／プレオープンの段取り</p>
- <div class="grp">知っておいてほしいこと</div><p class="shl" style="margin:0">出てくる数字は、あなたの答えと、仮に置いた条件からの計算です。結果を約束するものではありません。内容は、この端末のこのブラウザに保存されます。</p>
- <button class="btn ghost" data-act="close">閉じる</button>`)}
+ <div class="grp">流れ</div><ol class="gl"><li><b>質問に答える</b><span>分かることだけで大丈夫。未定のまま進めます。</span></li><li><b>いまの段階を選ぶ</b><span>いちばん上の「いまの段階」を押すと選べます。段階に合わせて、ホームに出るものが変わります。</span></li><li><b>物件の資料を入れる</b><span>家賃と広さから、その場所で続けるのに1日に何人要るかが出ます。</span></li><li><b>やることを1つずつ進める</b><span>開店の目標日から、期限の目安が付きます。</span></li><li><b>登録すると、続きから開ける</b><span>別の端末でも同じ計画を開けます。登録しなくても使えます。</span></li></ol>
+ <div class="grp">下のメニュー</div>${G.map(g=>`<button class="nrow" ${has?`data-tab="${g[0]}" data-fg="1" data-act2="close"`:''}><span class="nic">${ic(g[0],18)}</span><span class="nt2"><b>${g[1]}</b><small>${g[2]}</small></span>${has?'<em>›</em>':''}</button>`).join('')}
+ <div class="grp">知っておいてほしいこと</div><p class="shl" style="margin:0">出てくる数字は、あなたの答えと、仮に置いた条件からの計算です。結果を約束するものではありません。内容は、この端末のこのブラウザに保存されます。</p>`)}
 /* ---- あなたの登録 ---- */
 function meSheet(){const s=PUB&&!S._u?null:st(),asks=s?(s.asks||[]):[];const at=S._acc&&S._acc.at?new Date(S._acc.at):null;
  openSheet(`<h3>あなたの登録</h3>
@@ -2231,7 +2230,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b){
  if(b.dataset.up){UPF=b.dataset.up;document.getElementById('upimg').click();return}if(b.dataset.updoc){UPF=b.dataset.updoc;document.getElementById('updoc').click();return}
  if(b.dataset.sv){svSheet(b.dataset.sv);return}
  if(b.dataset.kk){kClick(b.dataset.kk,b.dataset.kt);return}
- if(b.dataset.tab){const s0=st();if(TABS.some(x=>x[0]===b.dataset.tab))s0.area=null;s0.tab=b.dataset.tab;window.scrollTo(0,0);render();return}
+ if(b.dataset.tab){const s0=st();if(TABS.some(x=>x[0]===b.dataset.tab))s0.area=null;s0.tab=b.dataset.tab;s0._fg=b.dataset.fg?b.dataset.tab:null;window.scrollTo(0,0);render();return}
  if(b.dataset.hm){const [a,v]=b.dataset.hm.split(':'),s0=st();if(a==='rent'){rentSheet();return}if(a==='home'){s0.tab='home';s0.area=null}else if(a==='area'){s0.tab='home';s0.area=v;if(v==='viable')s0._viaSeen=1}save();window.scrollTo(0,0);render();return}
  if(b.dataset.p){cur=b.dataset.p;window.scrollTo(0,0);render();return}
  if(b.dataset.edit){editSheet(b.dataset.edit);return}if(b.dataset.check){checkSheet(b.dataset.check);return}if(b.dataset.task){taskSheet(b.dataset.task);return}
