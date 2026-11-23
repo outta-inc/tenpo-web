@@ -491,6 +491,13 @@ button.frow{min-height:44px}
 button.frow{border-top:1px solid var(--line);font-size:14.5px}button.frow:first-of-type{border-top:0}button.frow .ic{flex:none}button.frow small{font-size:12px}
 button.frow::after{content:"›";color:#a9a294;font-size:18px;margin-left:4px}
 div.frow{min-height:44px;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
+.ppd{border:1.5px solid var(--line);border-radius:14px;background:#fff;margin:10px 0;overflow:hidden}.ppd[open]{border-color:var(--green)}
+.ppsum{display:flex;align-items:center;gap:10px;min-height:60px;padding:10px 14px;cursor:pointer;list-style:none}.ppsum::-webkit-details-marker{display:none}
+.ppsum .tx{flex:1;min-width:0}.ppsum .tx b{display:block;font-size:14.5px}.ppsum .tx small{display:block;font-size:12px;color:var(--sub)}
+.ppsum>i{font-style:normal;color:#a9a294;font-size:18px;transition:transform .15s}.ppd[open] .ppsum>i{transform:rotate(90deg)}
+.ppnd{font-size:13px;font-weight:700;border-radius:99px;padding:3px 10px;white-space:nowrap;background:var(--lime2);color:var(--green)}.ppnd.mid{background:#F6EBD2;color:#8a6510}.ppnd.ng{background:#FBEDE6;color:#A9562A}
+.ppd .ppi{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
+.ppd .pph>b{display:none}.ppd .pph{justify-content:flex-end;min-height:0}
 </style>
 </head>
 <body>
@@ -2355,28 +2362,31 @@ function ppInit(p){if(!p.init)return null;const a=p.init,t=(a.dep||0)+(a.key||0)
 function ppChecks(p){const c=[...(p.chk||[])];return c.slice(0,5)}
 function ppSheet(){pickSync();save();const s=st();s.pp=s.pp||[];const r=cur==='b'?null:calc(),pp=r?hmPeople(r):null,f=r?r.f:null;
  const card=(p,demo)=>{const ut=p.tsubo?Math.round(p.rent/p.tsubo/100)*100:null,j=demo?null:ppJudge(p),ini=ppInit(p),ph=p.ph?(s.ph||[]).find(x=>x.id===p.ph):null,ck=ppChecks(p);
-  return `<div class="ppi ${demo?'smp':''}"><div class="pph">${ph?`<img class="ppth" src="${ph.d}" alt="">`:''}<b>${esc(p.n)}</b>${demo?'<span class="tag">見本</span>':`<button class="lk" data-tl="ppdel:${p.id}">消す</button>`}</div>
+  const sum=`<summary class="ppsum"><span class="tx"><b>${esc(p.n)}</b><small>家賃 ${man(p.rent)}${p.tsubo?`・${p.tsubo}坪`:''}${s.pick===p.id?'・いま計算中':''}</small></span>${j?`<span class="ppnd ${j.lv}">1日${j.n.need}${j.n.unit}</span>`:''}<i>›</i></summary>`;
+  return `<details class="ppd" data-id="${p.id}" ${open1||s._ppOpen===p.id?'open':''}>${sum}<div class="ppi ${demo?'smp':''}"><div class="pph">${ph?`<img class="ppth" src="${ph.d}" alt="">`:''}<b>${esc(p.n)}</b>${demo?'<span class="tag">見本</span>':`<button class="lk" data-tl="ppdel:${p.id}">消す</button>`}</div>
   <div class="ppn"><span>家賃<b>${man(p.rent)}</b></span>${p.tsubo?`<span>広さ<b>${p.tsubo}坪</b></span><span>1坪あたり<b>${yen(ut)}</b></span>`:''}${p.floor?`<span>階<b>${esc(p.floor)}</b></span>`:''}</div>
   ${p.rentNote?`<p class="ppm">${esc(p.rentNote)}</p>`:''}
   ${j?`<div class="ppj ${j.lv}"><div class="ppjn"><span>${p.try&&(p.try.seats||p.try.lunch)?'元の希望で、この家賃を払って続けるには':'この家賃で続けるには'}</span><b>1日 ${j.n.need}${j.n.unit}</b><small>いまの計画は${j.n.have}${j.n.unit}</small></div><p><b>${j.head}</b>${j.sub}</p></div>${j.hint?`<p class="pph2">${j.hint}</p>`:''}`:''}
   ${j&&j.seatsHere?`<p class="ppm">席の目安 ${j.seatsHere}席（仮）${f&&f.seats?`・計画は${f.seats}席`:''}</p>`:''}
   ${ini?`<p class="ppm">契約のときに払う額の目安 <b>${man(ini.t)}</b>（${[ini.a.dep?'保証金'+man(ini.a.dep):'',ini.a.key?'礼金'+man(ini.a.key):'',ini.a.brk?'仲介'+man(ini.a.brk):'',ini.a.pre?'前家賃'+man(ini.a.pre):''].filter(Boolean).join('・')}）</p>`:''}
   ${ck.length?`<div class="ppck"><b>内見で確かめること</b><ul>${ck.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
-  ${p.memo?`<p class="ppm">${esc(p.memo)}</p>`:''}${demo||!j?'':`${ppCmp(p,0)}${pfSeenLine(p)}<button class="btn dark ppfund" data-pf="open:${p.id}">この場所での形を見る</button>${p.seen?'':`<button class="lk" data-pf="seen:${p.id}">この物件を内見した</button>`}`}${demo?'':`<button class="btn ghost ppfund" data-fundpp="${p.id}">${s.pick===p.id?'開業資金で見る（いま、この物件で計算中）':'この物件で、開業資金を見る'}</button>`}</div>`};
+  ${p.memo?`<p class="ppm">${esc(p.memo)}</p>`:''}${demo||!j?'':`${ppCmp(p,0)}${pfSeenLine(p)}<button class="btn dark ppfund" data-pf="open:${p.id}">この場所での形を見る</button>${p.seen?'':`<button class="lk" data-pf="seen:${p.id}">この物件を内見した</button>`}`}${demo?'':`<button class="btn ghost ppfund" data-fundpp="${p.id}">${s.pick===p.id?'お金で見る（いま、この物件で計算中）':'この物件で、お金を見る'}</button>`}</div></details>`};
+ const open1=s.pp.length===1;
  const L=[...s.pp].map(p=>({p,j:ppJudge(p)})).sort((x,y)=>{const o=v=>!v?1:v.lv==='ok'?0:v.lv==='mid'?1:2,a=o(x.j)-o(y.j);if(a)return a;return x.p.rent-y.p.rent}).map(x=>x.p);
  const okN=L.filter(p=>{const j=ppJudge(p);return j&&j.lv==='ok'}).length;
  openSheet(`<h3>物件の比較</h3><p class="shl">マイソク（募集の紙）を撮ると、家賃や広さを読み取って並べます。物件ごとに、続けるには1日に何${pp?pp.unit:'人'}要るかが出ます。</p>
  <div class="msbox"><div class="msb2"><button class="btn dark" id="ms_cam"><svg class="ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>マイソクを撮る</button><button class="btn ghost" id="ms_pick">写真・PDFから選ぶ</button></div>
- <p>AIが家賃・広さ・保証金・居抜きかどうかなどを読み取ります。足す前に、読み取った中身を確かめられます。表と裏など、3枚まで一緒に入れられます。</p>
+ ${s.pp.length?'':'<p>AIが家賃・広さ・保証金・居抜きかどうかなどを読み取ります。足す前に、読み取った中身を確かめられます。表と裏など、3枚まで一緒に入れられます。</p>'}
  <input type="file" id="ms_in1" accept="image/*" capture="environment" hidden><input type="file" id="ms_in2" accept="image/*,application/pdf" multiple hidden></div>
  ${pp?`<div class="ppbase"><span>いまの計画</span><b>1日 ${pp.have}${pp.unit}・1${pp.unit==='人'?'人':'件'}あたり ${yen(f.price)}</b><small>月の売上 ${man(r.sales)}</small></div>${cbBtn('cust','この人数のもと（客単価・回転数・あなたの給料など）')}`:''}
- ${L.length?`<p class="pps">${L.length}件を、回る見込みの高い順に並べています。${pp?(okN?`いまの計画で回るのは${okN}件です。`:'いまの計画のままで回る物件は、まだありません。'):''}</p>${L.map(p=>card(p)).join('')}`
+ ${L.length?`<p class="pps">${L.length}件を、回る見込みの高い順に並べています。右は、続けるのに要る数です。押すと、くわしく開きます。${pp?(okN?`いまの計画で回るのは${okN}件です。`:'いまの計画のままで回る物件は、まだありません。'):''}</p>${L.map(p=>card(p)).join('')}`
    :`<ol class="pst"><li>街や不動産会社でもらった<b>マイソクを撮る</b></li><li>読み取った家賃・広さを確かめて、足す</li><li>この家賃で続けるには<b>1日に何${pp?pp.unit:'人'}要るか</b>が出る</li></ol>`}
  <details class="addf"><summary>手で入れる</summary><div class="field"><label>呼び名（自分が分かれば何でも）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
  <div class="f2"><div class="field"><label>家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal" placeholder="例：15"></div><div class="field"><label>広さ（坪・分かれば）</label><input id="pp_t" type="number" inputmode="decimal" placeholder="例：10"></div></div>
  <div class="field"><label>気づいたこと（なくても足せます）</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。"></textarea></div><button class="btn dark" id="pp_add">この物件を足す</button></details>
  <p class="ftn">要る人数は、いまの計画の1${pp&&pp.unit==='件'?'件':'人'}あたりの金額・原価・人件費・あなたの取り分から出しています。計画の数字を変えると、ここも変わります。</p>`);
  $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim(),r2=+$i('pp_r').value;if(!n||!(r2>0)){toast('呼び名と家賃を入れてください');return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();const np=s.pp[s.pp.length-1];if(ppJudge(np))pfSheet(np.id);else ppSheet()};
+ document.querySelectorAll('#sheet .ppd').forEach(d=>d.ontoggle=()=>{if(d.open)s._ppOpen=d.dataset.id;else if(s._ppOpen===d.dataset.id)delete s._ppOpen});
  $i('ms_cam').onclick=()=>$i('ms_in1').click();$i('ms_pick').onclick=()=>$i('ms_in2').click();
  $i('ms_in1').onchange=e=>msStart([...e.target.files]);$i('ms_in2').onchange=e=>msStart([...e.target.files])}
 /* ===== 2026-11-23 この場所での形：物件を入れた直後に「希望どおりだと、ここではこうなる」と「届く形」を返す。
