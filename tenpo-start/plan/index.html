@@ -243,6 +243,7 @@ body.pub{background:var(--bg)}body.pub .top{top:0}
 body.lock{overflow:hidden}
 .fade{animation:f .35s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .tdc{width:26px;height:26px;border-radius:50%;border:2px solid #c9cdc8;background:#fff;flex:none;padding:0;position:relative}.tdc.done{background:var(--green);border-color:var(--green)}.tdc.done::after{content:"";position:absolute;left:8px;top:4px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}.tdc.wait{border-color:var(--tmp);border-style:dashed}.tdc.doing{border-color:var(--green)}
+.tdg{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;color:var(--sub);margin:18px 0 2px}.tdg small{font-weight:500}.tdx{background:var(--lime2);border-radius:12px;padding:10px 12px;margin:12px 0;font-size:13px;line-height:1.7}.tdx .wl{display:flex;gap:6px;align-items:flex-start}.tdx .btn{margin-top:8px;display:flex;width:100%;justify-content:center}.tdx .sr{display:block}.tdf summary{font-size:13px;color:var(--sub);padding:10px 0;min-height:44px;display:flex;align-items:center;cursor:pointer}.shf0{margin-top:16px}
 .tdm{background:none;border:none;text-align:left;padding:0;color:var(--ink);font:inherit}.tdd{text-decoration:line-through;color:var(--sub);font-weight:500}
 .top .biz{margin-left:auto}.hbtn{margin-left:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--green);display:flex;align-items:center;justify-content:center;padding:0;flex:none}
 .gl{margin:6px 0 0;padding-left:20px}.gl li{margin:8px 0;font-size:13.5px;line-height:1.6}.gl li b{display:block}.gl li span{color:var(--sub);font-size:12.5px}
@@ -1020,21 +1021,6 @@ function roadData0(){const p=P[cur],f=vals(),k=st().k||{};const kw=st().kWhy||{}
   {t:'開店したあと',when:'開店後',items:after}]}
 function fmtDate(d){return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}）`}
 function roadCount(){const s=st();s.road=s.road||{};const all=roadData().flatMap(p=>p.items).filter(i=>i.need[0]!=='no');return[all.filter(i=>i.auto||s.road[i.id]).length,all.length]}
-function roadTab(){const s=st();s.road=s.road||{};const open=s.open?new Date(s.open+'T00:00:00'):null;const R=roadData();
- const act=i=>i.need[0]!=='no',isDone=i=>i.auto||s.road[i.id];const [dn,n]=roadCount();
- let h=`<div class="card"><div class="kpi"><div class="kn">${dn}<small>/${n}</small></div><div class="kb"><b>済んだこと</b>${pbar(dn,n)}</div></div>
- <p class="small">順番は目安です。左の丸を押すと「済み」になり、日付つきで「ここまでの歩み」に残ります。もう一度押すと戻せます。項目を押すと、窓口と詳しい説明が開きます。</p>
- ${open?`<span class="pill">${ic('flag',14)}開店の目標 ${fmtDate(open)}${s.openApprox?'（目安）':''}</span>`:`<button class="btn ghost sm" data-kk="open" data-kt="date">${ic('flag',14)} 開店日を入れると、期限が日付になります</button>`}</div>`;
- R.forEach((p,pi)=>{const a=p.items.filter(act),d=a.filter(isDone).length;
-  h+=`<div class="card"><div class="ph"><span class="pn ${d===a.length?'full':''}">${d===a.length?'✓':pi+1}</span><div><h2>${p.t}</h2><span class="small">${p.when}</span></div><span class="kc">${d}/${a.length}</span></div>${pbar(d,a.length,'sm')}`;
-  p.items.forEach(i=>{const dd=isDone(i),no=!act(i);let dl=i.dl;if(typeof dl==='number'){if(open){const x=new Date(open);x.setDate(x.getDate()+dl);dl=`${fmtDate(x)}まで`}else dl=dl<0?`開店の${-dl}日前まで`:`開店から${dl}日以内`}
-   const nd=i.need[0]==='ask'?'<span class="pill ask">要確認</span>':no?'<span class="pill">いまは不要</span>':'';
-   h+=`<div class="ri ${no?'off':''}"><button class="st ${dd?'ok':''}" ${i.auto?'':`data-road="${i.id}"`} aria-label="${dd?'済み。押すと戻す':'済みにする'}">${dd?'✓':''}</button><details class="tx"><summary><b>${i.t}${dd?`<span class="dn">${i.auto?'答えた内容から、済み':(typeof s.road[i.id]==='string'?md(s.road[i.id])+'に':'')+'済み'}</span>`:''}</b><span class="pills">${dl?`<span class="pill dl">${ic('clock',13)}${dl}</span>`:''}${nd}${i.sv?'<span class="pill sv">依頼の文あり</span>':''}</span></summary>
-   <div class="nt"><div class="wl">${ic('who',14)}${i.who}</div>${i.need[1]?`<div class="wl">${ic('info',14)}${i.need[1]}</div>`:''}${i.note||''}${i.src.length?` <span class="sr">出典 ${i.src.map(q=>`<a href="${SRCS[q-1][1]}" target="_blank" rel="noopener">${q}</a>`).join('・')}</span>`:''}</div>
-   ${i.tab?`<button class="btn ghost sm" data-tab="${i.tab}">「${TTL[i.tab][0]}」を開く</button>`:''}${i.sv?svBtn(i.sv):''}</details></div>`});h+='</div>'});
- h+=`<div class="card"><details><summary><b>出典（${SRCS.length}件）</b></summary><ol class="srcl">${SRCS.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ol></details></div>`;
- return h}
-
 /* ===== D：いまお店がある人の2店舗目 ===== */
 function renderD(){const s=st(),r=calc(),f=r.f;const est=s.f.turns.src==='est';const k=s.k||{};
  const hero=`<div class="hero fade"><div class="k">いまのお店の実績から・2店舗目／エリアを検討中</div>
@@ -1208,9 +1194,9 @@ const TABS=[['home','ホーム'],['shop','お店'],['road','やること'],['ask
 const TTL={home:['',''],ask:['',''],shop:['お店','あなたのお店'],files:['フォルダ','写真とデータをためる場所'],plan:['計画','売上と、家賃を払う前に残る額'],check:['確かめること','結果を動かす順に'],place:['物件','探すときの物差しと候補'],road:['',''],ans:['カルテ','あなたのお店について、分かっていること']};
 
 function tabbar(tab,n){if(!TABS.some(x=>x[0]===tab))tab='home';return `<nav class="tabbar">${TABS.map(([k,l])=>`<button data-tab="${k}" class="${k===tab?'on':''}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICON[k]}</svg><span>${l}</span>${k==='check'&&n?`<em>${n}</em>`:''}</button>`).join('')}</nav>`}
-function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:renderC,d:renderD}[cur]();v.check=cur==='b'?v.check+measCard():measCard()+v.check;v.road=roadTab();v.files=filesTab();if(!s._h1){s._h1=1;s.tab='home';s.area=null}const tab=s.tab||'home';const bk=['plan','check','files'].includes(tab)?`<button class="bk" data-hm="${s.area?'area:'+s.area:'home'}">‹ ${s.area?HM.find(x=>x[0]===s.area)[1]:'ホーム'}</button>`:'';
+function renderHome(){const s=st();const v={a:renderA,t:renderT,b:renderB,c:renderC,d:renderD}[cur]();v.check=cur==='b'?v.check+measCard():measCard()+v.check;v.files=filesTab();if(!s._h1){s._h1=1;s.tab='home';s.area=null}const tab=s.tab||'home';const bk=['plan','check','files'].includes(tab)?`<button class="bk" data-hm="${s.area?'area:'+s.area:'home'}">‹ ${s.area?HM.find(x=>x[0]===s.area)[1]:'ホーム'}</button>`:'';
  const n=v.nCheck??Math.min(4,sensitivity().length);let body;
- if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry&&s.worry.length<=12?`気になっている「${esc(s.worry)}」のことから、一緒に見ていきます。`:s.worry?'気になっていることから、一緒に見ていきます。':''}順番どおりでなくて、分かっている所からでかまいません。`,'','',`<div class="alt"><button data-tl="guide:">このアプリでできること</button></div>`):'')+backCard()+shopTab(v);else if(tab==='home')body=s.area?areaPage(s.area,v):homeTab();else if(tab==='ask')body=askTab();else if(tab==='plan')body=bk+planTop(v);else if(tab==='check'&&cur!=='b')body=bk+checkTop();else if(tab==='road')body=tdCard()+v.road;else body=bk+tabFace(tab,v)+v[tab];
+ if(tab==='shop')body=(s.day===0&&s.events.length<=1?face('はじめまして','ここからは、1人で考えなくて大丈夫です',`いただいた答えは、もう計画に入っています。${s.worry&&s.worry.length<=12?`気になっている「${esc(s.worry)}」のことから、一緒に見ていきます。`:s.worry?'気になっていることから、一緒に見ていきます。':''}順番どおりでなくて、分かっている所からでかまいません。`,'','',`<div class="alt"><button data-tl="guide:">このアプリでできること</button></div>`):'')+backCard()+shopTab(v);else if(tab==='home')body=s.area?areaPage(s.area,v):homeTab();else if(tab==='ask')body=askTab();else if(tab==='plan')body=bk+planTop(v);else if(tab==='check'&&cur!=='b')body=bk+checkTop();else if(tab==='road')body=todoTab();else body=bk+tabFace(tab,v)+v[tab];
  return header(dLabel(s.day),(tab==='shop'||tab==='home')?'':(TTL[tab]||[''])[0])+`<div class="wrap">${body}${PUB?accCard(tab):''}</div>`+tabbar(tab,n)}
 
 /* ===== シート ===== */
@@ -1871,48 +1857,58 @@ const TST={todo:'まだ',doing:'進めている',wait:'返事待ち',done:'済�
 function tdAll(){const s=st();s.road=s.road||{};s.ts=s.ts||{};s.td=s.td||[];const open=s.open?new Date(s.open+'T00:00:00'):null,out=[];
  roadData().forEach(ph=>{const wn=ph.when||'',sg=/12〜9/.test(wn)?['idea','search','apply']:/9〜6/.test(wn)?['apply','contract']:/6〜4/.test(wn)?['contract']:/開店後/.test(wn)?['open']:['prep'];const m=(ph.when||'').match(/(\d+)か月前/),pd=/開店後/.test(ph.when||'')?14:m?-m[1]*30:null;
   ph.items.filter(i=>i.need[0]!=='no').forEach(i=>{const x=s.ts[i.id]||{},off=typeof i.dl==='number'?i.dl:pd;
-   out.push({stg:sg,id:'r:'+i.id,rid:i.id,t:i.t,who:x.who||i.who||'自分',due:x.due||(open&&off!=null?iso(addDays(open,off)):null),auto:!x.due,st:(i.auto||s.road[i.id])?'done':(x.st||'todo'),note:x.note||'',hint:typeof i.dl==='string'?i.dl:''})})});
+   out.push({stg:sg,id:'r:'+i.id,rid:i.id,t:i.t,who:x.who||i.who||'自分',due:x.due||(open&&off!=null?iso(addDays(open,off)):null),ask:i.need[0]==='ask',auto:!x.due,st:(i.auto||s.road[i.id])?'done':(x.st||'todo'),note:x.note||'',hint:typeof i.dl==='string'?i.dl:''})})});
  if(offOk()&&s.off&&(s.off.tk||s.off.dv)){const nm=[s.off.tk?'持ち帰り':'',s.off.dv?'デリバリー':''].filter(Boolean).join('・'),x=s.ts.off_hk||{};out.push({stg:['contract','prep'],id:'r:off_hk',rid:'off_hk',xr:1,t:`${nm}を売るのに、いまの営業許可で足りるかを保健所に聞く`,who:x.who||'自分',due:x.due||(open?iso(addDays(open,-60)):null),auto:!x.due,st:s.road.off_hk?'done':(x.st||'todo'),note:x.note||'',hint:'工事の前の相談の時に一緒に'})}
  s.td.forEach(x=>out.push({id:'m:'+x.id,mid:x.id,t:x.t,who:x.who||'自分',due:x.due||null,st:x.st||'todo',note:x.note||'',mine:1}));
  (s.ct||[]).filter(c=>c.wait).forEach(c=>out.push({id:'c:'+c.id,cid:c.id,t:`${c.n}：${c.wait}`,who:c.n,due:null,st:'wait',contact:1}));
  return out}
 const byDue=(a,b)=>(a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9999')?1:0;
 function tdRow(x){const t0=iso(tdNow()),due=x.due?(x.due<t0&&x.st!=='done'?(x.auto?`早めに・目安は${md(x.due)}`:`${md(x.due)} 過ぎています`):x.due===t0?'今日':md(x.due)+(x.auto?'ごろ':'')):(x.hint||'期限なし');
- return `<div class="lrow"><button class="tdc ${x.st}" data-tl="tdc:${x.id}" aria-label="済みにする"></button><button class="lm tdm" data-tl="tde:${x.id}"><b class="${x.st==='done'?'tdd':''}">${esc(x.t)}</b><small>${due}・${esc(x.who)}${x.st==='wait'||x.st==='doing'?'・'+TST[x.st]:''}</small></button></div>`}
-function tdCard(){const s=st(),A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),open=A.filter(x=>x.st!=='done'),soon=open.filter(x=>x.due&&x.due<=wk).sort(byDue),late=soon.filter(x=>x.due<t0&&!x.auto).length,early=soon.filter(x=>x.due<t0&&x.auto).length,wait=open.filter(x=>x.st==='wait').length;
- const g=stgOf(),mine=open.filter(x=>x.stg&&x.stg.includes(g)).sort(byDue);const rows=mine.length?mine.slice(0,5):soon.length?soon.slice(0,5):open.filter(x=>!x.contact).slice(0,3);
- return `<div class="card"><div class="kh">${ic('check',20)}<h2>やること</h2><span class="kc">済み ${A.length-open.length}/${A.length}</span></div>
- <p class="lead">${mine.length?`いまの段階（${STGL[g]}）のやることです。`:''}${!s.open?'開店の目標日を入れると、それぞれに期限の目安が付きます。':mine.length?'':late?`自分で決めた期限を過ぎた物が${late}件あります。動かせる物は、日付を変えて大丈夫です。`:early?`開店の目標日から見ると、早めに進めたい物が${early}件あります。上から1つずつで大丈夫です。`:soon.length?'今日から1週間の分です。':'この1週間に期限の物はありません。先の物から、1つ進めておけます。'}</p>
- ${!s.open?`<div style="margin:10px 0 14px"><button class="btn ghost sm" data-kk="open" data-kt="x">開店の目標日を入れる</button></div>`:`<button class="lk" data-kk="open" data-kt="date" style="padding-top:0">開店の目標 ${fmtDate(new Date(s.open+'T00:00:00'))}${s.openApprox?'（目安）':''} ›</button>`}${rows.map(tdRow).join('')}
- <div class="alt"><button data-tl="td:all">全部見る（残り${open.length}）</button><button data-tl="tdadd:">＋ やることを足す</button></div>${wait?`<button class="lk" data-tl="td:wait">返事を待っていること ${wait}件</button>`:''}</div>`}
-function tdSheet(v){const A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),open=A.filter(x=>x.st!=='done').sort(byDue),done=A.filter(x=>x.st==='done');
- const L=v==='week'?open.filter(x=>x.due&&x.due<=wk):v==='wait'?open.filter(x=>x.st==='wait'||!/自分/.test(x.who)):open;
- openSheet(`<h3>やること</h3><div class="seg" style="margin-bottom:6px">${[['week','今日と今週'],['all','全部'],['wait','人に頼んでいること']].map(o=>`<button data-tl="td:${o[0]}" class="${v===o[0]?'on':''}">${o[1]}</button>`).join('')}</div>
- ${L.map(tdRow).join('')||`<p class="emp">${v==='week'?'この1週間に期限の物はありません。':v==='wait'?'人に頼んでいること・返事待ちは、ありません。':'残っている物はありません。'}</p>`}
- ${v==='all'&&done.length?`<details class="addf"><summary>済み ${done.length}件</summary>${done.map(tdRow).join('')}</details>`:''}
- <button class="btn dark" data-tl="tdadd:">＋ やることを足す</button><button class="btn ghost" data-act="close">閉じる</button>`);st()._tdv=v}
+ return `<div class="lrow"><button class="tdc ${x.st}" data-tl="tdc:${x.id}" aria-label="済みにする"></button><button class="lm tdm" data-tl="tde:${x.id}"><b class="${x.st==='done'?'tdd':''}">${esc(x.t)}</b><small>${due}・${esc(x.who)}${x.st==='wait'||x.st==='doing'?'・'+TST[x.st]:''}${x.ask&&x.st!=='done'?'・要確認':''}</small></button></div>`}
+/* やること：1つのリスト。見方は「いまの段階」「全部」「返事待ち」。済みの印は丸だけ */
+function tdGroups(L){const t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),mo=iso(addDays(tdNow(),31)),G=[['late','早めに進めたい',x=>x.due&&x.due<t0],['week','今日から1週間',x=>x.due&&x.due>=t0&&x.due<=wk],['month','1か月のうちに',x=>x.due&&x.due>wk&&x.due<=mo],['later','それより先',x=>x.due&&x.due>mo],['none','期限なし',x=>!x.due]];
+ return G.map(([id,t,f])=>{const R=L.filter(f).sort(byDue);return R.length?`<p class="tdg">${t}<small>${R.length}</small></p>${R.map(tdRow).join('')}`:''}).join('')}
+function todoTab(){const s=st(),A=tdAll(),g=stgOf(),v=['stage','all','wait'].includes(s._tdv)?s._tdv:'stage',open=A.filter(x=>x.st!=='done'),done=A.filter(x=>x.st==='done'),wait=open.filter(x=>x.st==='wait'||x.contact||!/自分/.test(x.who));
+ const inStg=x=>!x.stg||x.stg.includes(g);
+ let h=`<div class="card"><div class="kh">${ic('check',20)}<h2>やること</h2><span class="kc">済み ${done.length}/${A.length}</span></div>${pbar(done.length,A.length,'sm')}
+ ${!s.open?`<button class="nsrow" data-kk="open" data-kt="date"><span class="tx"><b>開店の目標日を入れる</b><small>入れると、それぞれに期限の目安が付きます</small></span><i>›</i></button>`:`<button class="nsrow" data-kk="open" data-kt="date"><span class="tx"><b>開店の目標</b></span><span class="v">${fmtDate(new Date(s.open+'T00:00:00'))}${s.openApprox?'（目安）':''}</span><i>›</i></button>`}
+ <div class="seg" style="margin:12px 0 4px">${[['stage','いまの段階'],['all','全部'],['wait',`返事待ち${wait.length?' '+wait.length:''}`]].map(o=>`<button data-tdv="${o[0]}" class="${v===o[0]?'on':''}">${o[1]}</button>`).join('')}</div>`;
+ if(v==='stage'){const L=open.filter(x=>!x.contact&&inStg(x)),D=done.filter(x=>x.stg&&x.stg.includes(g));
+  h+=`<p class="small">いまの段階（${STGL[g]}）のやることです。丸を押すと済みになり、もう一度押すと戻せます。項目を押すと、窓口と説明、期限やだれがやるかを直せます。</p>${tdGroups(L)||`<p class="emp">この段階のやることは、済んでいます。次の段階へ進む目印は、ホームで見られます。</p>`}
+  ${D.length?`<details class="addf"><summary>この段階で済んだこと ${D.length}件</summary>${D.map(tdRow).join('')}</details>`:''}`}
+ else if(v==='all'){const R=roadData(),ph=R.map(p=>{const L=A.filter(x=>x.rid&&!x.xr&&p.items.some(i=>i.id===x.rid));if(!L.length)return '';const d=L.filter(x=>x.st==='done').length;
+   const O=L.filter(x=>x.st!=='done').sort(byDue),D=L.filter(x=>x.st==='done');return `<p class="tdg">${d===L.length?'✓ ':''}${p.t}<small>${p.when?p.when+'・':''}${d}/${L.length}</small></p>${O.map(tdRow).join('')}${D.length?`<details class="tdf"><summary>済み ${D.length}件</summary>${D.map(tdRow).join('')}</details>`:''}`}).join('');
+  const M=A.filter(x=>x.mine||x.xr);
+  h+=ph+(M.length?`<p class="tdg">自分で足したこと・ほかのこと<small>${M.length}</small></p>${M.map(tdRow).join('')}`:'')}
+ else h+=`<p class="small">人に頼んでいること、返事を待っていることです。返事が来たら、丸を押します。</p>${wait.sort(byDue).map(tdRow).join('')||'<p class="emp">人に頼んでいること・返事待ちは、ありません。</p>'}`;
+ h+=`<div class="shf0"><button class="btn dark" data-tl="tdadd:">＋ やることを足す</button></div></div>
+ <div class="card"><details><summary><b>出典（${SRCS.length}件）</b></summary><ol class="srcl">${SRCS.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ol></details></div>`;
+ return h}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-tdv]');if(!b)return;e.preventDefault();const s=st();s._tdv=b.dataset.tdv;save();render()},true);
+/* 前の「やること」シートの入口は、やることのタブの見方へ */
+function tdSheet(v){const s=st();s._tdv={week:'stage',all:'all',wait:'wait'}[v]||v||'stage';s.tab='road';s.area=null;try{closeSheet()}catch(e){}save();render();scrollTo(0,0)}
 function tdEdit(id,isNew){const s=st(),x=isNew?{id:'',t:'',who:'自分',due:'',st:'todo',note:'',mine:1}:tdAll().find(y=>y.id===id);if(!x)return;
  if(x.contact){ctEdit(x.cid);return}
- openSheet(`<h3>${isNew?'やることを足す':esc(x.t)}</h3>
+ openSheet(`<h3>${isNew?'やることを足す':esc(x.t)}</h3>${(()=>{const i=x.rid&&!x.xr?roadData().flatMap(p=>p.items).find(y=>y.id===x.rid):null;if(!i)return '';return `<div class="tdx"><div class="wl">${ic('who',14)}窓口：${i.who}</div>${i.need[1]?`<div class="wl">${ic('info',14)}${i.need[1]}</div>`:''}${i.note?`<div>${i.note}</div>`:''}${i.src.length?`<span class="sr">出典 ${i.src.map(q=>`<a href="${SRCS[q-1][1]}" target="_blank" rel="noopener">${q}</a>`).join('・')}</span>`:''}${i.tab?`<button class="btn ghost sm" data-tab="${i.tab}" data-act2="close">「${TTL[i.tab][0]}」を開く</button>`:''}${i.sv?svBtn(i.sv):''}</div>`})()}
  ${x.mine?`<div class="field"><label>やること</label><input id="td_t" value="${esc(x.t)}" placeholder="例：内装会社に電話して、見積もりを頼む"></div>`:''}
  ${isNew?'':`<div class="field"><label>いまの状態</label><div class="seg" id="td_st">${Object.entries(TST).map(o=>`<button type="button" data-v="${o[0]}" class="${x.st===o[0]?'on':''}">${o[1]}</button>`).join('')}</div></div>`}
  <div class="field"><label>期限${x.auto&&x.due?'（開店の目標日から置いた目安）':''}</label>${dateField('td_due',x.due)}</div>
  <div class="field"><label>だれがやるか</label><input id="td_who" value="${esc(x.who)}" placeholder="例：自分・家族・内装会社"></div>
  <div class="field"><label>メモ</label><textarea id="td_note" rows="2">${esc(x.note)}</textarea></div>
  <button class="btn dark" id="td_save">${isNew?'足す':'この内容にする'}</button>
- ${x.rid&&!x.xr?`<button class="btn ghost" data-tab="road" data-act2="close">くわしい説明を「開店まで」で見る</button>`:''}${x.mine&&!isNew?`<button class="lk" id="td_del">このやることを消す</button>`:''}`);
+ ${x.mine&&!isNew?`<button class="lk" id="td_del">このやることを消す</button>`:''}`);
  let stv=x.st;document.querySelectorAll('#td_st button').forEach(b=>b.onclick=()=>{stv=b.dataset.v;document.querySelectorAll('#td_st button').forEach(y=>y.classList.toggle('on',y===b))});
  $i('td_save').onclick=()=>{const due=$i('td_due').value||null,who=$i('td_who').value.trim()||'自分',note=$i('td_note').value.trim();
   if(x.mine){const t=$i('td_t').value.trim();if(!t){toast('やることを書いてください');return}
    if(isNew){s.td.push({id:uid(),t,due,who,note,st:'todo'});log(`やること「${esc(t)}」を足した`)}else{const o=s.td.find(y=>y.id===x.mid);Object.assign(o,{t,due,who,note,st:stv});if(stv==='done'&&x.st!=='done')log(`「${esc(t)}」を済みにした`)}}
   else{s.ts[x.rid]={...(s.ts[x.rid]||{}),who,note,st:stv==='done'?'todo':stv};if(due&&(!x.auto||due!==x.due))s.ts[x.rid].due=due;const was=!!s.road[x.rid];s.road[x.rid]=stv==='done';if(stv==='done'&&!was)log(`「${esc(x.t)}」を済みにした`)}
-  save();render();tdSheet(s._tdv||'all')};
- if($i('td_del'))$i('td_del').onclick=()=>{s.td=s.td.filter(y=>y.id!==x.mid);save();render();tdSheet(s._tdv||'all')}}
+  save();closeSheet();render()};
+ if($i('td_del'))$i('td_del').onclick=()=>{s.td=s.td.filter(y=>y.id!==x.mid);save();closeSheet();render()}}
 function tdToggle(id){const s=st(),x=tdAll().find(y=>y.id===id);if(!x)return;
  if(x.contact){const c=s.ct.find(y=>y.id===x.cid);c.logs=c.logs||[];c.logs.push({d:iso(tdNow()),t:`返事が来た：${c.wait}`});c.wait='';log(`${esc(c.n)}から返事が来た`)}
  else if(x.mine){const o=s.td.find(y=>y.id===x.mid);o.st=o.st==='done'?'todo':'done';if(o.st==='done')log(`「${esc(o.t)}」を済みにした`)}
  else{if(tdAll().find(y=>y.id===id).st==='done'&&!s.road[x.rid]){toast('答えた内容から、済みになっています');return}if(s.road[x.rid])delete s.road[x.rid];else{s.road[x.rid]=iso(tdNow());log(`「${esc(x.t)}」を済みにした`)}}
- save();render();if($i('sheet').classList.contains('on'))tdSheet(s._tdv||'all')}
+ save();render()}
 /* ---- 開店までの道具 ---- */
 const QC=[['naiso','内装・設備の工事'],['kiki','厨房機器・家具・レジ'],['bukken','物件を借りるお金'],['junbi','開店前の仕入れ・備品・告知']];
 
