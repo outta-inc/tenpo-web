@@ -34,6 +34,16 @@ export const CORE = [
   ['first','初めて開く'],['worked','働いた経験はあるが、開くのは初めて'],
   ['opened','開業したことがある'],['operating','今もお店を運営している']
  ]),
+ // 2026/11/23：今もお店を運営している人にだけ、今のお店の実績を聞く。新しいお店の仮の数字の代わりに「今のお店の実績」として使う。
+ number('existingGuestsPerDay','今のお店には、1日に何人くらい来ていますか（ならした数）','人',40,0,{branch:'operating',max:2000,
+  takeawayLabel:'今のお店では、1日に何件くらいの会計がありますか（ならした数）',takeawayUnit:'件',
+  salonLabel:'今のお店では、1日に何人くらいの予約がありますか（ならした数）',salonExample:5,
+  help:'分かる範囲で大丈夫です。新しいお店でも同じになるとは限らないので、仮の見込みとして使います。'}),
+ number('existingSeats','今のお店の席数は、いくつですか','席',12,1,{branch:'operatingSeats',max:200,
+  salonLabel:'今のお店の施術の席やベッドは、いくつですか',salonUnit:'台',salonExample:2}),
+ number('existingDaysPerMonth','今のお店は、月に何日開けていますか','日',26,1,{branch:'operating',max:31}),
+ number('existingCostRatePct','今のお店の原価率は、何%くらいですか','%',30,0,{branch:'operating',max:100,
+  salonLabel:'今のお店の材料費は、売上の何%くらいですか',salonExample:10}),
  text('purpose','どんな場面で来てもらいたいですか','近所の人が、昼食や午後の休憩に立ち寄る',{
   examples:{takeaway:'仕事帰りに夕食を持ち帰る',salon:'仕事帰りに体を休めたい時'}}),
  text('mainProduct','中心の商品は何にしたいですか','コーヒーと温かいサンドイッチ',{
@@ -50,6 +60,8 @@ export const CORE = [
  number('peakStaff','いちばん混む時間は、何人で営業しますか（自分を入れて）','人',2,1,{
   salonLabel:'いちばん混む時間に、同時に施術する人は何人ですか（自分を入れて）',
   help:'店主を数えた合計です。サロンは受付だけの人を含めません。家族か雇う人かは、ここから決めつけません。'}),
+ select('selfWork','あなた自身も、お店で働きますか',[['yes','自分もお店で働く'],['no','人に任せる']],{
+  help:'あなたの給料は人件費に入りません。働くかどうかで、続けるのに要る人数が変わります。'}),
  select('propertyStage','物件探しは、どこまで進んでいますか',[
   ['idea','まだ構想中'],['area','エリアを検討中'],['viewing','候補を内見中'],
   ['contracted','契約済み'],['existing','今の物件を使う']
@@ -60,12 +72,14 @@ export const CORE = [
  ]}
 ];
 export const OPTIONAL = [
- text('openingTarget','いつごろ開きたいですか','来年の秋ごろ'),
+ select('openingWhen','いつごろ開きたいですか',[['m3','3か月以内'],['m6','半年くらい先'],['m12','1年くらい先'],['m18','1年より先']],{
+  help:'目安で大丈夫です。開店日の目安にして、やることの期限を出します。あとで日付に直せます。'}),
+ text('openingTarget','いつごろ開きたいですか','来年の秋ごろ',{branch:'retired'}),
  text('area','どの辺りで考えていますか','住宅街。エリアは未定'),
  text('businessHours','営業したい時間は何時から何時までですか','10時〜17時'),
  text('workingHours','準備や片付けを含め、仕事に使える時間はどのくらいですか','9時〜18時。準備にかかる時間は、これから確かめる'),
  number('daysOffPerWeek','週に何日、休みたいですか','日',1,0,{max:7}),
- text('operators','だれが、どんな時間に運営しますか','店主1人を基本に、昼だけ補助を頼む'),
+ text('operators','だれが、どんな時間に運営しますか','店主1人を基本に、昼だけ補助を頼む',{branch:'retired'}),
  number('helperHoursPerDay','補助を頼む時間は、1日何時間で考えていますか','時間',3,0,{integer:false,max:24,branch:'helper'}),
  number('ownFundsYen','自分で用意できるお金は、いくらですか','円',2000000,0,{private:true}),
  number('desiredMonthlyTakeHomeYen','毎月、あなたの生活に要る額（給料）はいくらですか','円',250000,0,{private:true}),
@@ -102,6 +116,9 @@ export function isActive(q,state){const model=modelOf(state),b=valueOf(state,'bu
  switch(q.branch){
   case 'chooseModel':return valueOf(state,'category')==='other'||legacyChoose(state);
   case 'notOther':return valueOf(state,'category')!=='other';
+  case 'operating':return valueOf(state,'experience')==='operating';
+  case 'operatingSeats':return valueOf(state,'experience')==='operating'&&['seated','salon'].includes(model);
+  case 'retired':return false;
   case 'salon':return model==='salon';
   case 'notTakeaway':return ['seated','salon'].includes(model);
   case 'helper':return model!=='salon' && valueOf(state,'peakStaff')>1;

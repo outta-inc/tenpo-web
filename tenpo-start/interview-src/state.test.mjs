@@ -11,8 +11,8 @@ test('all undecided is saved without supplying a default calculation',()=>{
  assert.equal(calculationInput(s).ready,false);assert.equal(legacyPayload(s).payload,null);
  assert.equal(calculationInput(s).data.averageSpendYen,null);
 });
-test('cafe has ten core screens and passes 12 seats / 1100 yen / 2 people unchanged',()=>{
- const s=cafe();assert.equal(questionsFor(s).length,10);assert.equal(calculationInput(s).ready,true);
+test('cafe has eleven core screens and passes 12 seats / 1100 yen / 2 people unchanged',()=>{
+ const s=cafe();assert.equal(questionsFor(s).length,11);assert.equal(calculationInput(s).ready,true);
  assert.deepEqual(calculationInput(s).data,{model:'seated',capacity:12,averageSpendYen:1100,peakStaff:2,serviceMinutes:null});
  assert.equal(calculationInput(s).sources.capacity.status,'provisional');
 });
@@ -21,7 +21,7 @@ test('salon requires service duration; seat data cannot silently become beds',()
  assert.equal(s.archived.find(a=>a.id==='capacity').answer.value,12);
  for(const [k,v]of Object.entries({capacity:2,averageSpendYen:8000,peakStaff:1}))s=set(s,k,v);
  assert.ok(calculationInput(s).missing.includes('serviceMinutes'));
- s=set(s,'serviceMinutes',45);assert.equal(calculationInput(s).ready,true);assert.equal(questionsFor(s).length,11);
+ s=set(s,'serviceMinutes',45);assert.equal(calculationInput(s).ready,true);assert.equal(questionsFor(s).length,12);
 });
 test('cake shop branches explicitly and stale salon fields are archived',()=>{
  let s=set(base(),'businessType','cake');assert.equal(modelOf(s),null);
@@ -78,4 +78,23 @@ test('answers saved before the two levels still load and keep their model',()=>{
  storage.setItem(STORAGE_KEY,JSON.stringify(old));const r=loadInterview(storage);
  assert.equal(r.error,null);assert.equal(modelOf(r.state),'salon');
  old.answers.businessType.value='bar';storage.setItem(STORAGE_KEY,JSON.stringify(old));assert.equal(modelOf(loadInterview(storage).state),'seated');
+});
+
+test('a person running a shop now is asked for that shop, and the answers go to the hand-off',()=>{
+ let s=set(cafe(),'experience','operating');const ids=questionsFor(s).map(q=>q.id);
+ for(const id of ['existingGuestsPerDay','existingSeats','existingDaysPerMonth','existingCostRatePct'])assert.ok(ids.includes(id),id);
+ s=set(s,'existingGuestsPerDay',55);s=set(s,'existingSeats',10);s=set(s,'existingDaysPerMonth',25);s=set(s,'existingCostRatePct',32);
+ assert.deepEqual(legacyPayload(s).payload.existing,{guests:55,seats:10,days:25,costRatePct:32});
+ assert.throws(()=>set(s,'existingDaysPerMonth',40));
+ s=set(s,'experience','first');assert.equal(s.answers.existingSeats,undefined);assert.equal(legacyPayload(s).payload.existing,null);
+ assert.ok(s.archived.some(a=>a.id==='existingGuestsPerDay'));
+});
+test('self work and opening month are choices; old free-text answers still load',()=>{
+ let s=set(cafe(),'selfWork','no');assert.equal(legacyPayload(s).payload.selfWork,'no');
+ s=set(s,'openingWhen','m6');assert.equal(legacyPayload(s).payload.openingWhen,'m6');
+ assert.equal(questionsFor(s,{optional:true}).some(q=>q.id==='openingTarget'||q.id==='operators'),false);
+ const store=new Map();const storage={getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v)};
+ const old=base();old.answers.openingTarget={value:'来年の秋ごろ',status:'answered',source:'user',updatedAt:now};
+ old.answers.operators={value:'店主1人',status:'answered',source:'user',updatedAt:now};
+ storage.setItem(STORAGE_KEY,JSON.stringify(old));assert.equal(loadInterview(storage).error,null);
 });
