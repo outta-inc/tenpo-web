@@ -300,6 +300,10 @@ html{touch-action:manipulation;-webkit-text-size-adjust:100%}
 .sheet .dt summary{font-size:13.5px;padding:10px 0 2px}
 .sheet .seg button{min-height:40px;padding:8px 14px;font-size:13.5px}
 .sheet .verdict{font-size:14px;border-radius:14px}
+.hstg{margin-left:auto;margin-right:8px;background:var(--lime2);border:0;border-radius:12px;padding:5px 12px;display:flex;flex-direction:column;align-items:flex-end;font:inherit;min-width:0;max-width:52vw}.hstg small{font-size:10.5px;color:var(--sub);line-height:1.3}.hstg b{font-size:13.5px;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.4}
+.stgl{display:flex;flex-direction:column;gap:8px;margin-top:14px}.stgl button{display:flex;align-items:center;gap:12px;text-align:left;border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;font:inherit;color:var(--ink)}.stgl button span:nth-child(2){flex:1;min-width:0}.stgl b{display:block;font-size:15px}.stgl small{display:block;font-size:12px;color:var(--sub);line-height:1.5}.stgl button.on{border-color:var(--green);background:#f3f8f3}.stgl em{font-style:normal;font-size:11.5px;font-weight:700;color:#fff;background:var(--green);border-radius:99px;padding:2px 8px;white-space:nowrap}
+.stgc .btn{margin-top:10px}.stgb{display:block;font-size:16px;line-height:1.5;margin-top:2px}.stgq{font-size:14px;line-height:1.7;margin:6px 0 0;padding-left:10px;border-left:3px solid var(--gold);color:var(--ink)}.stgn{font-size:12.5px;color:var(--sub);line-height:1.7;margin:12px 2px 0}.stgn .lk{padding:0;font-size:12.5px}
+.hmo{margin-top:18px}.hmo>summary{list-style:none;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 40px 12px 14px;position:relative}.hmo>summary::-webkit-details-marker{display:none}.hmo>summary::after{content:"›";position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(90deg);color:var(--sub);font-size:18px}.hmo[open]>summary::after{transform:translateY(-50%) rotate(-90deg)}.hmo>summary b{display:block;font-size:15px}.hmo>summary small{display:block;font-size:12px;color:var(--sub);line-height:1.5;margin-top:2px}
 .hmh{padding:6px 2px 0}.hmh h1{font-size:23px;margin:0;line-height:1.4}.hmh p{font-size:13px;color:var(--sub);line-height:1.7;margin:6px 0 0}
 .hmc{display:flex;gap:8px;margin-top:14px}.hmc div{flex:1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}.hmc span{display:block;font-size:11.5px;color:var(--sub)}.hmc b{font-size:20px;color:var(--green)}.hmc b.t{color:var(--tmp)}.hmc b.n{color:var(--ink)}
 .hml{padding:4px 16px;overflow:hidden}.hmr{display:flex;align-items:center;gap:12px;width:calc(100% + 32px);margin:0 -16px;padding:10px 16px;min-height:64px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:var(--ink);font:inherit}.hmr:first-child{border-top:0}.hmr.now{background:#fbf6e8}
@@ -1660,7 +1664,7 @@ function ivDerive(u){const o={};
  return o}
 function ivPlan(){const u=ivU();if(!u)return;const prev=S._u||S._uOld||null;applyIV(u);const had=!!prev;ivSync(u,prev);S._u=u;delete S._uOld;
  if(!S._t0){S._t0=Date.now();BASE=new Date(new Date().setHours(0,0,0,0))}S._iv=null;S[cur].day=Math.max(0,Math.floor((new Date().setHours(0,0,0,0)-BASE.getTime())/864e5));
- if(!had){const z=S[cur];z.tab='home';z._h1=1;z.area={area:'place',viewing:'place',contracted:'proc',existing:'proc'}[u.stage]||null}log(had?'ヒアリングの答えを直した':'ヒアリングの答えから、最初の計画を受け取った');save();scrollTo(0,0);render()}
+ if(!had){const z=S[cur];z.tab='home';z._h1=1;z.area=null;if(!z.stg){const g0={idea:'idea',area:'search',viewing:'search',contracted:'contract',existing:'contract'}[u.stage];if(g0)z.stg=g0}}log(had?'ヒアリングの答えを直した':'ヒアリングの答えから、最初の計画を受け取った');save();scrollTo(0,0);render()}
 function ivFinish(){S._ivDone=1;ivSave();const u=ivU();
  if(S._u&&u){ivPlan();toast('答えを残しました');return}
  if(S._u&&!u){S._uOld=S._u;delete S._u}
@@ -1841,9 +1845,9 @@ const md=s=>{const d=new Date(s+'T00:00:00');return `${d.getMonth()+1}/${d.getDa
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const TST={todo:'まだ',doing:'進めている',wait:'返事待ち',done:'済み'};
 function tdAll(){const s=st();s.road=s.road||{};s.ts=s.ts||{};s.td=s.td||[];const open=s.open?new Date(s.open+'T00:00:00'):null,out=[];
- roadData().forEach(ph=>{const m=(ph.when||'').match(/(\d+)か月前/),pd=/開店後/.test(ph.when||'')?14:m?-m[1]*30:null;
+ roadData().forEach(ph=>{const wn=ph.when||'',sg=/12〜9/.test(wn)?['idea','search','apply']:/9〜6/.test(wn)?['apply','contract']:/6〜4/.test(wn)?['contract']:/開店後/.test(wn)?['open']:['prep'];const m=(ph.when||'').match(/(\d+)か月前/),pd=/開店後/.test(ph.when||'')?14:m?-m[1]*30:null;
   ph.items.filter(i=>i.need[0]!=='no').forEach(i=>{const x=s.ts[i.id]||{},off=typeof i.dl==='number'?i.dl:pd;
-   out.push({id:'r:'+i.id,rid:i.id,t:i.t,who:x.who||i.who||'自分',due:x.due||(open&&off!=null?iso(addDays(open,off)):null),auto:!x.due,st:(i.auto||s.road[i.id])?'done':(x.st||'todo'),note:x.note||'',hint:typeof i.dl==='string'?i.dl:''})})});
+   out.push({stg:sg,id:'r:'+i.id,rid:i.id,t:i.t,who:x.who||i.who||'自分',due:x.due||(open&&off!=null?iso(addDays(open,off)):null),auto:!x.due,st:(i.auto||s.road[i.id])?'done':(x.st||'todo'),note:x.note||'',hint:typeof i.dl==='string'?i.dl:''})})});
  s.td.forEach(x=>out.push({id:'m:'+x.id,mid:x.id,t:x.t,who:x.who||'自分',due:x.due||null,st:x.st||'todo',note:x.note||'',mine:1}));
  (s.ct||[]).filter(c=>c.wait).forEach(c=>out.push({id:'c:'+c.id,cid:c.id,t:`${c.n}：${c.wait}`,who:c.n,due:null,st:'wait',contact:1}));
  return out}
@@ -1851,10 +1855,10 @@ const byDue=(a,b)=>(a.due||'9999')<(b.due||'9999')?-1:(a.due||'9999')>(b.due||'9
 function tdRow(x){const t0=iso(tdNow()),due=x.due?(x.due<t0&&x.st!=='done'?(x.auto?`早めに・目安は${md(x.due)}`:`${md(x.due)} 過ぎています`):x.due===t0?'今日':md(x.due)+(x.auto?'ごろ':'')):(x.hint||'期限なし');
  return `<div class="lrow"><button class="tdc ${x.st}" data-tl="tdc:${x.id}" aria-label="済みにする"></button><button class="lm tdm" data-tl="tde:${x.id}"><b class="${x.st==='done'?'tdd':''}">${esc(x.t)}</b><small>${due}・${esc(x.who)}${x.st==='wait'||x.st==='doing'?'・'+TST[x.st]:''}</small></button></div>`}
 function tdCard(){const s=st(),A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),open=A.filter(x=>x.st!=='done'),soon=open.filter(x=>x.due&&x.due<=wk).sort(byDue),late=soon.filter(x=>x.due<t0&&!x.auto).length,early=soon.filter(x=>x.due<t0&&x.auto).length,wait=open.filter(x=>x.st==='wait').length;
- const rows=soon.length?soon.slice(0,5):open.filter(x=>!x.contact).slice(0,3);
+ const g=stgOf(),mine=open.filter(x=>x.stg&&x.stg.includes(g)).sort(byDue);const rows=mine.length?mine.slice(0,5):soon.length?soon.slice(0,5):open.filter(x=>!x.contact).slice(0,3);
  return `<div class="card"><div class="kh">${ic('check',20)}<h2>やること</h2><span class="kc">済み ${A.length-open.length}/${A.length}</span></div>
- <p class="lead">${!s.open?'開店の目標日を入れると、それぞれに期限の目安が付きます。':late?`自分で決めた期限を過ぎた物が${late}件あります。動かせる物は、日付を変えて大丈夫です。`:early?`開店の目標日から見ると、早めに進めたい物が${early}件あります。上から1つずつで大丈夫です。`:soon.length?'今日から1週間の分です。':'この1週間に期限の物はありません。先の物から、1つ進めておけます。'}</p>
- ${!s.open?`<div style="margin:10px 0 14px"><button class="btn ghost sm" data-kk="open" data-kt="x">開店の目標日を入れる</button></div>`:''}${rows.map(tdRow).join('')}
+ <p class="lead">${mine.length?`いまの段階（${STGL[g]}）のやることです。`:''}${!s.open?'開店の目標日を入れると、それぞれに期限の目安が付きます。':mine.length?'':late?`自分で決めた期限を過ぎた物が${late}件あります。動かせる物は、日付を変えて大丈夫です。`:early?`開店の目標日から見ると、早めに進めたい物が${early}件あります。上から1つずつで大丈夫です。`:soon.length?'今日から1週間の分です。':'この1週間に期限の物はありません。先の物から、1つ進めておけます。'}</p>
+ ${!s.open?`<div style="margin:10px 0 14px"><button class="btn ghost sm" data-kk="open" data-kt="x">開店の目標日を入れる</button></div>`:`<button class="lk" data-kk="open" data-kt="date" style="padding-top:0">開店の目標 ${fmtDate(new Date(s.open+'T00:00:00'))}${s.openApprox?'（目安）':''} ›</button>`}${rows.map(tdRow).join('')}
  <div class="alt"><button data-tl="td:all">全部見る（残り${open.length}）</button><button data-tl="tdadd:">＋ やることを足す</button></div>${wait?`<button class="lk" data-tl="td:wait">返事を待っていること ${wait}件</button>`:''}</div>`}
 function tdSheet(v){const A=tdAll(),t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),open=A.filter(x=>x.st!=='done').sort(byDue),done=A.filter(x=>x.st==='done');
  const L=v==='week'?open.filter(x=>x.due&&x.due<=wk):v==='wait'?open.filter(x=>x.st==='wait'||!/自分/.test(x.who)):open;
@@ -1952,10 +1956,57 @@ function hmState(){const s=st(),f=vals(),p=P[cur],rc0=roadCount(),rd=rc0[0],rn=r
   proc:rd>=rn?['done',`${rn}件すべて済み`]:rd?['doing',`${rd}/${rn}件 済み`]:['todo',`窓口への手続きなど${rn}件`],
   promo:s.pre&&s.pre.date?['doing',`プレオープン ${md(s.pre.date)}`]:['todo','Google・Instagram・プレオープン']};
  const ids=HM.map(x=>x[0]);let next=ids.find(id=>R[id][0]==='todo')||ids.find(id=>R[id][0]==='doing');if(n&&n.gap<0&&!s._viaSeen)next='viable';return{R,next}}
-function homeTab(){const s=st(),h=hmState(),R=h.R,c=k=>HM.filter(x=>R[x[0]][0]===k).length,first=s.day===0&&s.events.length<=1;
- return `<div class="hmh"><h1>お店を始めるまでの全部</h1><p>${first?'いただいた答えは、もう入っています。':''}決めることは9つです。順番は前後してかまいません。</p></div>
- <div class="hmc"><div><span>決まった</span><b>${c('done')}</b></div><div><span>仮で進行中</span><b class="t">${c('doing')}</b></div><div><span>これから</span><b class="n">${c('todo')}</b></div></div>
- ${homeCalcCard()}<div class="card hml">${HM.map(([id,t],i)=>{const stt=R[id][0],now=id===h.next;return `<button class="hmr ${stt} ${now?'now':''}" data-hm="area:${id}"><span class="hmn">${stt==='done'?'✓':i+1}</span><span class="hmt"><b>${t}</b><small>${R[id][1]}</small></span>${now?'<em class="nx">次はここ</em>':`<em>${{done:'決まった',doing:'仮で進行中',todo:'これから'}[stt]}</em>`}<i>›</i></button>`}).join('')}</div>
+/* ===== 2026-11-23 段階：いまの段階をヘッダーで選び、ホームとやることを段階に合わせて並べ替える。機能は消さず「ほかの準備」にたたむ ===== */
+const STG=[['idea','構想中','どんなお店にするかを考えている'],['search','物件を探している','エリアを見ている・内見をしている'],['apply','物件が決まりそう','申し込んだ・契約の前'],['contract','物件が決まった','契約した'],['prep','開店の準備中','工事が進み、メニュー・人・告知を整えている'],['open','開店した','お店を開けた']];
+const STGL=Object.fromEntries(STG.map(x=>[x[0],x[1]]));
+function stgOf(){const s=st();if(s.stg&&STGL[s.stg])return s.stg;let g=null;try{const u=S._u&&S._u._iv?S._u:null;g=u?{idea:'idea',area:'search',viewing:'search',contracted:'contract',existing:'contract'}[u.stage]:null}catch(e){}
+ if(!g||g==='idea')g=(s.pp||[]).length?'search':'idea';return g}
+function stgSet(g,by){const s=st(),old=stgOf();if(!STGL[g])return;s.stg=g;if(by)s.stgBy=by;if(old!==g)log(`段階を「${STGL[g]}」にした`);s.tab='home';s.area=null;save();render()}
+function stgSheet(){const g=stgOf();openSheet(`<h3>いまの段階</h3><p class="shl">段階に合わせて、ホームの並びが変わります。どの段階でも、ほかの準備は「ほかの準備」から開けます。いつでも選び直せます。</p>
+ <div class="stgl">${STG.map(([id,t,d],i)=>`<button class="${id===g?'on':''}" data-stgset="${id}"><span class="nn">${i+1}</span><span><b>${t}</b><small>${d}</small></span>${id===g?'<em>いまここ</em>':''}</button>`).join('')}</div>
+ <button class="btn ghost" data-act="close">閉じる</button>`)}
+/* 段階ごとの、ホームの上に出すもの */
+function stgTop(){const s=st(),g=stgOf(),f=vals(),L=x=>(s[x]||[]).length,food=cur!=='c',k=s.k||{},rc0=roadCount(),pk=(s.pp||[]).find(x=>x.id===s.pick);
+ const HEAD={idea:['まず、あなたのお店と、気になる物件から','思いを書いて、募集を1つ入れてみると、その場所で続けられるかが見えてきます。'],search:['物件を見ながら、お店の形を決めていきます','物件を入れると、希望どおりにやった時に1日に何人要るかと、その物件で試せる案が出ます。'],apply:['契約の前に、確かめておきます','契約は、あとから戻しにくい判断です。確かめることと、お金の見通しを先に見ます。'],contract:['物件が決まりました。開店までの段取りです','手続き・工事・支払いの順番を整えます。'],prep:['開店に向けて、中身を整えます','出す物・人・知らせ方を決めていきます。'],open:['開店、おつかれさまです','開けてから分かった数字に替えていくと、次の判断がしやすくなります。']}[g];
+ let b='';
+ if(g==='idea'){const R=hmState().R;
+  b=`<div class="card stgc"><p class="hmk">あなたのお店</p><b class="stgb">${R.concept[1]}</b>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead">大切にしたいことを書いておくと、物件を見る時の軸になります。</p>'}<button class="btn ghost sm" data-hm="area:concept">${k.must?'見る・直す':'思いを書く'}</button></div>
+  <div class="card stgc"><p class="hmk">気になる物件</p>${L('pp')?`<b class="stgb">${L('pp')}件</b>`:'<b class="stgb">まだありません</b><p class="lead">ネットで見た募集で大丈夫です。マイソクの写真か、家賃と広さだけでも入れられます。</p>'}<button class="btn dark" data-tl="tool:pp">${L('pp')?'物件の比較を開く':'募集を1つ入れてみる'}</button><p class="ftn">物件を入れると、あなたのお店がその場所で続けられるかと、守れる所・変える所が出ます。</p></div>
+  <div class="card">${hrow('yen','お金のざっくり','開けるまでのお金と、続けるためのお金','data-x="money"')}</div>`}
+ if(g==='search')b=`<div class="card">${hrow('place','物件の比較と、この場所での形','物件を入れると、1日に何人要るかと、試せる案が出ます','data-tl="tool:pp"',L('pp')?L('pp')+'件':'')}${hrow('clock','店の前で数える','人通りと入る人を数えて、見込みを確かめる','data-act="meas"',L('meas')?L('meas')+'回':'')}${hrow('who','内装会社に、内見へ来てもらう','その時に送る文ができます','data-sv="naiso"')}</div>${homeCalcCard()}`;
+ if(g==='apply')b=`<div class="card">${pk?`<p class="hmk">申し込む物件</p><b class="stgb">${esc(pk.n)}　家賃 ${man(pk.rent)}</b>`:'<p class="lead">申し込む物件を、物件の比較で選んでください。</p>'}${hrow('check','契約の前に確かめること','用途・営業できる時間・出る時の決まりなど','data-stga="1"',pk&&pk.pre?Object.values(pk.pre).filter(Boolean).length+'件 済み':'')}${hrow('yen','この物件での開業資金と、借りる額','合計と、公庫に相談する時の目安','data-x="money"')}${hrow('who','工事の見積もりを取る','内装会社に送る文ができます','data-sv="naiso"')}</div>`;
+ if(g==='contract')b=`<div class="card">${hrow('check','手続き','保健所・消防署・税務署など。順番と期限','data-tab="road"',`${rc0[0]}/${rc0[1]}`)}${hrow('who','工事の依頼と、見積もりの比較','同じ項目の見積もりを並べて選ぶ','data-tl="tool:qt"',L('qt')?L('qt')+'件':'')}${hrow('yen','支払いの予定表','いつ、いくら出ていくか','data-tl="tool:pay"')}</div>`;
+ if(g==='prep')b=`<div class="card">${food?hrow('ans','メニューとレシピ','売値と材料費から、原価率が出ます','data-x="recipe"',L('rc')?L('rc')+'品':''):hrow('yen','料金','1回の料金を見る・直す','data-edit="price"')}${hrow('people','採用','人手 → 募集 → 応募者','data-x="hire"',L('ap')?L('ap')+'人':'')}${hrow('flag','告知と、プレオープンの段取り','日・呼ぶ人・試すこと・直す所','data-tl="tool:pre"')}</div>`;
+ if(g==='open')b=`<div class="card">${hrow('flag','開店したあとへ','開けてからの準備','data-tl="tool:os"')}${food?hrow('ans','メニューと原価','実際の材料費で、原価率を見直す','data-x="recipe"',L('rc')?L('rc')+'品':''):hrow('yen','料金','1回の料金を見る・直す','data-edit="price"')}</div>${homeCalcCard()}`;
+ const i=STG.findIndex(x=>x[0]===g),nx=STG[i+1],NXT={idea:'物件を1つ入れると、次の段階に進みます。',search:'申し込む物件が決まったら、物件の「この場所での形」から「この物件で申し込む」を押します。',apply:'契約したら、「契約の前に確かめること」から「契約した」を押します。',contract:'工事が始まったら、次の段階へ。',prep:'お店を開けたら、次の段階へ。'}[g];
+ return `<div class="hmh"><h1>${HEAD[0]}</h1><p>${HEAD[1]}</p></div>${b}${nx?`<p class="stgn">${NXT} <button class="lk" data-stg="1">段階を選び直す ›</button></p>`:''}`}
+/* 契約の前に確かめること（物件が決まりそう） */
+function applySheet(){const s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(!p){openSheet(`<h3>契約の前に確かめること</h3><p class="shl">先に、申し込む物件を選びます。</p><button class="btn dark" data-tl="tool:pp">物件の比較を開く</button>`);return}
+ p.pre=p.pre||{};const food=cur!=='c',C=[['use',food?'この業態で使ってよいか（用途・重飲食ができるか）':'この業態で使ってよいか（用途）'],['hours','営業できる時間と曜日（ビルや近所の決まり）'],['sign','看板を出せる場所と大きさ'],['free','家賃がいつから始まるか（工事の間の家賃）'],['dep','保証金・敷金が、出る時にいくら戻るか'],['restore','出る時に、どこまで元に戻すか（原状回復）'],['cancel','解約は何か月前に伝えるか・途中でやめる時の決まり'],['kind','契約の種類（定期借家なら、更新できるか）']].concat(ppChecks(p).map((t,i)=>['x'+i,t]));
+ const dn=C.filter(c=>p.pre[c[0]]).length,n=hmNeed(p.rent),k=s.k||{};
+ openSheet(`<h3>契約の前に確かめること</h3><p class="shl"><b>${esc(p.n)}</b>　家賃 ${man(p.rent)}${p.tsubo?`・${p.tsubo}坪`:''}</p>
+ <div class="card soft"><p class="lead" style="margin:0">契約は、あとから戻しにくい判断です。全部に印が付かなくても進めます。分からない所は、契約の前に不動産会社に聞いておくと安心です。</p></div>
+ <div class="card"><div class="kh"><h2>確かめること</h2><span class="kc">済み ${dn}/${C.length}</span></div>${C.map(([id,t])=>`<div class="lrow"><button class="tdc ${p.pre[id]?'done':''}" data-appre="${id}" aria-label="確かめた"></button><button class="lm tdm" data-appre="${id}"><b class="${p.pre[id]?'tdd':''}">${esc(t)}</b></button></div>`).join('')}
+ <button class="btn ghost" data-pf="ask:${p.id}">聞くことを文にする</button></div>
+ <div class="card"><h2>決める前の、最後の確認</h2>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:''}${n?`<p class="lead">この物件で続けるには、1日に${n.need}${n.unit}が要ります。いまの見込みは1日${n.have}${n.unit}。${n.gap>=0?`毎月 ${man(n.gap)} 残る計算です。`:`毎月 ${man(-n.gap)} 足りません。`}（仮）</p>`:''}${ppCmp(p,1)}
+ <div class="alt"><button data-pf="open:${p.id}">この場所での形を見る</button><button data-x="money">開業資金を見る</button></div></div>
+ <button class="btn dark" data-stgmv="contract">契約した</button><button class="btn ghost" data-stgmv="search">申し込みをやめて、探し直す</button>`)}
+document.addEventListener('click',e=>{let b=e.target.closest('[data-stg]');if(b){stgSheet();return}
+ b=e.target.closest('[data-stgset]');if(b){const g=b.dataset.stgset;closeSheet();stgSet(g,'you');toast(`段階を「${STGL[g]}」にしました`);return}
+ b=e.target.closest('[data-stga]');if(b){applySheet();return}
+ b=e.target.closest('[data-appre]');if(b){const s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(!p)return;p.pre=p.pre||{};p.pre[b.dataset.appre]=!p.pre[b.dataset.appre];save();const sh=document.getElementById('sheet'),sc=sh.scrollTop;applySheet();document.getElementById('sheet').scrollTop=sc;return}
+ b=e.target.closest('[data-stgap]');if(b){const s=st(),p=(s.pp||[]).find(x=>x.id===b.dataset.stgap);if(!p)return;s.pick=p.id;s.rentSeen=p.rent;delete s._noPick;log(`「${esc(p.n)}」に申し込むことにした`);stgSet('apply','you');
+  openSheet(`<h3>物件が決まりそうですね</h3><p class="shl">ここからは、契約の前に確かめることと、お金の見通しが中心です。ホームの並びを入れ替えました。ほかの準備は、ホームの「ほかの準備」から、いつでも開けます。</p><button class="btn dark" data-stga="1">契約の前に確かめることを見る</button><button class="btn ghost" data-act="close">あとで</button>`);return}
+ b=e.target.closest('[data-stgmv]');if(b){const g=b.dataset.stgmv,s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(g==='contract'){if(p)log(`「${esc(p.n)}」を契約した`);stgSet('contract','you');
+   openSheet(`<h3>物件が決まりましたね</h3><p class="shl">大きな判断でした。ここからは、手続き・工事・支払いの予定が中心です。ホームの並びを入れ替えました。決めたことは「ここまでの歩み」に残っています。</p><button class="btn dark" data-tab="road">やることを見る</button><button class="btn ghost" data-act="close">ホームへ</button>`)}
+  else{closeSheet();stgSet(g,'you');toast(`段階を「${STGL[g]}」に戻しました`)}return}
+});
+document.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.hmo){st().hmo=e.target.open;save()}},true);
+
+function homeTab(){const s=st(),h=hmState(),R=h.R,c=k=>HM.filter(x=>R[x[0]][0]===k).length,g=stgOf(),calcTop=g==='search'||g==='open';
+ return `${stgTop()}
+ <details class="hmo" data-hmo="1" ${s.hmo?'open':''}><summary><b>ほかの準備</b><small>お店を始めるまでの全部（9つ）・決まった${c('done')}・仮で進行中${c('doing')}・これから${c('todo')}</small></summary>
+ ${calcTop?'':homeCalcCard()}<div class="card hml">${HM.map(([id,t],i)=>{const stt=R[id][0],now=id===h.next;return `<button class="hmr ${stt} ${now?'now':''}" data-hm="area:${id}"><span class="hmn">${stt==='done'?'✓':i+1}</span><span class="hmt"><b>${t}</b><small>${R[id][1]}</small></span>${now?'<em class="nx">次はここ</em>':`<em>${{done:'決まった',doing:'仮で進行中',todo:'これから'}[stt]}</em>`}<i>›</i></button>`}).join('')}</div></details>
  ${backCard()}<div class="alt hma"><button class="ln" data-tab="ask">どれも、LINEで事務局に相談できます（無料）</button><button data-tl="guide:">このアプリでできること</button></div>`}
 function hrow(icn,t,d,attr,tag){return `<button class="nrow" ${attr}><span class="nic">${ic(icn,18)}</span><span class="nt2"><b>${t}</b><small>${d}</small></span>${tag?`<em class="pl">${tag}</em>`:''}<em>›</em></button>`}
 /* 続けていけるか：見た家賃から、1日に要る人数を出す。差と、埋める道を見せる */
@@ -2288,6 +2339,7 @@ function pfSheet(id){const s=st(),p=(s.pp||[]).find(x=>x.id===id);if(!p){ppSheet
  <div class="card"><h2>まだ分からないこと</h2><p class="lead">マイソクだけでは分かりません。不動産会社に聞くか、内見で確かめます。</p><ul class="pfl">${[...ck,pfSeatShop()?'昼の営業や、におい・煙の決まり':null,'看板を出せる場所'].filter(Boolean).slice(0,6).map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
  <button class="btn ghost" data-pf="ask:${p.id}">聞くことを文にする</button></div>
  ${p.seen?'':`<button class="btn ghost" data-pf="seen:${p.id}">この物件を内見した</button>`}
+ ${['idea','search'].includes(stgOf())?`<button class="btn ghost" data-stgap="${p.id}">この物件で申し込む（決まりそう）</button>`:stgOf()==='apply'&&s.pick===p.id?`<button class="btn ghost" data-stga="1">契約の前に確かめること</button>`:''}
  <button class="btn ghost" data-pf="back:">物件の比較へ戻る</button>
  <p class="ftn">要る${u}数は、計画の金額・原価・人件費・あなたの取り分から出しています。どれも仮で、計算のもとで変えられます。</p>`)}
 function pfLunchEd(p){const e=ppEval(p),L=e&&e.lunch;if(!L)return '';const row=(k,lab,v,st)=>`<div class="pfe"><span>${lab}</span><button data-pf="lun:${p.id}:${k}:-${st}" aria-label="減らす">−</button><b>${v}</b><button data-pf="lun:${p.id}:${k}:${st}" aria-label="増やす">＋</button></div>`;
@@ -2591,12 +2643,12 @@ function planTop(v){if(cur==='b')return planTopB(v);
 
 
 /* 2026-11-23 ヘッダー：業態と日付をやめ、店名と開店までの日数（押すと直せる） */
-function header(sub,title){const s=st(),k=s.k||{};let d='';if(s.open){const n=Math.round((new Date(s.open+'T00:00:00')-tdNow())/864e5);d=n>0?`開店まで<b>${n}</b>日`:n===0?'今日が開店日':`開店から${-n}日`}
- return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><span class="hdi"><button class="hdn ${k.name?'':'emp'}" data-kk="name" data-kt="text">${k.name?esc(k.name):'お店の名前はこれから'}</button><button class="hdd ${s.open?'':'emp'}" data-kk="open" data-kt="date">${d||'開店日を決める ›'}</button></span>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
+function header(sub,title){const g=stgOf();
+ return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階</small><b>${STGL[g]} ›</b></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
 
 
 /* 2026-11-23 見直し：考える物件をアプリ全体で1つに保つ */
-function pickSync(){const s=st(),pp=s.pp||[];if(s.pick&&!pp.find(x=>x.id===s.pick)){delete s.pick;delete s.rentSeen}
+function pickSync(){const s=st(),pp=s.pp||[];if(s.stg==='idea'&&s.stgBy!=='you'&&pp.length){s.stg='search';log('物件を入れたので、段階を「物件を探している」にした')}if(s.pick&&!pp.find(x=>x.id===s.pick)){delete s.pick;delete s.rentSeen}
  if(pp.length>(s._ppN||0))delete s._noPick;s._ppN=pp.length;
  if(!s.pick&&!s.rentSeen&&pp.length&&!s._noPick){const q=pp[pp.length-1];s.pick=q.id;s.rentSeen=q.rent}
  const p=pp.find(x=>x.id===s.pick);if(p&&s.rentSeen!==p.rent)s.rentSeen=p.rent}
