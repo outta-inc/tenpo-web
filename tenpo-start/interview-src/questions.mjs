@@ -22,7 +22,7 @@ export const CORE = [
   examples:{takeaway:'仕事帰りに夕食を持ち帰る',salon:'仕事帰りに体を休めたい時'}}),
  text('mainProduct','中心の商品は何にしたいですか','コーヒーと温かいサンドイッチ',{
   salonLabel:'中心のメニューは何にしたいですか',examples:{takeaway:'手土産のケーキ',salon:'60分のもみほぐし'}}),
- number('capacity','席数は、いくつで考えていますか','席',12,1,{branch:'notTakeaway',
+ number('capacity','席数は、いくつで考えていますか','席',12,1,{max:200,branch:'notTakeaway',
   salonLabel:'同時に使える施術の席やベッドは、いくつですか',salonUnit:'台',salonExample:2,
   help:'まだ物件が決まっていなくても、仮で書けます。持ち帰りだけの場合は、前の画面で店の形を変えます。'}),
  number('averageSpendYen','1人が1回に使う金額は、いくらで考えていますか','円',1100,1,{
@@ -52,7 +52,7 @@ export const OPTIONAL = [
  text('operators','だれが、どんな時間に運営しますか','店主1人を基本に、昼だけ補助を頼む'),
  number('helperHoursPerDay','補助を頼む時間は、1日何時間で考えていますか','時間',3,0,{integer:false,max:24,branch:'helper'}),
  number('ownFundsYen','自分で用意できるお金は、いくらですか','円',2000000,0,{private:true}),
- number('desiredMonthlyTakeHomeYen','毎月、手元に残したい額はいくらですか','円',250000,0,{private:true}),
+ number('desiredMonthlyTakeHomeYen','毎月、あなたの生活に要る額（給料）はいくらですか','円',250000,0,{private:true}),
  // ---- ここから5問は Claude が追加（2026/11/21、松尾さんの指示）。計画の「仮」を本人の答えに替えるための任意の質問。
  text('shopName','店名は決まっていますか。仮の名前でも書けます','まだ仮で「◯◯珈琲」',{maxLength:60}),
  text('motive','お店を始めたいと思った理由を、ひとことで残してください','近所に、1人でも落ち着ける場所をつくりたい'),
