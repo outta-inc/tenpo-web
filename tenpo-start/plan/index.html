@@ -499,6 +499,9 @@ div.frow{min-height:44px;padding:8px 0;border-top:1px solid var(--line);font-siz
 .ppd .ppi{border:0;border-top:1px solid var(--line);border-radius:0;margin:0}
 .ppd .pph>b{display:none}.ppd .pph{justify-content:flex-end;min-height:0}
 .acc1{padding:6px 16px 10px}.acc1 .nsrow{border:0}.acc1 .lk{display:block;margin:0 auto}
+
+.toast{white-space:normal;width:max-content;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;border-radius:18px}
+@media (min-width:900px){.toast{max-width:min(560px,calc(100vw - 260px))}}
 </style>
 </head>
 <body>
@@ -951,7 +954,7 @@ function karteData(){const p=P[cur],s=st();s.k=s.k||{};const food=cur!=='c';
 const kFilled=i=>i.val&&i.src!=='tmp';
 function karteCount(){const it=karteData().flatMap(x=>x.items);return[it.filter(kFilled).length,it.length]}
 
-function kClick(k,type){if(type==='lock'){toast(PUB?'お店の画面のいちばん下「ヒアリングの答えを見る・直す」から変えられます':'ヒアリングの答えです');return}if(type==='field'){editSheet(k);return}if(type==='sup'){supSheet();return}if(type==='meas'){measSheet();return}
+function kClick(k,type){if(type==='lock'){openSheet(`<h3>ヒアリングで答えた内容です</h3><p class="shl">この項目は、ヒアリングの答えから入っています。直す時は、ヒアリングの答えを開いて、その質問を直してください。直すと、ここも変わります。</p><div class="shf"><button class="btn dark" data-ivopen="1" data-act2="close">ヒアリングの答えを見る・直す</button></div>`);return}if(type==='field'){editSheet(k);return}if(type==='sup'){supSheet();return}if(type==='meas'){measSheet();return}
  const s=st();const it=karteData().flatMap(x=>x.items).find(i=>i.k===k)||{scene:{label:'来てほしい場面',type:'text'},work:{label:'仕事に使える時間（準備・片付けを含む）',type:'text'}}[k]||{label:'開店の目標日',type:'date'};const cur0=k==='open'?(s.open||''):(s.k[k]??'');
  const ms=new Set(it.type==='multi'&&cur0?String(cur0).split('・'):[]);
  let inp=it.type==='multi'?`<div class="seg" id="kmul">${it.opts.map(o=>`<button data-v="${o}" class="${ms.has(o)?'on':''}">${o}</button>`).join('')}</div><p class="small">いくつでも選べます。</p>`:it.type==='opts'?`<div class="seg" id="kseg">${it.opts.map(o=>`<button data-v="${o}" class="${cur0===o?'on':''}">${o}</button>`).join('')}</div>`
@@ -2227,7 +2230,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-tl]');if(b
   if(a==='buygot'){const x=s.buy.find(y=>y.id===v);x.got=!x.got;save();render();buySheet();return}if(a==='buydel'){s.buy=s.buy.filter(x=>x.id!==v);save();render();buySheet();return}
   if(a==='preck'){s.pre.ck[v]=!s.pre.ck[v];save();preSheet();return}if(a==='prefx'){s.pre.fix[+v].d=!s.pre.fix[+v].d;save();preSheet();return}}
  const c=e.target.closest('[data-act2=close]');if(c)closeSheet()});
-let tt;function toast(t){const e=document.getElementById('toast');e.classList.remove('act');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),1800)}
+let tt;function toast(t){const e=document.getElementById('toast');e.classList.remove('act');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),Math.min(5000,1800+Math.max(0,String(t).length-20)*60))}
 /* 日付の欄：いまの日付を日本語で見せ、「日付を選ぶ」と、よく使う近道を出す。中の input は元の id のまま */
 function dtLabel(v){if(!v)return '';const d=new Date(v+'T00:00:00');if(isNaN(d))return '';return (d.getFullYear()!==new Date().getFullYear()?d.getFullYear()+'年':'')+`${d.getMonth()+1}月${d.getDate()}日（${'日月火水木金土'[d.getDay()]}）`}
 function dateField(id,val,quick){quick=quick||[['今日',0],['1週間後',7],['1か月後',30]];const l=dtLabel(val);
