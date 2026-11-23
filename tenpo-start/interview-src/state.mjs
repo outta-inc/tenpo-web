@@ -80,7 +80,7 @@ export function legacyPayload(state){
  return {ready:true,missing:[],payload:{biz:{seated:'カフェ',takeaway:'持ち帰りの店',salon:'サロン'}[p.model],businessLabel,
   category:v('category'),businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
   price:p.averageSpendYen,team:p.peakStaff,dur:p.serviceMinutes,
-  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators'),keepYen:v('desiredMonthlyTakeHomeYen'),
+  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators')??({yes:'自分もお店で働く',no:'人に任せる'}[v('selfWork')]??null),keepYen:v('desiredMonthlyTakeHomeYen'),
   ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),
   selfWork:v('selfWork'),openingWhen:v('openingWhen'),
   existing:v('experience')==='operating'?{guests:v('existingGuestsPerDay'),seats:v('existingSeats'),days:v('existingDaysPerMonth'),costRatePct:v('existingCostRatePct')}:null,

@@ -90,7 +90,7 @@ test('a person running a shop now is asked for that shop, and the answers go to 
  assert.ok(s.archived.some(a=>a.id==='existingGuestsPerDay'));
 });
 test('self work and opening month are choices; old free-text answers still load',()=>{
- let s=set(cafe(),'selfWork','no');assert.equal(legacyPayload(s).payload.selfWork,'no');
+ let s=set(cafe(),'selfWork','no');assert.equal(legacyPayload(s).payload.selfWork,'no');assert.equal(legacyPayload(s).payload.who,'人に任せる');
  s=set(s,'openingWhen','m6');assert.equal(legacyPayload(s).payload.openingWhen,'m6');
  assert.equal(questionsFor(s,{optional:true}).some(q=>q.id==='openingTarget'||q.id==='operators'),false);
  const store=new Map();const storage={getItem:k=>store.get(k)??null,setItem:(k,v)=>store.set(k,v)};

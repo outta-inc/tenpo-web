@@ -528,7 +528,7 @@ function checksB(){const sup=st().sup;const L=[
 /* ===== 状態 ===== */
 let M=null;const KEY=window.__PUB?'tenpo-start:plan:v1':'tenpo-start-proto-v22';let S=load()||{};let cur=(S._cur&&P[S._cur])?S._cur:'a';
 function fresh(pid){const f={};for(const[k,o]of Object.entries(P[pid].fields))f[k]={v:o.v,src:o.src};const q=HQ[pid],k={},kA=[];const put=(a,b)=>{if(b==null||b===UND)return;k[a]=b;kA.push(a)};
- put('career',q.exp);put('when',q.when);put('hours',q.time);put('holiday',q.off);put('who',q.who);put('ownR',q.own);if(pid!=='c')put('late',(q.time||'').includes('深夜')?'出す':'出さない');
+ put('career',q.exp);put('when',q.when);put('hours',q.time);put('holiday',q.off);put('who',q.who);put('ownR',q.own);if(pid!=='c'&&q.time)put('late',q.time.includes('深夜')?'出す':'出さない');
  return{stage:'form',day:0,f,checks:{},events:[],obs:{},sup:null,k,kA,worry:q.worry}}
 function st(){if(!S[cur])S[cur]=fresh(cur);return S[cur]}
 function save(){try{S._cur=cur;localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.accSched)window.accSched()}
@@ -1543,7 +1543,7 @@ function legacyPayload(state){
  return {ready:true,missing:[],payload:{biz:{seated:'カフェ',takeaway:'持ち帰りの店',salon:'サロン'}[p.model],businessLabel,
   category:v('category'),businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
   price:p.averageSpendYen,team:p.peakStaff,dur:p.serviceMinutes,
-  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators'),keepYen:v('desiredMonthlyTakeHomeYen'),
+  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators')??({yes:'自分もお店で働く',no:'人に任せる'}[v('selfWork')]??null),keepYen:v('desiredMonthlyTakeHomeYen'),
   ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),
   selfWork:v('selfWork'),openingWhen:v('openingWhen'),
   existing:v('experience')==='operating'?{guests:v('existingGuestsPerDay'),seats:v('existingSeats'),days:v('existingDaysPerMonth'),costRatePct:v('existingCostRatePct')}:null,
@@ -1620,7 +1620,7 @@ function applyIV(u){const m={seated:'a',takeaway:'t',salon:'c'}[u.model];{const 
  cur=m}
 const ivKv=u=>({career:u.expL,when:u.when,hours:u.time,holiday:ivOffL(u.off),who:u.who,ownR:u.ownYen!=null?man(u.ownYen):null,must:u.must,flex:u.flex,work:u.work,area:u.area,scene:u.model==='salon'?u.purpose:null,evidence:u.evidence,name:u.name,motive:u.motive});
 /* 答えを直した時：写真・メモ・相談番号・歩みは残す。直した項目の数字だけを入れ替える。実測した数字は上書きしない。 */
-function ivSync(u,prev){const m=cur,first=!S[m],pv=prev&&prev._iv?prev:null;
+function ivSync(u,prev){const m=cur,pv=prev&&prev._iv?prev:null,first=!S[m]||(!pv&&S[m].stage==='form');
  if(first){S[m]=fresh(m);const o=S._m&&S._m!==m&&S[S._m];if(o){for(const k of Object.keys(o))if(!['f','checks','obs','sup','stage','tab','k','kA','worry','seatsM'].includes(k))S[m][k]=o[k];S[m].k={...(o.k||{}),...S[m].k}}}
  const s=S[m];s.stage='home';
  if(!first){const MAP={seats:'seats',beds:'seats',price:'price',extra:'team',team:'team',staff:'team',dur:'dur',staffH:'helper',keep:'keepYen',days:'off',costRate:'_none',turns:'guests',peak:'guests',off:'guests',util:'guests',loan:'borrow'};
@@ -1692,7 +1692,7 @@ function ivReview(){const row=q=>{const a=IVS.answers[q.id],v=ivShow(q,a);return
  ${S._u?'<button class="btn ghost" data-ivquit="1">変えずに、お店の画面へ戻る</button>':''}${IVFT}</div>`}
 function ivMemo(){const c=IV.calculationInput(IVS),v=id=>IV.valueOf(IVS,id),pr=v('priorities')||{},bh=v('businessHours'),wh=v('workingHours'),off=v('daysOffPerWeek'),just=S._iv&&S._iv.just;
  const tk=[wh?wh:bh?`営業${bh}／準備と片付けは未定`:null,off!=null?(off===0?'休みなし':`週${off}日休み`):null].filter(Boolean).join('・')||null;
- const R=[['来てほしい場面',v('purpose'),'purpose'],[ivLabel('mainProduct'),v('mainProduct'),'mainProduct'],['仕事に使える時間',tk,wh||!bh?'workingHours':'businessHours'],['運営する人',v('operators'),'operators'],['大切にしたいこと',pr.mustKeep||null,'priorities'],['調整できること',pr.canAdjust||null,'priorities']];
+ const R=[['来てほしい場面',v('purpose'),'purpose'],[ivLabel('mainProduct'),v('mainProduct'),'mainProduct'],['仕事に使える時間',tk,wh||!bh?'workingHours':'businessHours'],['運営する人',v('operators')||({yes:'自分もお店で働く',no:'人に任せる'}[v('selfWork')]||null),v('operators')?'operators':'selfWork'],['大切にしたいこと',pr.mustKeep||null,'priorities'],['調整できること',pr.canAdjust||null,'priorities']];
  const missL={businessType:'お店の形',salesModel:'売上の形'};
  return ivHead()+`<div class="wrap fade">${ivBanner()}${face(just?'残しました':'おかえりなさい','ここからは、1人で考えなくて大丈夫です','いまの答えを、5項目のメモにまとめました。物件やメニューを選ぶときに、立ち返る所です。')}
  <div class="card"><div class="kh">${ic('ans',20)}<h2>5項目のメモ</h2></div><p class="lead">迷う所は「未定」のままで進めます。行を押すと書けます。</p>
