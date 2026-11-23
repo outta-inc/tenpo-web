@@ -2381,11 +2381,11 @@ function ppSheet(){pickSync();save();const s=st();s.pp=s.pp||[];const r=cur==='b
  ${pp?`<div class="ppbase"><span>いまの計画</span><b>1日 ${pp.have}${pp.unit}・1${pp.unit==='人'?'人':'件'}あたり ${yen(f.price)}</b><small>月の売上 ${man(r.sales)}</small></div>${cbBtn('cust','この人数のもと（客単価・回転数・あなたの給料など）')}`:''}
  ${L.length?`<p class="pps">${L.length}件を、回る見込みの高い順に並べています。右は、続けるのに要る数です。押すと、くわしく開きます。${pp?(okN?`いまの計画で回るのは${okN}件です。`:'いまの計画のままで回る物件は、まだありません。'):''}</p>${L.map(p=>card(p)).join('')}`
    :`<ol class="pst"><li>街や不動産会社でもらった<b>マイソクを撮る</b></li><li>読み取った家賃・広さを確かめて、足す</li><li>この家賃で続けるには<b>1日に何${pp?pp.unit:'人'}要るか</b>が出る</li></ol>`}
- <details class="addf"><summary>手で入れる</summary><div class="field"><label>呼び名（自分が分かれば何でも）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
+ <details class="addf"><summary>手で入れる</summary><div class="field"><label>呼び名（空なら「物件${(s.pp||[]).length+1}」）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
  <div class="f2"><div class="field"><label>家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal" placeholder="例：15"></div><div class="field"><label>広さ（坪・分かれば）</label><input id="pp_t" type="number" inputmode="decimal" placeholder="例：10"></div></div>
  <div class="field"><label>気づいたこと（なくても足せます）</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。"></textarea></div><button class="btn dark" id="pp_add">この物件を足す</button></details>
  <p class="ftn">要る人数は、いまの計画の1${pp&&pp.unit==='件'?'件':'人'}あたりの金額・原価・人件費・あなたの取り分から出しています。計画の数字を変えると、ここも変わります。</p>`);
- $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim(),r2=+$i('pp_r').value;if(!n||!(r2>0)){toast('呼び名と家賃を入れてください');return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();const np=s.pp[s.pp.length-1];if(ppJudge(np))pfSheet(np.id);else ppSheet()};
+ $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim()||`物件${s.pp.length+1}`,r2=+$i('pp_r').value;if(!(r2>0)){toast('家賃を入れてください');$i('pp_r').focus();return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();const np=s.pp[s.pp.length-1];if(ppJudge(np))pfSheet(np.id);else ppSheet()};
  document.querySelectorAll('#sheet .ppd').forEach(d=>d.ontoggle=()=>{if(d.open)s._ppOpen=d.dataset.id;else if(s._ppOpen===d.dataset.id)delete s._ppOpen});
  $i('ms_cam').onclick=()=>$i('ms_in1').click();$i('ms_pick').onclick=()=>$i('ms_in2').click();
  $i('ms_in1').onchange=e=>msStart([...e.target.files]);$i('ms_in2').onchange=e=>msStart([...e.target.files])}
