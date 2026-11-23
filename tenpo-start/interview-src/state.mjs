@@ -1,10 +1,10 @@
-import {VERSION,ALL,CORE,valueOf,modelOf,isActive,questionsFor} from './questions.mjs';
+import {VERSION,ALL,CORE,BUSINESSES,CATEGORIES,valueOf,modelOf,isActive,questionsFor,categoryOf} from './questions.mjs';
 export const STORAGE_KEY='tenpo-start:interview:v1';
 const stat=['answered','provisional','undecided','skipped','declined'];
 const blank=status=>({value:null,status,source:'user',updatedAt:null});
 export function createInterview(id,now){
  return {schemaVersion:VERSION,interviewId:id,createdAt:now,updatedAt:now,answers:{},
-  archived:[],ui:{questionId:'businessType'},consultation:{number:null,preparedCount:0,sentCount:null}};
+  archived:[],ui:{questionId:'category'},consultation:{number:null,preparedCount:0,sentCount:null}};
 }
 function validValue(q,v){
  if(q.type==='select')return q.options.some(o=>o.value===v);
@@ -28,6 +28,12 @@ export function setAnswer(state,id,value,status,now){
  if(id==='businessType' && valueOf(next,id)!==valueOf(state,id) && next.answers.salesModel){
   next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;
  }
+ // 大項目を変えたら、合わなくなった中項目と売上の形を外す（消さずに archived へ）。
+ if(id==='category' && valueOf(next,id)!==valueOf(state,id)){
+  const b=valueOf(next,'businessType');
+  if(next.answers.businessType&&b!==null&&categoryOf(b)!==valueOf(next,'category')){next.archived.push({id:'businessType',answer:next.answers.businessType,at:now});delete next.answers.businessType;}
+  if(next.answers.salesModel){next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;}
+ }
  const newModel=modelOf(next);
  const reset=oldModel!==newModel?['capacity','averageSpendYen','serviceMinutes','peakStaff','helperHoursPerDay']:[];
  for(const field of ALL){if(next.answers[field.id]&&(reset.includes(field.id)||!isActive(field,next))){
@@ -36,7 +42,7 @@ export function setAnswer(state,id,value,status,now){
  next.updatedAt=now;return next;
 }
 export function calculationInput(state){
- const model=modelOf(state),need=['businessType','averageSpendYen','peakStaff'];
+ const model=modelOf(state),need=[valueOf(state,'category')===null&&valueOf(state,'businessType')!==null?'businessType':'category','averageSpendYen','peakStaff'];
  if(!model)need.push('salesModel');
  if(model==='seated'||model==='salon')need.push('capacity');
  if(model==='salon')need.push('serviceMinutes');
@@ -70,11 +76,14 @@ export function legacyPayload(state){
  const c=calculationInput(state);if(!c.ready)return {ready:false,missing:c.missing,payload:null};
  const v=id=>valueOf(state,id),p=c.data;
  // A handoff payload only. Existing applyUser() must preserve sources and handle model-specific units.
- const businessLabel={cafe:'カフェ',restaurant:'レストラン・食堂・定食屋',bar:'居酒屋・バー',cake:'ケーキ屋・菓子店',takeaway:'持ち帰りの店',salon:'サロン',other:'ほかの業態'}[v('businessType')];
+ const businessLabel=(BUSINESSES.find(o=>o.value===v('businessType'))||CATEGORIES.find(o=>o.value===v('category'))||{}).label;
  return {ready:true,missing:[],payload:{biz:{seated:'カフェ',takeaway:'持ち帰りの店',salon:'サロン'}[p.model],businessLabel,
-  businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
+  category:v('category'),businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
   price:p.averageSpendYen,team:p.peakStaff,dur:p.serviceMinutes,
-  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators'),keepYen:v('desiredMonthlyTakeHomeYen'),
-  ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),sources:c.sources},
+  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators')??({yes:'自分もお店で働く',no:'人に任せる'}[v('selfWork')]??null),keepYen:v('desiredMonthlyTakeHomeYen'),
+  ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),
+  selfWork:v('selfWork'),openingWhen:v('openingWhen'),
+  existing:v('experience')==='operating'?{guests:v('existingGuestsPerDay'),seats:v('existingSeats'),days:v('existingDaysPerMonth'),costRatePct:v('existingCostRatePct')}:null,
+  sources:c.sources},
   requiresIntegration:true};
 }
