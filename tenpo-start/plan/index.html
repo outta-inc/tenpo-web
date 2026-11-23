@@ -1331,12 +1331,28 @@ const choices = entries => entries.map(([value,label]) => ({value,label}));
 const select = (id,label,entries,extra={}) => ({id,label,type:'select',options:choices(entries),...extra});
 const text = (id,label,example,extra={}) => ({id,label,type:'text',example,maxLength:600,...extra});
 const number = (id,label,unit,example,min=1,extra={}) => ({id,label,type:'number',unit,example,min,integer:true,...extra});
-const BUSINESSES = choices([
- ['cafe','カフェ'],['restaurant','レストラン・食堂・定食屋'],['bar','居酒屋・バー'],
- ['cake','ケーキ屋・菓子店'],['takeaway','持ち帰りの店'],['salon','サロン'],['other','ほかの業態']
+// 2026/11/23：大項目（category）→ 中項目（businessType）の2段階に。大項目で計算の形が決まる。
+// 中項目の古い値（takeaway・salon）は、前に保存した答えを読めるように残し、新しい選択肢には出さない（hidden）。
+const CATEGORIES = choices([
+ ['seated','席で食べる・飲む店'],['takeaway','持ち帰り・物販の店'],['salon','施術・サロン'],['other','ほかの業態']
 ]);
+const BUSINESSES = [
+ ['cafe','カフェ・喫茶','seated'],['noodle','ラーメン・カレー・そばなどの専門店','seated'],
+ ['restaurant','食堂・定食屋・レストラン','seated'],['bistro','予約が中心のレストラン・ビストロ','seated'],
+ ['izakaya','居酒屋','seated'],['bar','バー・スナック','seated'],
+ ['bento','弁当・惣菜','takeaway'],['cake','パン・ケーキ・菓子','takeaway'],
+ ['stand','コーヒーやドリンクのスタンド','takeaway'],['retail','雑貨・花などの物販','takeaway'],
+ ['relax','リラクゼーション・整体','salon'],['hair','美容室・理容室','salon'],
+ ['nail','ネイル・まつげ','salon'],['esthe','エステ','salon'],
+ ['other','ほかの業態','other'],
+ ['takeaway','持ち帰りの店','takeaway',true],['salon','サロン','salon',true]
+].map(([value,label,category,hidden])=>({value,label,category,...(hidden?{hidden:true}:{})}));
+const categoryOf = v => (BUSINESSES.find(o=>o.value===v)||{}).category ?? null;
 const CORE = [
- {id:'businessType',label:'どんなお店を開きたいですか',type:'select',options:BUSINESSES},
+ {id:'category',label:'どんなお店を開きたいですか',type:'select',options:CATEGORIES,
+  help:'カフェでも、持ち帰りが中心なら「持ち帰り・物販の店」を選びます。'},
+ {id:'businessType',label:'いちばん近いものはどれですか',type:'select',options:BUSINESSES,branch:'notOther',
+  help:'ぴったりの物が無ければ、いちばん近いものを選びます。'},
  select('salesModel','売上は、どの形で考えると近いですか',[
   ['seated','席で過ごしてもらう店'],['takeaway','持ち帰ってもらう店'],['salon','予約枠で施術する店']
  ],{branch:'chooseModel',help:'両方ある場合は、最初に中心となる方を選びます。もう一方の売上は自動で足しません。'}),
@@ -1398,16 +1414,20 @@ const ACTIONS = {next:'次へ',back:'戻る',unknown:'まだ決めていない',
  provisional:'仮で置く',confirmed:'確かめた内容',voice:'キーボードの音声入力も使えます'};
 const ALL = [...CORE,...OPTIONAL];
 function valueOf(state,id){const a=state.answers[id];return ['answered','provisional'].includes(a?.status)?a.value:null;}
+// 前の版の答え（大項目が無く、ケーキ屋・ほかの業態で売上の形を選んだ人）は、前のとおりに読む。
+const legacyChoose = state => valueOf(state,'category')===null && ['cake','other'].includes(valueOf(state,'businessType'));
+function categorySelected(state){const c=valueOf(state,'category');if(c)return c;
+ const b=valueOf(state,'businessType');return b&&!legacyChoose(state)?categoryOf(b):null;}
 function modelOf(state){
- const b=valueOf(state,'businessType');
- if(['cafe','restaurant','bar'].includes(b))return 'seated';
- if(b==='takeaway')return 'takeaway';
- if(b==='salon')return 'salon';
- return ['cake','other'].includes(b)?valueOf(state,'salesModel'):null;
+ if(legacyChoose(state))return valueOf(state,'salesModel');
+ const c=categorySelected(state);
+ if(c==='other')return valueOf(state,'salesModel');
+ return c;
 }
 function isActive(q,state){const model=modelOf(state),b=valueOf(state,'businessType');
  switch(q.branch){
-  case 'chooseModel':return ['cake','other'].includes(b);
+  case 'chooseModel':return valueOf(state,'category')==='other'||legacyChoose(state);
+  case 'notOther':return valueOf(state,'category')!=='other';
   case 'salon':return model==='salon';
   case 'notTakeaway':return ['seated','salon'].includes(model);
   case 'helper':return model!=='salon' && valueOf(state,'peakStaff')>1;
@@ -1420,7 +1440,8 @@ function isActive(q,state){const model=modelOf(state),b=valueOf(state,'businessT
 function questionsFor(state,{optional=false}={}){return (optional?OPTIONAL:CORE).filter(q=>isActive(q,state)).map(q=>{
  const model=modelOf(state);return {...q,label:q[model+'Label']||q.label,unit:q[model+'Unit']||q.unit,
  example:q[model+'Example']??q.examples?.[model]??q.example,
- options:q.id==='salesModel'&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon'):q.options};
+ options:q.id==='salesModel'&&legacyChoose(state)&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon')
+  :q.id==='businessType'?q.options.filter(o=>!o.hidden&&o.category!=='other'&&(!valueOf(state,'category')||o.category===valueOf(state,'category'))):q.options};
 });}
 
 
@@ -1429,7 +1450,7 @@ const stat=['answered','provisional','undecided','skipped','declined'];
 const blank=status=>({value:null,status,source:'user',updatedAt:null});
 function createInterview(id,now){
  return {schemaVersion:VERSION,interviewId:id,createdAt:now,updatedAt:now,answers:{},
-  archived:[],ui:{questionId:'businessType'},consultation:{number:null,preparedCount:0,sentCount:null}};
+  archived:[],ui:{questionId:'category'},consultation:{number:null,preparedCount:0,sentCount:null}};
 }
 function validValue(q,v){
  if(q.type==='select')return q.options.some(o=>o.value===v);
@@ -1453,6 +1474,12 @@ function setAnswer(state,id,value,status,now){
  if(id==='businessType' && valueOf(next,id)!==valueOf(state,id) && next.answers.salesModel){
   next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;
  }
+ // 大項目を変えたら、合わなくなった中項目と売上の形を外す（消さずに archived へ）。
+ if(id==='category' && valueOf(next,id)!==valueOf(state,id)){
+  const b=valueOf(next,'businessType');
+  if(next.answers.businessType&&b!==null&&categoryOf(b)!==valueOf(next,'category')){next.archived.push({id:'businessType',answer:next.answers.businessType,at:now});delete next.answers.businessType;}
+  if(next.answers.salesModel){next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;}
+ }
  const newModel=modelOf(next);
  const reset=oldModel!==newModel?['capacity','averageSpendYen','serviceMinutes','peakStaff','helperHoursPerDay']:[];
  for(const field of ALL){if(next.answers[field.id]&&(reset.includes(field.id)||!isActive(field,next))){
@@ -1461,7 +1488,7 @@ function setAnswer(state,id,value,status,now){
  next.updatedAt=now;return next;
 }
 function calculationInput(state){
- const model=modelOf(state),need=['businessType','averageSpendYen','peakStaff'];
+ const model=modelOf(state),need=[valueOf(state,'category')===null&&valueOf(state,'businessType')!==null?'businessType':'category','averageSpendYen','peakStaff'];
  if(!model)need.push('salesModel');
  if(model==='seated'||model==='salon')need.push('capacity');
  if(model==='salon')need.push('serviceMinutes');
@@ -1495,20 +1522,20 @@ function legacyPayload(state){
  const c=calculationInput(state);if(!c.ready)return {ready:false,missing:c.missing,payload:null};
  const v=id=>valueOf(state,id),p=c.data;
  // A handoff payload only. Existing applyUser() must preserve sources and handle model-specific units.
- const businessLabel={cafe:'カフェ',restaurant:'レストラン・食堂・定食屋',bar:'居酒屋・バー',cake:'ケーキ屋・菓子店',takeaway:'持ち帰りの店',salon:'サロン',other:'ほかの業態'}[v('businessType')];
+ const businessLabel=(BUSINESSES.find(o=>o.value===v('businessType'))||CATEGORIES.find(o=>o.value===v('category'))||{}).label;
  return {ready:true,missing:[],payload:{biz:{seated:'カフェ',takeaway:'持ち帰りの店',salon:'サロン'}[p.model],businessLabel,
-  businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
+  category:v('category'),businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
   price:p.averageSpendYen,team:p.peakStaff,dur:p.serviceMinutes,
   time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators'),keepYen:v('desiredMonthlyTakeHomeYen'),
   ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),sources:c.sources},
   requiresIntegration:true};
 }
 
-return {VERSION,BUSINESSES,CORE,OPTIONAL,ACTIONS,ALL,valueOf,modelOf,isActive,questionsFor,STORAGE_KEY,createInterview,setAnswer,calculationInput,progress,saveInterview,loadInterview,legacyPayload};})();
+return {VERSION,CATEGORIES,BUSINESSES,categoryOf,CORE,OPTIONAL,ACTIONS,ALL,valueOf,legacyChoose,categorySelected,modelOf,isActive,questionsFor,STORAGE_KEY,createInterview,setAnswer,calculationInput,progress,saveInterview,loadInterview,legacyPayload};})();
 /*IV:END*/
 /* ===== 公開用：ヒアリング（質問の文・順番・分岐は interview-src/questions.mjs が正。ここは画面と、計画への受け渡し） ===== */
 let IVS=null,IVNOTE=null,IVERR=null,IVRAW=null;
-const IVL={businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
+const IVL={category:'お店の種類',businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
  averageSpendYen:{d:'1人が1回に使う金額',takeaway:'1回の会計の金額',salon:'中心のメニューの料金'},serviceMinutes:'施術時間',peakStaff:{d:'混む時間の人数',salon:'同時に施術する人数'},propertyStage:'物件探し',priorities:'大切にしたいこと・調整できること',
  openingTarget:'開きたい時期',area:'エリア',businessHours:'営業したい時間',workingHours:'仕事に使える時間',daysOffPerWeek:'休み（週）',operators:'運営する人',helperHoursPerDay:'補助を頼む時間（1日）',
  ownFundsYen:'自分で用意できるお金',desiredMonthlyTakeHomeYen:'毎月、あなたの生活に要る額',worry:'いちばん気になっていること',shopName:'店名',motive:'お店を始めたい理由',guestsPerDay:{d:'1日に来てほしい人数',takeaway:'1日の会計の数',salon:'1日の予約の数'},candidateRentYen:'気になる物件の家賃',borrowPlan:'お金を借りる予定',existingEvidence:'今の店で確かめたこと'};
@@ -1525,7 +1552,7 @@ function ivShow(q,a){if(!a||a.value==null)return null;const v=a.value;
 function ivSave(){const r=IV.saveInterview(localStorage,IVS);IVNOTE=r.ok?null:r.message;return r.ok}
 function ivMigrate(u){const put=(id,v)=>{try{if(v==null||v===''||(typeof v==='number'&&isNaN(v)))return;IVS=IV.setAnswer(IVS,id,v,'provisional',ivNow())}catch(e){}};
  const sal=u.biz==='サロン',take=u.biz==='持ち帰りの店'||(!sal&&u.seats!==undefined&&u.seats!==''&&+u.seats===0);
- put('businessType',take?'takeaway':{'カフェ':'cafe','レストラン・食堂':'restaurant','サロン':'salon'}[u.biz]);
+ put('category',take?'takeaway':sal?'salon':u.biz?'seated':null);if(!take&&!sal)put('businessType',{'カフェ':'cafe','レストラン・食堂':'restaurant'}[u.biz]);
  if(sal)put('mainProduct',u.purpose);else{put('purpose',u.purpose);put('mainProduct',u.item)}
  if(!take&&+u.seats>0)put('capacity',+u.seats);if(+u.price>0)put('averageSpendYen',+u.price);if(sal&&+u.dur>0)put('serviceMinutes',+u.dur);if(+u.team>0)put('peakStaff',+u.team);
  put('propertyStage',{'まだ構想中':'idea','エリアを検討中':'area','候補を内見中':'viewing','契約済み':'contracted'}[u.place]);put('businessHours',u.time);
@@ -1538,7 +1565,7 @@ function ivBoot(){try{IVRAW=localStorage.getItem(IV.STORAGE_KEY)}catch(e){}
 const ivOffL=n=>n==null?null:n===0?'なし':`週${n}日`;
 function ivU(){const c=IV.calculationInput(IVS);if(!c.ready)return null;const p=IV.legacyPayload(IVS).payload,v=id=>IV.valueOf(IVS,id),s=id=>(IVS.answers[id]||{}).status,
   lab=id=>{const o=IV.ALL.find(x=>x.id===id).options.find(o=>o.value===v(id));return o?o.label:null},pr=v('priorities')||{};
- return{_iv:1,model:c.data.model,bizL:v('businessType')==='other'?'お店':p.businessLabel,purpose:p.purpose,item:p.item,seats:p.seats,price:p.price,team:p.team,dur:p.dur,time:p.time,off:p.off,who:p.who,keepYen:p.keepYen,ownYen:p.ownYen,
+ return{_iv:1,model:c.data.model,bizL:(v('category')==='other'||v('businessType')==='other')?'お店':p.businessLabel,purpose:p.purpose,item:p.item,seats:p.seats,price:p.price,team:p.team,dur:p.dur,time:p.time,off:p.off,who:p.who,keepYen:p.keepYen,ownYen:p.ownYen,
   placeL:lab('propertyStage'),expL:lab('experience'),must:pr.mustKeep||null,flex:pr.canAdjust||null,helper:v('helperHoursPerDay'),work:v('workingHours'),when:v('openingTarget'),area:v('area'),worry:v('worry'),evidence:v('existingEvidence'),name:v('shopName'),motive:v('motive'),guests:v('guestsPerDay'),rent:v('candidateRentYen'),borrow:v('borrowPlan'),stage:v('propertyStage'),
   st:{seats:s('capacity'),price:s('averageSpendYen'),team:s('peakStaff'),dur:s('serviceMinutes'),helper:s('helperHoursPerDay'),keepYen:s('desiredMonthlyTakeHomeYen'),off:s('daysOffPerWeek'),guests:s('guestsPerDay')}}}
 /* 本人の答えは「ヒアリングの答え」、確かめた内容は「あなたの入力」。聞いていない数（回転数・営業日数・原価率など）は仮置きのまま、根拠を添える。 */
@@ -1597,7 +1624,7 @@ function ivQuestion(opt){if(!S._iv||S._iv.mode!==(opt?'opt':'q'))S._iv={mode:opt
  else if(q.type==='text')body=`<textarea data-ivi="v" rows="3" maxlength="${q.maxLength}" placeholder="例：${esc(q.example)}">${esc(d.v)}</textarea>`;
  else body=q.fields.map(f=>`<label class="ivl">${f.label}</label><textarea data-ivi="${f.id}" rows="2" maxlength="${f.maxLength}" placeholder="例：${esc(f.example)}">${esc(d.v[f.id]||'')}</textarea>`).join('');
  const stg=q.type==='select'?'':`<div class="ivs"><button type="button" data-ivst="provisional" class="${d.st!=='answered'?'on':''}">${IV.ACTIONS.provisional}</button><button type="button" data-ivst="answered" class="${d.st==='answered'?'on':''}">${IV.ACTIONS.confirmed}</button></div>`;
- const help=q.id==='businessType'?'カフェでも、持ち帰りが中心なら「持ち帰りの店」を選んでください。':q.help;
+ const help=q.help;
  return ivHead()+`<div class="wrap fade">${ivBanner()}${hello?face('はじめまして','まだ決まっていなくても大丈夫です','分かることから、1つずつ残しましょう。開きたい気持ちがあれば、そこから始められます。'):''}
  <div class="card"><div class="ivp">${I.edit?'答えを直す':pg.label}</div><h2 class="ivh">${q.label}</h2>${help?`<p class="lead">${help}</p>`:''}${body}${stg}
  ${q.type==='text'||q.type==='group'?`<p class="ivv">${IV.ACTIONS.voice}。文字になった内容を見てから、進んでください。</p>`:''}<p class="iverr" id="iverr">${I.err||''}</p>

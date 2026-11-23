@@ -5,12 +5,28 @@ const choices = entries => entries.map(([value,label]) => ({value,label}));
 const select = (id,label,entries,extra={}) => ({id,label,type:'select',options:choices(entries),...extra});
 const text = (id,label,example,extra={}) => ({id,label,type:'text',example,maxLength:600,...extra});
 const number = (id,label,unit,example,min=1,extra={}) => ({id,label,type:'number',unit,example,min,integer:true,...extra});
-export const BUSINESSES = choices([
- ['cafe','カフェ'],['restaurant','レストラン・食堂・定食屋'],['bar','居酒屋・バー'],
- ['cake','ケーキ屋・菓子店'],['takeaway','持ち帰りの店'],['salon','サロン'],['other','ほかの業態']
+// 2026/11/23：大項目（category）→ 中項目（businessType）の2段階に。大項目で計算の形が決まる。
+// 中項目の古い値（takeaway・salon）は、前に保存した答えを読めるように残し、新しい選択肢には出さない（hidden）。
+export const CATEGORIES = choices([
+ ['seated','席で食べる・飲む店'],['takeaway','持ち帰り・物販の店'],['salon','施術・サロン'],['other','ほかの業態']
 ]);
+export const BUSINESSES = [
+ ['cafe','カフェ・喫茶','seated'],['noodle','ラーメン・カレー・そばなどの専門店','seated'],
+ ['restaurant','食堂・定食屋・レストラン','seated'],['bistro','予約が中心のレストラン・ビストロ','seated'],
+ ['izakaya','居酒屋','seated'],['bar','バー・スナック','seated'],
+ ['bento','弁当・惣菜','takeaway'],['cake','パン・ケーキ・菓子','takeaway'],
+ ['stand','コーヒーやドリンクのスタンド','takeaway'],['retail','雑貨・花などの物販','takeaway'],
+ ['relax','リラクゼーション・整体','salon'],['hair','美容室・理容室','salon'],
+ ['nail','ネイル・まつげ','salon'],['esthe','エステ','salon'],
+ ['other','ほかの業態','other'],
+ ['takeaway','持ち帰りの店','takeaway',true],['salon','サロン','salon',true]
+].map(([value,label,category,hidden])=>({value,label,category,...(hidden?{hidden:true}:{})}));
+export const categoryOf = v => (BUSINESSES.find(o=>o.value===v)||{}).category ?? null;
 export const CORE = [
- {id:'businessType',label:'どんなお店を開きたいですか',type:'select',options:BUSINESSES},
+ {id:'category',label:'どんなお店を開きたいですか',type:'select',options:CATEGORIES,
+  help:'カフェでも、持ち帰りが中心なら「持ち帰り・物販の店」を選びます。'},
+ {id:'businessType',label:'いちばん近いものはどれですか',type:'select',options:BUSINESSES,branch:'notOther',
+  help:'ぴったりの物が無ければ、いちばん近いものを選びます。'},
  select('salesModel','売上は、どの形で考えると近いですか',[
   ['seated','席で過ごしてもらう店'],['takeaway','持ち帰ってもらう店'],['salon','予約枠で施術する店']
  ],{branch:'chooseModel',help:'両方ある場合は、最初に中心となる方を選びます。もう一方の売上は自動で足しません。'}),
@@ -72,16 +88,20 @@ export const ACTIONS = {next:'次へ',back:'戻る',unknown:'まだ決めてい�
  provisional:'仮で置く',confirmed:'確かめた内容',voice:'キーボードの音声入力も使えます'};
 export const ALL = [...CORE,...OPTIONAL];
 export function valueOf(state,id){const a=state.answers[id];return ['answered','provisional'].includes(a?.status)?a.value:null;}
+// 前の版の答え（大項目が無く、ケーキ屋・ほかの業態で売上の形を選んだ人）は、前のとおりに読む。
+export const legacyChoose = state => valueOf(state,'category')===null && ['cake','other'].includes(valueOf(state,'businessType'));
+export function categorySelected(state){const c=valueOf(state,'category');if(c)return c;
+ const b=valueOf(state,'businessType');return b&&!legacyChoose(state)?categoryOf(b):null;}
 export function modelOf(state){
- const b=valueOf(state,'businessType');
- if(['cafe','restaurant','bar'].includes(b))return 'seated';
- if(b==='takeaway')return 'takeaway';
- if(b==='salon')return 'salon';
- return ['cake','other'].includes(b)?valueOf(state,'salesModel'):null;
+ if(legacyChoose(state))return valueOf(state,'salesModel');
+ const c=categorySelected(state);
+ if(c==='other')return valueOf(state,'salesModel');
+ return c;
 }
 export function isActive(q,state){const model=modelOf(state),b=valueOf(state,'businessType');
  switch(q.branch){
-  case 'chooseModel':return ['cake','other'].includes(b);
+  case 'chooseModel':return valueOf(state,'category')==='other'||legacyChoose(state);
+  case 'notOther':return valueOf(state,'category')!=='other';
   case 'salon':return model==='salon';
   case 'notTakeaway':return ['seated','salon'].includes(model);
   case 'helper':return model!=='salon' && valueOf(state,'peakStaff')>1;
@@ -94,5 +114,6 @@ export function isActive(q,state){const model=modelOf(state),b=valueOf(state,'bu
 export function questionsFor(state,{optional=false}={}){return (optional?OPTIONAL:CORE).filter(q=>isActive(q,state)).map(q=>{
  const model=modelOf(state);return {...q,label:q[model+'Label']||q.label,unit:q[model+'Unit']||q.unit,
  example:q[model+'Example']??q.examples?.[model]??q.example,
- options:q.id==='salesModel'&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon'):q.options};
+ options:q.id==='salesModel'&&legacyChoose(state)&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon')
+  :q.id==='businessType'?q.options.filter(o=>!o.hidden&&o.category!=='other'&&(!valueOf(state,'category')||o.category===valueOf(state,'category'))):q.options};
 });}

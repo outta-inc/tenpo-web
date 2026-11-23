@@ -1,10 +1,15 @@
 import asyncio
 from playwright.async_api import async_playwright
 SKIP={'次へ','今は飛ばす','まだ決めていない','戻る','この内容を残す','分かることをもう少し書く','計画を見る'}
+CAT={'カフェ':('席で食べる・飲む店','カフェ・喫茶'),'居酒屋':('席で食べる・飲む店','居酒屋'),'持ち帰りの店':('持ち帰り・物販の店','弁当・惣菜'),'パン・ケーキ':('持ち帰り・物販の店','パン・ケーキ・菓子'),'サロン':('施術・サロン','リラクゼーション・整体'),'美容室':('施術・サロン','美容室・理容室'),'ほかの業態':('ほかの業態',None)}
 async def walk(pg,biz):
   await pg.evaluate("localStorage.clear()");await pg.reload();await pg.wait_for_timeout(1200)
-  await pg.get_by_role('button',name=biz,exact=True).first.click();await pg.wait_for_timeout(120)
+  cat,sub=CAT.get(biz,(biz,None))
+  await pg.get_by_role('button',name=cat,exact=True).first.click();await pg.wait_for_timeout(120)
   await pg.get_by_role('button',name='次へ').first.click();await pg.wait_for_timeout(150)
+  if sub:
+    await pg.get_by_role('button',name=sub,exact=True).first.click();await pg.wait_for_timeout(120)
+    await pg.get_by_role('button',name='次へ').first.click();await pg.wait_for_timeout(150)
   for i in range(80):
     t=await pg.evaluate("document.body.innerText")
     if 'お店を始めるまでの全部' in t: return 'HOME'
@@ -42,7 +47,7 @@ async def main():
     b=await p.chromium.launch();pg=await b.new_page(viewport={'width':393,'height':852})
     errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     await pg.goto('http://localhost:8765/plan/');await pg.wait_for_timeout(1200)
-    for biz in ['カフェ','レストラン・食堂・定食屋','居酒屋・バー','持ち帰りの店','サロン']:
+    for biz in ['カフェ','居酒屋','持ち帰りの店','パン・ケーキ','サロン','美容室','ほかの業態']:
       r=await walk(pg,biz);print(biz,r.replace('\n','|')[:150],await pg.evaluate("cur"))
     print(errs);await b.close()
 if __name__=='__main__':asyncio.run(main())
