@@ -1868,7 +1868,7 @@ function tdRow(x){const t0=iso(tdNow()),due=x.due?(x.due<t0&&x.st!=='done'?(x.au
 /* やること：1つのリスト。見方は「いまの段階」「全部」「返事待ち」。済みの印は丸だけ */
 function tdGroups(L){const t0=iso(tdNow()),wk=iso(addDays(tdNow(),7)),mo=iso(addDays(tdNow(),31)),G=[['late','早めに進めたい',x=>x.due&&x.due<t0],['week','今日から1週間',x=>x.due&&x.due>=t0&&x.due<=wk],['month','1か月のうちに',x=>x.due&&x.due>wk&&x.due<=mo],['later','それより先',x=>x.due&&x.due>mo],['none','期限なし',x=>!x.due]];
  return G.map(([id,t,f])=>{const R=L.filter(f).sort(byDue);return R.length?`<p class="tdg">${t}<small>${R.length}</small></p>${R.map(tdRow).join('')}`:''}).join('')}
-function todoTab(){const s=st(),A=tdAll(),g=stgOf(),v=['stage','all','wait'].includes(s._tdv)?s._tdv:'stage',open=A.filter(x=>x.st!=='done'),done=A.filter(x=>x.st==='done'),wait=open.filter(x=>x.st==='wait'||x.contact||!/自分/.test(x.who));
+function todoTab(){const s=st(),A=tdAll(),g=stgOf(),v=['stage','all','wait'].includes(s._tdv)?s._tdv:'stage',open=A.filter(x=>x.st!=='done'),done=A.filter(x=>x.st==='done'),wait=open.filter(x=>x.st==='wait'||x.contact);
  const inStg=x=>!x.stg||x.stg.includes(g);
  let h=`<div class="card"><div class="kh">${ic('check',20)}<h2>やること</h2><span class="kc">済み ${done.length}/${A.length}</span></div>${pbar(done.length,A.length,'sm')}
  ${!s.open?`<button class="nsrow" data-kk="open" data-kt="date"><span class="tx"><b>開店の目標日を入れる</b><small>入れると、それぞれに期限の目安が付きます</small></span><i>›</i></button>`:`<button class="nsrow" data-kk="open" data-kt="date"><span class="tx"><b>開店の目標</b></span><span class="v">${fmtDate(new Date(s.open+'T00:00:00'))}${s.openApprox?'（目安）':''}</span><i>›</i></button>`}
@@ -1880,7 +1880,7 @@ function todoTab(){const s=st(),A=tdAll(),g=stgOf(),v=['stage','all','wait'].inc
    const O=L.filter(x=>x.st!=='done').sort(byDue),D=L.filter(x=>x.st==='done');return `<p class="tdg">${d===L.length?'✓ ':''}${p.t}<small>${p.when?p.when+'・':''}${d}/${L.length}</small></p>${O.map(tdRow).join('')}${D.length?`<details class="tdf"><summary>済み ${D.length}件</summary>${D.map(tdRow).join('')}</details>`:''}`}).join('');
   const M=A.filter(x=>x.mine||x.xr);
   h+=ph+(M.length?`<p class="tdg">自分で足したこと・ほかのこと<small>${M.length}</small></p>${M.map(tdRow).join('')}`:'')}
- else h+=`<p class="small">人に頼んでいること、返事を待っていることです。返事が来たら、丸を押します。</p>${wait.sort(byDue).map(tdRow).join('')||'<p class="emp">人に頼んでいること・返事待ちは、ありません。</p>'}`;
+ else h+=`<p class="small">「返事待ち」にしたことです。返事が来たら、丸を押します。項目を押すと「返事待ち」にできます。</p>${wait.sort(byDue).map(tdRow).join('')||'<p class="emp">返事を待っていることは、ありません。</p>'}`;
  h+=`<div class="shf0"><button class="btn dark" data-tl="tdadd:">＋ やることを足す</button></div></div>
  <div class="card"><details><summary><b>出典（${SRCS.length}件）</b></summary><ol class="srcl">${SRCS.map(([t,u])=>`<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join('')}</ol></details></div>`;
  return h}
