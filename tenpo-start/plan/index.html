@@ -1992,7 +1992,7 @@ const STGC={
  open:{h:'開店、おつかれさまです',d:'開けてから最初の1か月。実際の数字で、計画を直していく時期です。',done:'',
   trip:[['思ったよりお客さんが少ない','時間帯ごとに、店の前を通る人と入る人を数えると、知られていないのか、入りにくいのかが分かれます。','data-act="meas"','店の前で数える','お客さんを増やす方法を相談したい'],
    ['忙しすぎて、回らない','どの時間に手が足りないかを書き出して、その時間だけ人を頼む形から考えます。','data-x="hire"','採用','人手のことを相談したい'],
-   ['2店舗目を、考え始めたい','今のお店の実際の数字が、次のお店の計画の土台になります。','data-act2="1"','最初の1か月の振り返り','2店舗目のことを相談したい']]}};
+   ['2店舗目を、考え始めたい','今のお店の実際の数字が、次のお店の計画の土台になります。','data-actsh="1"','最初の1か月の振り返り','2店舗目のことを相談したい']]}};
 function stgTrip(g){const c=STGC[g];return `<div class="card stgt"><h2>この時期に、よくあるつまずき</h2>${c.trip.map(([q,a,at,lb,ask])=>`<details class="stgtr"><summary>${q}</summary><p>${a}</p><div class="alt"><button ${at}>${lb}</button><button data-ask="${ask}">事務局に相談する</button></div></details>`).join('')}</div>`}
 /* 思いを言葉にする（構想中） */
 function mustSheet(){const s=st(),k=s.k=s.k||{},w=k.mw||{};openSheet(`<h3>思いを言葉にする</h3><p class="shl">3つに短く答えると、1つの文になります。物件を見る時の軸になり、物件の判断にも出てきます。あとから何度でも直せます。</p>
@@ -2040,12 +2040,12 @@ function stgTop(){const s=st(),g=stgOf(),c=STGC[g],L=x=>(s[x]||[]).length,food=c
  if(g==='contract')b=`<div class="card">${hrow('check','手続き','保健所・消防署・税務署など。順番と期限','data-tab="road"',`${rc0[0]}/${rc0[1]}`)}${hrow('who','工事の依頼と、見積もりの比較','同じ項目の見積もりを並べて選ぶ','data-tl="tool:qt"',L('qt')?L('qt')+'件':'')}${hrow('yen','支払いの予定表','いつ、いくら出ていくか','data-tl="tool:pay"')}</div>${buildSteps()}`;
  if(g==='prep')b=prepList();
  if(g==='open'){const a=s.act,ac=a&&a.guests?actCalc(a):null;
-  b=`<div class="card stgc"><p class="hmk">最初の1か月の振り返り</p>${ac?`<b class="stgb">実際は1日${a.guests}${ac.unit}・${pfGap(ac.gapA)}計算</b><p class="lead">計画では1日${ac.planG}${ac.unit}・${pfGap(ac.gapP)}計算でした。（仮）</p>`:'<p class="lead">開けてから分かった数字を入れると、計画との違いが出ます。その数字が、次の判断と2店舗目の計画の土台になります。</p>'}<button class="btn dark" data-act2="1">${ac?'振り返りを直す':'実際の数字を入れる'}</button></div>
+  b=`<div class="card stgc"><p class="hmk">最初の1か月の振り返り</p>${ac?`<b class="stgb">実際は1日${a.guests}${ac.unit}・${pfGap(ac.gapA)}計算</b><p class="lead">計画では1日${ac.planG}${ac.unit}・${pfGap(ac.gapP)}計算でした。（仮）</p>`:'<p class="lead">開けてから分かった数字を入れると、計画との違いが出ます。その数字が、次の判断と2店舗目の計画の土台になります。</p>'}<button class="btn dark" data-actsh="1">${ac?'振り返りを直す':'実際の数字を入れる'}</button></div>
   <div class="card">${hrow('flag','開店したあとへ','開けてからの準備','data-tl="tool:os"')}${food?hrow('ans','メニューと原価','実際の材料費で、原価率を見直す','data-x="recipe"',L('rc')?L('rc')+'品':''):hrow('yen','料金','1回の料金を見る・直す','data-edit="price"')}</div>${homeCalcCard()}`}
  const i=STG.findIndex(x=>x[0]===g);
  return `<div class="hmh"><h1>${c.h}</h1><p>${c.d}</p></div>${b}${stgTrip(g)}${c.done?`<div class="stgn"><b>次へ進む目印</b>${c.done} <button class="lk" data-stg="1">段階を選び直す ›</button></div>`:`<p class="stgn"><button class="lk" data-stg="1">段階を選び直す ›</button></p>`}`}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-mustw]');if(b){mustSheet();return}
- b=e.target.closest('[data-act2]');if(b){actSheet();return}
+ b=e.target.closest('[data-actsh]');if(b){actSheet();return}
  b=e.target.closest('[data-bs]');if(b){const s=st();s.bs=s.bs||{};const id=b.dataset.bs;s.bs[id]=!s.bs[id];if(s.bs[id])log(`工事の進め方：「${b.parentElement.querySelector('b').textContent.replace(/^\d+\. /,'')}」を済みにした`);save();render();return}
  b=e.target.closest('[data-pc]');if(b){const s=st();s.pc=s.pc||{};const id=b.dataset.pc;s.pc[id]=!s.pc[id];if(s.pc[id])log(`開店までにそろえること：「${b.parentElement.querySelector('b').textContent}」を済みにした`);save();render();return}});
 
