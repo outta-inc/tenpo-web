@@ -2089,7 +2089,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b){
  else if(a==='copy'){const t=s._msg||'';try{navigator.clipboard.writeText(t).then(()=>toast('コピーしました'),selectMsg)}catch(err){selectMsg()}}});
 document.addEventListener('change',e=>{if(e.target.id==='upimg'){addImages(e.target.files);e.target.value='';return}
  if(e.target.id==='updoc'){const s=st();s.docs=s.docs||[];[...e.target.files].forEach(f=>s.docs.push({f:UPF,n:f.name,size:f.size}));log(`「${DF.find(q=>q[0]===UPF)[1]}」にファイルを${e.target.files.length}件入れた`);e.target.value='';render();return}if(e.target.id==='opendate'&&e.target.value){st().open=e.target.value;log('開店の目標日を '+e.target.value.replace(/-/g,'/')+' に変えた');render()}});
-render();
+const CB_ICON='<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+/* 最初の表示は、スクリプトを全部読み終えてから（あとで定義する定数を先に使って止まらないように） */
+Promise.resolve().then(render);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-later]');if(!b)return;const s=st();s.later=s.later||[];s.later.push(b.dataset.later);save();render();window.scrollTo(0,0)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-decide]');if(!b)return;const k=b.dataset.decide,v=parseFloat(document.getElementById('ev').value);if(isNaN(v))return;applyEdit(k,v,'you');closeSheet();save();render();toast('決めた数字として入れました')});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ask]');if(b)askSheet(b.dataset.ask)});
@@ -2412,7 +2414,6 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-fundpp]');
 
 /* ===== 2026-11-23 計算のもと：係数を1枚で見て直す／あなたの給料とお店に残す額を分ける ===== */
 const CB_G=[['cust','お客さんと売上',['seats','turns','price','days','util','beds','dur','gap','hours','staff','peak','peakH','off','stop','team','make','work']],['cost','原価と経費',['costRate','otherRate','loan']],['ppl','人',['extra','staffH','wage','labor','share']],['size','広さ',['perTsubo']]];
-const CB_ICON='<svg class="ic" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
 /* ホーム：計算のもとのカード */
 function homeCalcCard(){const c=cbSum();return `<div class="card cbhome"><div class="cbhh"><span class="cbi">${CB_ICON}</span><div><b>計算のもと</b><small>すべての数字は、ここの数字から出ています</small></div></div><div class="cbhv"><small>${c.lab}</small><b>${c.big}</b><span>${c.sub}</span></div><button class="btn dark" data-cb="">計算のもとを見る・直す</button></div>`}
 /* 続けていけるか：働くかの問い → 計算のもとの入口 → 答え（家賃の出どころは考えている物件の名前で） */
