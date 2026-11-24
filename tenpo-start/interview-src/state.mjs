@@ -1,4 +1,4 @@
-import {VERSION,ALL,CORE,BUSINESSES,CATEGORIES,CAT_NOW,valueOf,modelOf,isActive,questionsFor,categoryOf,weekStats} from './questions.mjs';
+import {VERSION,ALL,CORE,BUSINESSES,CATEGORIES,CAT_NOW,valueOf,modelOf,isActive,questionsFor,categoryOf,weekStats,isMonthly} from './questions.mjs';
 export const STORAGE_KEY='tenpo-start:interview:v1';
 const stat=['answered','provisional','undecided','skipped','declined'];
 const blank=status=>({value:null,status,source:'user',updatedAt:null});
@@ -34,6 +34,10 @@ export function setAnswer(state,id,value,status,now){
   const b=valueOf(next,'businessType');
   const cn=c=>CAT_NOW[c]||c;if(next.answers.businessType&&b!==null&&categoryOf(b)!==cn(valueOf(next,'category'))){next.archived.push({id:'businessType',answer:next.answers.businessType,at:now});delete next.answers.businessType;}
   if(next.answers.salesModel){next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;}
+ }
+ // 1回ごとと月謝では金額の意味が違うので、料金の形を変えたら金額を外す（消さずに archived へ）。
+ if(id==='feeModel' && valueOf(state,id)!==null && valueOf(next,id)!==valueOf(state,id)){
+  for(const k of ['averageSpendYen','secondSpendYen'])if(next.answers[k]){next.archived.push({id:k,answer:next.answers[k],at:now});delete next.answers[k];}
  }
  const newModel=modelOf(next);
  const reset=oldModel!==newModel?['capacity','averageSpendYen','secondSpendYen','serviceMinutes','peakStaff','helperHoursPerDay']:[];
@@ -83,7 +87,7 @@ export function legacyPayload(state){
   price:p.averageSpendYen,price2:p.secondSpendYen,week:p.schedule,team:p.peakStaff,dur:p.serviceMinutes,
   time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators')??({yes:'自分もお店で働く',no:'人に任せる'}[sw]??null),keepYen:v('desiredMonthlyTakeHomeYen'),
   ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),
-  selfWork:sw,otherBand:v('otherBand'),openingWhen:v('openingWhen'),
+  selfWork:sw,otherBand:v('otherBand'),fee:isMonthly(state)?'monthly':null,openingWhen:v('openingWhen'),
   existing:v('experience')==='operating'?{guests:v('existingGuestsPerDay'),seats:v('existingSeats'),days:v('existingDaysPerMonth'),costRatePct:v('existingCostRatePct')}:null,
   sources:c.sources},
   requiresIntegration:true};

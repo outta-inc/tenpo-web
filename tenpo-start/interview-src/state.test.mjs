@@ -78,3 +78,26 @@ test('answers saved by the previous version still load and keep their model',()=
  const o2=base();Object.assign(o2.answers,{category:A('other'),salesModel:A('takeaway')});storage.setItem(STORAGE_KEY,JSON.stringify(o2));
  assert.equal(modelOf(loadInterview(storage).state),'takeaway');
 });
+// 2026/11/25：整体・整骨院・鍼灸院・ペットホテルと、教室・運動の月謝（会員制）
+test('beauty has seitai, seikotsu and shinkyu on their own; life has a pet hotel',()=>{
+ const s=set(base(),'category','beauty');const b=questionsFor(s).find(q=>q.id==='businessType').options.map(o=>o.value);
+ for(const v of ['relax','seitai','seikotsu','shinkyu'])assert.ok(b.includes(v),v);
+ const l=questionsFor(set(base(),'category','life')).find(q=>q.id==='businessType').options.map(o=>o.value);
+ assert.deepEqual(l,['petsalon','pethotel']);
+ assert.equal(modelOf(set(s,'businessType','seikotsu')),'salon');
+});
+test('school asks how the fee is paid; monthly changes the price question and the payload',()=>{
+ let s=set(set(base(),'category','school'),'businessType','yoga');
+ assert.ok(questionsFor(s).some(q=>q.id==='feeModel'));
+ assert.ok(!questionsFor(set(set(base(),'category','beauty'),'businessType','seitai')).some(q=>q.id==='feeModel'));
+ s=set(s,'feeModel','monthly');
+ assert.equal(questionsFor(s).find(q=>q.id==='averageSpendYen').label,'1人の月謝（月額）は、いくらくらいですか？');
+ assert.equal(wordsOf(s).capUnit,'人');
+ s=set(s,'averageSpendYen',9000);
+ assert.equal(legacyPayload(s).payload.fee,'monthly');assert.equal(legacyPayload(s).payload.price,9000);
+ // 1回ごとに変えたら、月額の金額は使わない
+ const v=set(s,'feeModel','visit');assert.equal(calculationInput(v).data.averageSpendYen,null);assert.equal(legacyPayload(v).payload.fee,null);
+ assert.ok(v.archived.some(a=>a.id==='averageSpendYen'));
+ // 教室から外れたら、料金の形の答えも使わない
+ const c=set(set(s,'category','beauty'),'businessType','seitai');assert.equal(legacyPayload(c).payload.fee,null);
+});
