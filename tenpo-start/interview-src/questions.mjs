@@ -12,10 +12,10 @@ const number = (id,label,unit,example,min=1,extra={}) => ({id,label,type:'number
 export const CATEGORIES = [
  ['food','飲食店','カフェ、食堂、レストラン、居酒屋、バー'],
  ['takeaway','持ち帰り・物販','弁当、パン・菓子、ドリンクスタンド、花、雑貨'],
- ['beauty','美容・施術','美容室、ネイル、エステ、整体'],
+ ['beauty','美容・施術','美容室、ネイル、エステ、整体、整骨院、鍼灸'],
  ['school','教室・運動','学習塾、料理教室、ヨガ、パーソナルジム'],
  ['space','場所貸し','レンタルスペース、撮影スタジオ、ギャラリー'],
- ['life','暮らし・ペット','ペットサロン'],
+ ['life','暮らし・ペット','ペットサロン、ペットホテル'],
  // 前の版の大項目（読み込み用）
  ['seated','席で食べる・飲む店',null,true],['salon','施術・サロン',null,true],['other','ほかの業態',null,true]
 ].map(([value,label,desc,hidden])=>({value,label,...(desc?{desc}:{}),...(hidden?{hidden:true}:{})}));
@@ -27,11 +27,12 @@ export const BUSINESSES = [
  ['bento','弁当・惣菜','takeaway','takeaway'],['cake','パン・ケーキ・菓子','takeaway','takeaway'],
  ['stand','コーヒーやドリンクのスタンド','takeaway','takeaway'],['retail','雑貨・花などの物販','takeaway','takeaway'],
  ['hair','美容室・理容室','beauty','salon'],['nail','ネイル・まつげ','beauty','salon'],
- ['esthe','エステ','beauty','salon'],['relax','リラクゼーション・整体','beauty','salon'],
+ ['esthe','エステ','beauty','salon'],['relax','リラクゼーション・もみほぐし','beauty','salon'],
+ ['seitai','整体','beauty','salon'],['seikotsu','整骨院・接骨院','beauty','salon'],['shinkyu','鍼灸院','beauty','salon'],
  ['juku','学習塾','school','salon'],['cooking','料理教室','school','salon'],
  ['yoga','ヨガ・ピラティス','school','salon'],['gym','パーソナルジム','school','salon'],
  ['rental','レンタルスペース','space','salon'],['studio','撮影スタジオ','space','salon'],['gallery','ギャラリー','space','salon'],
- ['petsalon','ペットサロン','life','salon'],
+ ['petsalon','ペットサロン（トリミング）','life','salon'],['pethotel','ペットホテル・預かり','life','salon'],
  // 前の版の中項目（読み込み用）
  ['other','ほかの業態','other',null,true],['takeaway','持ち帰りの店','takeaway','takeaway',true],['salon','サロン','beauty','salon',true]
 ].map(([value,label,category,model,hidden])=>({value,label,category,model,...(hidden?{hidden:true}:{})}));
@@ -49,6 +50,8 @@ export const UNIT_WORDS = {
  beauty:{cap:'施術の席やベッドは、何台くらいですか？',capUnit:'台',capShort:'施術の台数',price:'中心のメニュー1回の料金は、いくらくらいですか？',priceShort:'1回の料金'},
  school:{cap:'1回に、何人まで受けられますか？',capUnit:'人',capShort:'1回の人数',price:'1人1回あたりの料金は、いくらくらいですか？',priceShort:'1人1回の料金',note:'月謝で受ける場合も、まずは1回あたりにならして考えます。'},
  space:{cap:'貸し出す部屋・区画は、いくつですか？',capUnit:'室',capShort:'部屋・区画の数',price:'1回の貸し出しは、いくらくらいですか？',priceShort:'1回の貸し出しの金額'},
+ // 2026/11/25：教室・運動で「月謝・月額の会員制」を選んだ人は、金額を月額で聞き、会員の数で計算する
+ monthly:{price:'1人の月謝（月額）は、いくらくらいですか？',priceShort:'月額',note:'月に何回来てもらうかは、あとで「計算のもと」で直せます。'},
  life:{cap:'同時に受けられるのは、何頭（何件）ですか？',capUnit:'件',capShort:'同時に受けられる数',price:'1回の料金は、いくらくらいですか？',priceShort:'1回の料金'}
 };
 export const DAYS = ['月','火','水','木','金','土','日'];
@@ -83,6 +86,9 @@ export const CORE = [
  select('salesModel','売上は、どの形で考えると近いですか',[
   ['seated','席で過ごしてもらう店'],['takeaway','持ち帰ってもらう店'],['salon','予約枠で施術する店']
  ],{branch:'chooseModel',help:'両方ある場合は、最初に中心となる方を選びます。'}),
+ // 2026/11/25：教室・運動だけ。月謝・会員制なら「会員の数 × 月額」で計算する
+ select('feeModel','料金は、どの形で受け取りますか？',[['visit','1回ごと（回数券を含む）'],['monthly','月謝・月額の会員制']],{branch:'school',
+  help:'会員制なら、売上は「会員の数 × 月額」で考えます。両方ある場合は、中心になる方を選びます。'}),
  {id:'schedule',label:'何曜日の、どの時間帯に開けますか？',type:'week',
   help:'近い形を選んでから、曜日ごとに直せます。開けた時間に、あなたがお店に立つかも決めます。'},
  select('otherBand','もう一方の時間帯は、条件が合えば開けてもよいですか？',[['no','開けられない'],['maybe','条件が合えば'],['unk','まだ分からない']],{branch:'oneBand',inline:true}),
@@ -149,8 +155,9 @@ export function modelOf(state){
  return CAT_MODEL[c]??null;
 }
 // 言葉の種類（席・台・人・室など）
+export const isMonthly = state => categorySelected(state)==='school' && valueOf(state,'feeModel')==='monthly';
 export function wordsOf(state){const c=categorySelected(state),m=modelOf(state);
- if(c&&UNIT_WORDS[c])return {...UNIT_WORDS[m==='takeaway'?'takeaway':m==='seated'?'seated':'beauty'],...UNIT_WORDS[c]};
+ if(c&&UNIT_WORDS[c])return {...UNIT_WORDS[m==='takeaway'?'takeaway':m==='seated'?'seated':'beauty'],...UNIT_WORDS[c],...(isMonthly(state)?UNIT_WORDS.monthly:{})};
  return UNIT_WORDS[m==='salon'?'beauty':m||'seated'];}
 // 曜日の表の集計
 export function weekStats(w){const z={days:0,l:0,d:0,me:0,st:0,lme:0,dme:0,lst:0,dst:0};if(!Array.isArray(w))return null;
@@ -163,6 +170,7 @@ export function isActive(q,state){const model=modelOf(state),w=weekStats(valueOf
   case 'operatingSeats':return valueOf(state,'experience')==='operating'&&['seated','salon'].includes(model);
   case 'retired':return false;
   case 'salon':return model==='salon';
+  case 'school':return categorySelected(state)==='school';
   case 'notTakeaway':return model!=='takeaway';
   case 'experienced':return ['opened','operating'].includes(valueOf(state,'experience'));
   case 'hasModel':return model!==null;

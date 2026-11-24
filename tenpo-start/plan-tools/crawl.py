@@ -20,7 +20,7 @@ async def main():
       ov=await pg.evaluate("[...document.querySelectorAll('body *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.right>395&&getComputedStyle(e).position!=='fixed'}).map(e=>e.tagName+'.'+e.className).slice(0,3)")
       if ov:issues.setdefault(tag+' OVERFLOW '+str(ov),1)
     SEL='[data-tab],[data-hm],[data-tl],[data-x],[data-sv],[data-cb],[data-act],[data-ask],[data-edit],[data-kk],[data-fundpp],[data-x]'
-    combos=[('sample',m,None) for m in ['a','d','t','c','b']]+[('ans',None,b) for b in ['カフェ','持ち帰りの店','サロン']]
+    combos=[('sample',m,None) for m in ['a','d','t','c','b']]+[('ans',None,b) for b in ['カフェ','持ち帰りの店','サロン','整骨院','ヨガ（会員制）','ペットホテル']]
     idx=int(sys.argv[1]);combos=combos[idx:idx+1]
     for state,mode,biz in combos:
         await pg.evaluate("localStorage.clear()");await pg.reload();await pg.wait_for_timeout(1200)
