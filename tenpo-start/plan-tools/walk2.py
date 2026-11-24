@@ -1,19 +1,19 @@
 import asyncio
 from playwright.async_api import async_playwright
-SKIP={'次へ','今は飛ばす','まだ決めていない','戻る','この内容を残す','分かることをもう少し書く','計画を見る'}
-CAT={'カフェ':('席で食べる・飲む店','カフェ・喫茶'),'居酒屋':('席で食べる・飲む店','居酒屋'),'持ち帰りの店':('持ち帰り・物販の店','弁当・惣菜'),'パン・ケーキ':('持ち帰り・物販の店','パン・ケーキ・菓子'),'サロン':('施術・サロン','リラクゼーション・整体'),'美容室':('施術・サロン','美容室・理容室'),'ほかの業態':('ほかの業態',None)}
+SKIP={'次へ','今は飛ばす','まだ決めていない','戻る','この内容を残す','分かることをもう少し書く','計画を見る','試算を見る','この試算で、お店の画面へ進む','答えを直す'}
+CAT={'カフェ':('飲食店','カフェ・喫茶'),'居酒屋':('飲食店','居酒屋'),'持ち帰りの店':('持ち帰り・物販','弁当・惣菜'),'パン・ケーキ':('持ち帰り・物販','パン・ケーキ・菓子'),'サロン':('美容・施術','リラクゼーション・整体'),'美容室':('美容・施術','美容室・理容室'),'学習塾':('教室・運動','学習塾'),'レンタルスペース':('場所貸し','レンタルスペース'),'ペットサロン':('暮らし・ペット','ペットサロン')}
 async def walk(pg,biz):
   await pg.evaluate("localStorage.clear()");await pg.reload();await pg.wait_for_timeout(1200)
   cat,sub=CAT.get(biz,(biz,None))
-  await pg.get_by_role('button',name=cat,exact=True).first.click();await pg.wait_for_timeout(120)
+  await pg.locator('[data-ivopt="first"]').first.click();await pg.wait_for_timeout(120)
   await pg.get_by_role('button',name='次へ').first.click();await pg.wait_for_timeout(150)
-  if sub:
-    await pg.get_by_role('button',name=sub,exact=True).first.click();await pg.wait_for_timeout(120)
-    await pg.get_by_role('button',name='次へ').first.click();await pg.wait_for_timeout(150)
+  await pg.locator('[data-ivopt]',has_text=cat).first.click();await pg.wait_for_timeout(120)
+  if sub:await pg.locator('[data-ivbiz]',has_text=sub).first.click();await pg.wait_for_timeout(120)
+  await pg.get_by_role('button',name='次へ').first.click();await pg.wait_for_timeout(150)
   for i in range(80):
     t=await pg.evaluate("document.body.innerText")
     if 'お店を始めるまでの全部' in t: return 'HOME'
-    for name in ['この内容を残す','計画を見る']:
+    for name in ['この試算で、お店の画面へ進む','この内容を残す','計画を見る']:
       loc=pg.get_by_role('button',name=name)
       if await loc.count():
         await loc.first.click();await pg.wait_for_timeout(200);break
@@ -35,6 +35,7 @@ async def walk(pg,biz):
           break
       await pg.wait_for_timeout(80)
       nx=pg.get_by_role('button',name='次へ')
+      if not await nx.count():nx=pg.get_by_role('button',name='試算を見る')
       if await nx.count():
         try:await nx.first.click(timeout=800)
         except Exception:
@@ -47,7 +48,7 @@ async def main():
     b=await p.chromium.launch();pg=await b.new_page(viewport={'width':393,'height':852})
     errs=[];pg.on('pageerror',lambda e:errs.append(str(e)))
     await pg.goto('http://localhost:8765/plan/');await pg.wait_for_timeout(1200)
-    for biz in ['カフェ','居酒屋','持ち帰りの店','パン・ケーキ','サロン','美容室','ほかの業態']:
+    for biz in ['カフェ','居酒屋','持ち帰りの店','パン・ケーキ','サロン','美容室','学習塾','レンタルスペース','ペットサロン']:
       r=await walk(pg,biz);print(biz,r.replace('\n','|')[:150],await pg.evaluate("cur"))
     print(errs);await b.close()
 if __name__=='__main__':asyncio.run(main())

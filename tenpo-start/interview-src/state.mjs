@@ -1,14 +1,15 @@
-import {VERSION,ALL,CORE,BUSINESSES,CATEGORIES,valueOf,modelOf,isActive,questionsFor,categoryOf} from './questions.mjs';
+import {VERSION,ALL,CORE,BUSINESSES,CATEGORIES,CAT_NOW,valueOf,modelOf,isActive,questionsFor,categoryOf,weekStats} from './questions.mjs';
 export const STORAGE_KEY='tenpo-start:interview:v1';
 const stat=['answered','provisional','undecided','skipped','declined'];
 const blank=status=>({value:null,status,source:'user',updatedAt:null});
 export function createInterview(id,now){
  return {schemaVersion:VERSION,interviewId:id,createdAt:now,updatedAt:now,answers:{},
-  archived:[],ui:{questionId:'category'},consultation:{number:null,preparedCount:0,sentCount:null}};
+  archived:[],ui:{questionId:'experience'},consultation:{number:null,preparedCount:0,sentCount:null}};
 }
 function validValue(q,v){
  if(q.type==='select')return q.options.some(o=>o.value===v);
  if(q.type==='number')return typeof v==='number'&&Number.isFinite(v)&&v>=q.min&&(!q.integer||Number.isSafeInteger(v))&&(q.max===undefined||v<=q.max);
+ if(q.type==='week')return Array.isArray(v)&&v.length===7&&v.every(x=>Array.isArray(x)&&x.length===2&&x.every(n=>n===0||n===1||n===2))&&v.some(x=>x[0]||x[1]);
  if(q.type==='text')return typeof v==='string'&&v.trim().length>0&&v.length<=q.maxLength;
  if(q.type==='group')return v && !Array.isArray(v) && typeof v==='object' &&
   Object.keys(v).every(k=>q.fields.some(f=>f.id===k)) &&
@@ -31,28 +32,28 @@ export function setAnswer(state,id,value,status,now){
  // 大項目を変えたら、合わなくなった中項目と売上の形を外す（消さずに archived へ）。
  if(id==='category' && valueOf(next,id)!==valueOf(state,id)){
   const b=valueOf(next,'businessType');
-  if(next.answers.businessType&&b!==null&&categoryOf(b)!==valueOf(next,'category')){next.archived.push({id:'businessType',answer:next.answers.businessType,at:now});delete next.answers.businessType;}
+  const cn=c=>CAT_NOW[c]||c;if(next.answers.businessType&&b!==null&&categoryOf(b)!==cn(valueOf(next,'category'))){next.archived.push({id:'businessType',answer:next.answers.businessType,at:now});delete next.answers.businessType;}
   if(next.answers.salesModel){next.archived.push({id:'salesModel',answer:next.answers.salesModel,at:now});delete next.answers.salesModel;}
  }
  const newModel=modelOf(next);
- const reset=oldModel!==newModel?['capacity','averageSpendYen','serviceMinutes','peakStaff','helperHoursPerDay']:[];
+ const reset=oldModel!==newModel?['capacity','averageSpendYen','secondSpendYen','serviceMinutes','peakStaff','helperHoursPerDay']:[];
  for(const field of ALL){if(next.answers[field.id]&&(reset.includes(field.id)||!isActive(field,next))){
   next.archived.push({id:field.id,model:oldModel,answer:next.answers[field.id],at:now});delete next.answers[field.id];
  }}
  next.updatedAt=now;return next;
 }
+// 2026/11/24：業態さえ分かれば計算する。金額・席数・曜日が未定なら、計画の側で「仮」と明示して置く。
 export function calculationInput(state){
- const model=modelOf(state),need=[valueOf(state,'category')===null&&valueOf(state,'businessType')!==null?'businessType':'category','averageSpendYen','peakStaff'];
+ const model=modelOf(state),need=[valueOf(state,'category')===null&&valueOf(state,'businessType')!==null?'businessType':'category'];
  if(!model)need.push('salesModel');
- if(model==='seated'||model==='salon')need.push('capacity');
- if(model==='salon')need.push('serviceMinutes');
- const missing=[...new Set(need)].filter(k=>valueOf(state,k)===null);
+ const missing=[...new Set(need)].filter(k=>valueOf(state,k)===null);if(!model&&!missing.includes('salesModel'))missing.push('salesModel');
+ const ids=['capacity','averageSpendYen','secondSpendYen','schedule','serviceMinutes','peakStaff'];
  const data={model,capacity:model==='takeaway'?null:valueOf(state,'capacity'),
-  averageSpendYen:valueOf(state,'averageSpendYen'),peakStaff:valueOf(state,'peakStaff'),
-  serviceMinutes:model==='salon'?valueOf(state,'serviceMinutes'):null};
- return {ready:missing.length===0,missing,data,sources:Object.fromEntries(need.map(k=>[k,state.answers[k]||blank('undecided')]))};
+  averageSpendYen:valueOf(state,'averageSpendYen'),secondSpendYen:valueOf(state,'secondSpendYen'),schedule:valueOf(state,'schedule'),
+  peakStaff:valueOf(state,'peakStaff'),serviceMinutes:model==='salon'?valueOf(state,'serviceMinutes'):null};
+ return {ready:missing.length===0,missing,data,sources:Object.fromEntries([...need,...ids].map(k=>[k,state.answers[k]||blank('undecided')]))};
 }
-export function progress(state,id,{optional=false}={}){const qs=questionsFor(state,{optional});
+export function progress(state,id,{optional=false}={}){const qs=questionsFor(state,{optional}).filter(q=>!q.inline);
  const position=Math.max(0,qs.findIndex(q=>q.id===id))+1;
  return {position,total:qs.length,answered:qs.filter(q=>valueOf(state,q.id)!==null).length,
  label:`${optional?'追加の質問':'お店の質問'} ${position}/${qs.length}`};
@@ -74,15 +75,15 @@ export function loadInterview(storage){
 }
 export function legacyPayload(state){
  const c=calculationInput(state);if(!c.ready)return {ready:false,missing:c.missing,payload:null};
- const v=id=>valueOf(state,id),p=c.data;
+ const v=id=>valueOf(state,id),p=c.data,w=weekStats(p.schedule),sw=w?(w.me>0?'yes':'no'):v('selfWork');
  // A handoff payload only. Existing applyUser() must preserve sources and handle model-specific units.
  const businessLabel=(BUSINESSES.find(o=>o.value===v('businessType'))||CATEGORIES.find(o=>o.value===v('category'))||{}).label;
  return {ready:true,missing:[],payload:{biz:{seated:'カフェ',takeaway:'持ち帰りの店',salon:'サロン'}[p.model],businessLabel,
   category:v('category'),businessType:v('businessType'),purpose:v('purpose'),item:v('mainProduct'),seats:p.model==='takeaway'?0:p.capacity,
-  price:p.averageSpendYen,team:p.peakStaff,dur:p.serviceMinutes,
-  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators')??({yes:'自分もお店で働く',no:'人に任せる'}[v('selfWork')]??null),keepYen:v('desiredMonthlyTakeHomeYen'),
+  price:p.averageSpendYen,price2:p.secondSpendYen,week:p.schedule,team:p.peakStaff,dur:p.serviceMinutes,
+  time:v('businessHours'),off:v('daysOffPerWeek'),who:v('operators')??({yes:'自分もお店で働く',no:'人に任せる'}[sw]??null),keepYen:v('desiredMonthlyTakeHomeYen'),
   ownYen:v('ownFundsYen'),place:v('propertyStage'),priorities:v('priorities'),
-  selfWork:v('selfWork'),openingWhen:v('openingWhen'),
+  selfWork:sw,otherBand:v('otherBand'),openingWhen:v('openingWhen'),
   existing:v('experience')==='operating'?{guests:v('existingGuestsPerDay'),seats:v('existingSeats'),days:v('existingDaysPerMonth'),costRatePct:v('existingCostRatePct')}:null,
   sources:c.sources},
   requiresIntegration:true};
