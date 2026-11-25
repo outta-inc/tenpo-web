@@ -1513,8 +1513,10 @@ const CORE = [
  {id:'schedule',label:'何曜日の、どの時間帯に開けますか？',type:'week',
   help:'近い形を選んでから、曜日ごとに直せます。開けた時間に、あなたがお店に立つかも決めます。'},
  select('otherBand','もう一方の時間帯は、条件が合えば開けてもよいですか？',[['no','開けられない'],['maybe','条件が合えば'],['unk','まだ分からない']],{branch:'oneBand',inline:true}),
+ // 2026/11/25：補足は、どの業態にも合う文にした。設問の文（UNIT_WORDS の price）が業態ごとに変わるので、補足でほかの業態の話はしない。
+ // 昼も夜も開ける時だけ、questionsFor が「昼と夜で分けて入れてください。」を前に足す
  number('averageSpendYen','お客さん1人が、1回に使う金額はいくらくらいですか？','円',1100,1,{
-  help:'時間帯で違えば、分けて入れてください。持ち帰りは1会計あたり、サロンは施術1回あたりの金額です。'}),
+  help:'だいたいの金額で大丈夫です。あとで直せます。'}),
  number('secondSpendYen','もう一方の時間帯の金額','円',1100,1,{branch:'twoBands',inline:true}),
  number('capacity','何席くらいのお店を考えていますか？','席',12,1,{max:200,branch:'notTakeaway',
   help:'物件を見て決めたい場合は「まだ決めていない」で進めて大丈夫です。'}),
@@ -1578,7 +1580,10 @@ function modelOf(state){
 // 言葉の種類（席・台・人・室など）
 const isMonthly = state => categorySelected(state)==='school' && valueOf(state,'feeModel')==='monthly';
 function wordsOf(state){const c=categorySelected(state),m=modelOf(state);
- if(c&&UNIT_WORDS[c])return {...UNIT_WORDS[m==='takeaway'?'takeaway':m==='seated'?'seated':'beauty'],...UNIT_WORDS[c],...(isMonthly(state)?UNIT_WORDS.monthly:{})};
+ if(c&&UNIT_WORDS[c]){const w={...UNIT_WORDS[m==='takeaway'?'takeaway':m==='seated'?'seated':'beauty'],...UNIT_WORDS[c],...(isMonthly(state)?UNIT_WORDS.monthly:{})};
+  // 2026/11/25：料金を「1回ごと」と答えた人には、月謝の補足（school.note）は出さない
+  if(c==='school'&&valueOf(state,'feeModel')==='visit')delete w.note;
+  return w;}
  return UNIT_WORDS[m==='salon'?'beauty':m||'seated'];}
 // 曜日の表の集計
 function weekStats(w){const z={days:0,l:0,d:0,me:0,st:0,lme:0,dme:0,lst:0,dst:0};if(!Array.isArray(w))return null;
@@ -1596,20 +1601,22 @@ function isActive(q,state){const model=modelOf(state),w=weekStats(valueOf(state,
   case 'experienced':return ['opened','operating'].includes(valueOf(state,'experience'));
   case 'hasModel':return model!==null;
   case 'hasProperty':return ['viewing','contracted','existing'].includes(valueOf(state,'propertyStage'));
-  case 'twoBands':return !!w&&w.l>0&&w.d>0;
+  // 2026/11/25：昼と夜で金額を分けて聞くのは、席のお店（飲食）だけ。計算で昼と夜を分けているのが席のお店だけのため
+  case 'twoBands':return model==='seated'&&!!w&&w.l>0&&w.d>0;
   case 'oneBand':return !!w&&((w.l>0)!==(w.d>0));
   default:return true;
  }
 }
 function questionsFor(state,{optional=false}={}){const model=modelOf(state),cat=categorySelected(state),W=wordsOf(state);
  return (optional?OPTIONAL:CORE).filter(q=>isActive(q,state)).map(q=>{
- let label=q[model+'Label']||q.label,unit=q[model+'Unit']||q.unit;
+ let label=q[model+'Label']||q.label,unit=q[model+'Unit']||q.unit,help=q.help;
  if(q.id==='capacity'&&W.cap){label=W.cap;unit=W.capUnit}
  if(q.id==='averageSpendYen'&&W.price)label=W.price;
+ if(q.id==='averageSpendYen'&&isActive({branch:'twoBands'},state))help='昼と夜で分けて入れてください。'+help;
  const opts=q.id==='businessType'?q.options.filter(o=>!o.hidden&&(!cat||o.category===cat))
   :q.id==='salesModel'&&legacyChoose(state)&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon')
   :q.options?q.options.filter(o=>!o.hidden||o.value===valueOf(state,q.id)):q.options;
- return {...q,label,unit,example:q[model+'Example']??q.examples?.[model]??q.example,options:opts};
+ return {...q,label,unit,...(help?{help}:{}),example:q[model+'Example']??q.examples?.[model]??q.example,options:opts};
 });}
 
 
@@ -1724,7 +1731,7 @@ function ivWeekTxt(v){const z=IV.weekStats(v);return z?`営業 週${z.days}日�
 function ivShow(q,a){if(!a||a.value==null)return null;const v=a.value;
  if(q.type==='week')return ivWeekTxt(v);
  if(q.id==='category'){const c=(IV.ALL.find(x=>x.id==='category').options.find(o=>o.value===v)||{}).label,b=(IV.BUSINESSES.find(o=>o.value===IV.valueOf(IVS,'businessType'))||{}).label;return c?(b&&b!==c?`${c}／${b}`:c):null}
- if(q.id==='averageSpendYen'){const v2=IV.valueOf(IVS,'secondSpendYen'),w=IV.weekStats(IV.valueOf(IVS,'schedule'));if(w&&w.l&&w.d)return `夜 ${yen(v)}／昼 ${v2!=null?yen(v2):'未定'}`;if(w)return `${w.d?'夜':'昼'} ${yen(v)}`}
+ if(q.id==='averageSpendYen'&&ivModel()==='seated'){const v2=IV.valueOf(IVS,'secondSpendYen'),w=IV.weekStats(IV.valueOf(IVS,'schedule'));if(w&&w.l&&w.d)return `夜 ${yen(v)}／昼 ${v2!=null?yen(v2):'未定'}`;if(w)return `${w.d?'夜':'昼'} ${yen(v)}`}
  if(q.type==='select')return (IV.ALL.find(x=>x.id===q.id).options.find(o=>o.value===v)||{}).label||null;
  if(q.type==='number')return q.unit==='円'?yen(v):v+q.unit;
  if(q.type==='group')return q.fields.filter(f=>v[f.id]).map(f=>`${f.label}：${v[f.id]}`).join('／');
@@ -1890,8 +1897,13 @@ function ivQuestion(opt){if(!S._iv||S._iv.mode!==(opt?'opt':'q'))S._iv={mode:opt
  const opts=(list,attr,val)=>`<div class="ivo">${list.map(o=>`<button type="button" data-${attr}="${o.value}" class="${val===o.value?'on':''}"><span>${o.label}${o.desc?`<small>${o.desc}</small>`:''}</span></button>`+(q.id==='category'&&attr==='ivopt'&&val===o.value&&o.value!=='other'?`<div class="ivo sub"><p class="ivv" style="margin:0">${o.label}の中では</p>${IV.BUSINESSES.filter(b=>!b.hidden&&b.category===o.value).map(b=>`<button type="button" data-ivbiz="${b.value}" class="${d.biz===b.value?'on':''}"><span>${b.label}</span></button>`).join('')}</div>`:'')).join('')}</div>`;
  if(q.type==='select')body=opts(q.options,'ivopt',d.v);
  else if(q.type==='week')body=ivWeekBody(d);
- else if(q.id==='averageSpendYen'){const w=IV.weekStats(IV.valueOf(IVS,'schedule')),u=ivULike(),inp=(k,band,val)=>`<div class="ivband">${band?`<label>${band==='l'?'昼':'夜'}</label>`:''}<div class="ivn"><input data-ivi="${k}" type="text" inputmode="numeric" value="${esc(val)}" placeholder="例：${ivDefPrice(u,band||undefined).toLocaleString()}" autocomplete="off"><i>円</i></div></div>`;
-  body=(w&&w.l&&w.d?inp('v2','l',d.v2)+inp('v','d',d.v):inp('v',w?(w.d?'d':'l'):null,d.v))+'<p class="ivy" id="ivy"></p>';if(W.note)lead=(lead?lead+'<br>':'')+W.note}
+ else if(q.id==='averageSpendYen'){const w=IV.weekStats(IV.valueOf(IVS,'schedule')),u=ivULike(),
+   /* 2026-11-25 金額の候補：この業態でよくある金額（ivDefPrice）と、その安め・高め。押すと欄に入り、あとから数字を直せる */
+   px=(k,band,val)=>{const base=ivDefPrice(u,band||undefined),stp=base<2000?100:base<10000?500:1000,rd=x=>Math.max(stp,Math.round(x/stp)*stp),now=ivNum(val,q);
+    return `<div class="seatst ivpx">${[['安め',rd(base*0.7)],['ふつう',base],['高め',rd(base*1.4)]].map(([t,n])=>`<button type="button" data-ivpx="${k}:${n}" class="${now===n?'on':''}"><b>${n.toLocaleString()}円</b><small>${t}</small></button>`).join('')}</div>`},
+   inp=(k,band,val)=>`<div class="ivband">${band?`<label>${band==='l'?'昼':'夜'}</label>`:''}<div class="ivn"><input data-ivi="${k}" type="text" inputmode="numeric" value="${esc(val)}" placeholder="例：${ivDefPrice(u,band||undefined).toLocaleString()}" autocomplete="off"><i>円</i></div>${px(k,band,val)}</div>`;
+  const two=IV.questionsFor(IVS).some(x=>x.id==='secondSpendYen'),seat=ivModel()==='seated';
+  body=(two?inp('v2','l',d.v2)+inp('v','d',d.v):inp('v',seat&&w?(w.d?'d':'l'):null,d.v))+'<p class="ivy" id="ivy"></p><p class="ivv">近い金額を押すと、欄に入ります。数字を直接入れても大丈夫です。</p>';if(W.note)lead=(lead?lead+'<br>':'')+W.note}
  else if(q.id==='capacity')body=`<div class="ivst"><button type="button" data-ivstep="-1" aria-label="減らす">−</button><div class="ivn"><input data-ivi="v" type="text" inputmode="numeric" value="${esc(d.v)}" placeholder="例：${({席:12,台:2,人:8,室:1,件:2})[q.unit]||12}" autocomplete="off"><i>${q.unit}</i></div><button type="button" data-ivstep="1" aria-label="増やす">＋</button></div><p class="ivv">−／＋で1つずつ、または数を直接入れられます（200まで）。</p>`;
  else if(q.type==='number')body=`<div class="ivn"><input data-ivi="v" type="text" inputmode="${q.integer?'numeric':'decimal'}" value="${esc(d.v)}" placeholder="例：${q.example}" autocomplete="off"><i>${q.unit}</i></div><p class="ivy" id="ivy"></p>`;
  else if(q.type==='text')body=`<textarea data-ivi="v" rows="3" maxlength="${q.maxLength}" placeholder="例：${esc(q.example)}">${esc(d.v)}</textarea>`;
@@ -1916,7 +1928,7 @@ function ivCommit(status){const I=S._iv,opt=I.mode==='opt',{q}=ivCur(opt);let va
  const two=q.id==='averageSpendYen'&&IV.questionsFor(IVS).some(x=>x.id==='secondSpendYen');
  if(!status){
   if(q.type==='week'){val=Array.isArray(I.d.v)&&I.d.v.some(x=>x[0]||x[1])?I.d.v:undefined;if(val===undefined){ivErr('近い形を選ぶか、曜日を押して開ける時間帯を選んでください。決めていなければ「まだ決めていない」を押します');return}}
-  else{val=ivRead(q);if(val===undefined&&!(two&&ivNum(I.d.v2,q)!==undefined)){ivErr('書かずに進む場合は「まだ決めていない」を選べます');return}if(Number.isNaN(val)){ivErr(`数字で入れてください。単位は「${q.unit}」です`);return}}
+  else{val=ivRead(q);if(val===undefined&&!(two&&ivNum(I.d.v2,q)!==undefined)){ivErr(`${q.type==='select'?'選ばずに':'書かずに'}進む場合は「まだ決めていない」を選べます`);return}if(Number.isNaN(val)){ivErr(`数字で入れてください。単位は「${q.unit}」です`);return}}
   if(two){v2=ivNum(I.d.v2,q);if(Number.isNaN(v2)){ivErr('昼の金額は、数字で入れてください');return}}
   if(q.id==='category'&&val!=='other'&&!I.d.biz){ivErr('その中から、いちばん近いものを選んでください');return}
   status=q.type==='select'||q.type==='week'?'provisional':I.d.st}
@@ -2025,7 +2037,7 @@ if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業�
  if(S._u){S._u._iv?applyIV(S._u):applyUser(S._u);S._m=cur;BASE=new Date(new Date(S._t0).setHours(0,0,0,0))}
  document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.ivi;if(!k||!S._iv||!S._iv.d)return;const d=S._iv.d;if(k==='v')d.v=e.target.value;else if(k==='v2')d.v2=e.target.value;else d.v[k]=e.target.value;
   if(S._iv.err)ivErr('');const y=document.getElementById('ivy');if(y){const q=IV.ALL.find(x=>x.id===S._iv.qid),n=q&&q.unit==='円'?ivRead(q):null;y.textContent=typeof n==='number'&&!Number.isNaN(n)&&n>=10000?`＝ ${man(n)}`:''}});
- document.addEventListener('click',e=>{const b=e.target.closest('[data-ivbiz],[data-ivwp],[data-ivwd],[data-ivwo],[data-ivwc],[data-ivob],[data-ivstep],[data-fst],[data-fgo],[data-ivopt],[data-ivst],[data-ivnext],[data-ivalt],[data-ivback],[data-ivedit],[data-ivfin],[data-ivmore],[data-ivquit],[data-ivplan],[data-ivopen],[data-ivask],[data-ivcopy]');if(!b)return;const D=b.dataset;
+ document.addEventListener('click',e=>{const b=e.target.closest('[data-ivbiz],[data-ivwp],[data-ivwd],[data-ivwo],[data-ivwc],[data-ivob],[data-ivstep],[data-ivpx],[data-fst],[data-fgo],[data-ivopt],[data-ivst],[data-ivnext],[data-ivalt],[data-ivback],[data-ivedit],[data-ivfin],[data-ivmore],[data-ivquit],[data-ivplan],[data-ivopen],[data-ivask],[data-ivcopy]');if(!b)return;const D=b.dataset;
   const rr=()=>{S._iv.err='';S._iv.fresh=false;render()};
   if(D.ivopt){const d=S._iv.d;if(d.v!==D.ivopt)d.biz=null;d.v=D.ivopt;rr();return}
   if(D.ivbiz){S._iv.d.biz=D.ivbiz;rr();return}
@@ -2037,6 +2049,7 @@ if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業�
    rr();return}
   if(D.ivob){S._iv.d.other=D.ivob;rr();return}
   if(D.ivstep){const d=S._iv.d,q=IV.questionsFor(IVS).find(x=>x.id==='capacity'),n0=ivNum(d.v,q||{unit:'席'}),base=Number.isFinite(n0)?n0:(({席:12,台:2,人:8,室:1,件:2})[(q||{}).unit]||12)-(+D.ivstep);d.v=String(Math.min(200,Math.max(1,base+(+D.ivstep))));rr();return}
+  if(D.ivpx){const[k,n]=D.ivpx.split(':'),d=S._iv.d,t=(+n).toLocaleString();if(k==='v2')d.v2=t;else d.v=t;rr();return}
   if(D.fst){const[k,dv]=D.fst.split(':');ivFst(k,+dv);return}
   if(D.fgo){if(D.fgo==='home'){S._iv=null;save();scrollTo(0,0);render()}else{S._iv={mode:'review'};save();scrollTo(0,0);render()}return}
   if(D.ivst){S._iv.d.st=D.ivst;document.querySelectorAll('[data-ivst]').forEach(x=>x.classList.toggle('on',x===b));return}

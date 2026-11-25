@@ -101,3 +101,22 @@ test('school asks how the fee is paid; monthly changes the price question and th
  // 教室から外れたら、料金の形の答えも使わない
  const c=set(set(s,'category','beauty'),'businessType','seitai');assert.equal(legacyPayload(c).payload.fee,null);
 });
+// 2026/11/25：金額の質問（4問目）の説明を、業態と時間帯に合わせる
+test('price question: the help fits the business, and lunch/dinner are asked separately only for seated shops',()=>{
+ const P=s=>questionsFor(s).find(q=>q.id==='averageSpendYen');
+ // 席のお店で昼も夜も開ける時だけ、昼と夜を分けて聞く
+ const c=cafe();assert.ok(questionsFor(c).some(q=>q.id==='secondSpendYen'));
+ assert.equal(P(c).help,'昼と夜で分けて入れてください。だいたいの金額で大丈夫です。あとで直せます。');
+ let l=set(set(set(base(),'category','food'),'businessType','cafe'),'schedule',week('weekdayLunch'));
+ assert.ok(!questionsFor(l).some(q=>q.id==='secondSpendYen'));assert.equal(P(l).help,'だいたいの金額で大丈夫です。あとで直せます。');
+ // 施術・持ち帰りは、昼も夜も開けていても金額は1つ。補足にほかの業態の話は出ない
+ for(const [cat,biz] of [['beauty','hair'],['takeaway','bento'],['space','gallery'],['life','pethotel']]){
+  const s=set(set(set(base(),'category',cat),'businessType',biz),'schedule',week('weekdayBoth'));
+  assert.ok(!questionsFor(s).some(q=>q.id==='secondSpendYen'),biz);assert.equal(P(s).help,'だいたいの金額で大丈夫です。あとで直せます。',biz);
+  assert.ok(!/持ち帰り|サロン|時間帯/.test(P(s).help),biz);}
+ // 教室：1回ごとと答えた人には、月謝の補足を出さない。決めていない人には出す。月謝の人には、月謝の補足を出す
+ let y=set(set(base(),'category','school'),'businessType','yoga');
+ assert.equal(wordsOf(y).note,'月謝で受ける場合も、まずは1回あたりにならして考えます。');
+ assert.equal(wordsOf(set(y,'feeModel','visit')).note,undefined);
+ assert.equal(wordsOf(set(y,'feeModel','monthly')).note,'月に何回来てもらうかは、あとで「計算のもと」で直せます。');
+});

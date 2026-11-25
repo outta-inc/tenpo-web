@@ -92,8 +92,10 @@ export const CORE = [
  {id:'schedule',label:'何曜日の、どの時間帯に開けますか？',type:'week',
   help:'近い形を選んでから、曜日ごとに直せます。開けた時間に、あなたがお店に立つかも決めます。'},
  select('otherBand','もう一方の時間帯は、条件が合えば開けてもよいですか？',[['no','開けられない'],['maybe','条件が合えば'],['unk','まだ分からない']],{branch:'oneBand',inline:true}),
+ // 2026/11/25：補足は、どの業態にも合う文にした。設問の文（UNIT_WORDS の price）が業態ごとに変わるので、補足でほかの業態の話はしない。
+ // 昼も夜も開ける時だけ、questionsFor が「昼と夜で分けて入れてください。」を前に足す
  number('averageSpendYen','お客さん1人が、1回に使う金額はいくらくらいですか？','円',1100,1,{
-  help:'時間帯で違えば、分けて入れてください。持ち帰りは1会計あたり、サロンは施術1回あたりの金額です。'}),
+  help:'だいたいの金額で大丈夫です。あとで直せます。'}),
  number('secondSpendYen','もう一方の時間帯の金額','円',1100,1,{branch:'twoBands',inline:true}),
  number('capacity','何席くらいのお店を考えていますか？','席',12,1,{max:200,branch:'notTakeaway',
   help:'物件を見て決めたい場合は「まだ決めていない」で進めて大丈夫です。'}),
@@ -157,7 +159,10 @@ export function modelOf(state){
 // 言葉の種類（席・台・人・室など）
 export const isMonthly = state => categorySelected(state)==='school' && valueOf(state,'feeModel')==='monthly';
 export function wordsOf(state){const c=categorySelected(state),m=modelOf(state);
- if(c&&UNIT_WORDS[c])return {...UNIT_WORDS[m==='takeaway'?'takeaway':m==='seated'?'seated':'beauty'],...UNIT_WORDS[c],...(isMonthly(state)?UNIT_WORDS.monthly:{})};
+ if(c&&UNIT_WORDS[c]){const w={...UNIT_WORDS[m==='takeaway'?'takeaway':m==='seated'?'seated':'beauty'],...UNIT_WORDS[c],...(isMonthly(state)?UNIT_WORDS.monthly:{})};
+  // 2026/11/25：料金を「1回ごと」と答えた人には、月謝の補足（school.note）は出さない
+  if(c==='school'&&valueOf(state,'feeModel')==='visit')delete w.note;
+  return w;}
  return UNIT_WORDS[m==='salon'?'beauty':m||'seated'];}
 // 曜日の表の集計
 export function weekStats(w){const z={days:0,l:0,d:0,me:0,st:0,lme:0,dme:0,lst:0,dst:0};if(!Array.isArray(w))return null;
@@ -175,18 +180,20 @@ export function isActive(q,state){const model=modelOf(state),w=weekStats(valueOf
   case 'experienced':return ['opened','operating'].includes(valueOf(state,'experience'));
   case 'hasModel':return model!==null;
   case 'hasProperty':return ['viewing','contracted','existing'].includes(valueOf(state,'propertyStage'));
-  case 'twoBands':return !!w&&w.l>0&&w.d>0;
+  // 2026/11/25：昼と夜で金額を分けて聞くのは、席のお店（飲食）だけ。計算で昼と夜を分けているのが席のお店だけのため
+  case 'twoBands':return model==='seated'&&!!w&&w.l>0&&w.d>0;
   case 'oneBand':return !!w&&((w.l>0)!==(w.d>0));
   default:return true;
  }
 }
 export function questionsFor(state,{optional=false}={}){const model=modelOf(state),cat=categorySelected(state),W=wordsOf(state);
  return (optional?OPTIONAL:CORE).filter(q=>isActive(q,state)).map(q=>{
- let label=q[model+'Label']||q.label,unit=q[model+'Unit']||q.unit;
+ let label=q[model+'Label']||q.label,unit=q[model+'Unit']||q.unit,help=q.help;
  if(q.id==='capacity'&&W.cap){label=W.cap;unit=W.capUnit}
  if(q.id==='averageSpendYen'&&W.price)label=W.price;
+ if(q.id==='averageSpendYen'&&isActive({branch:'twoBands'},state))help='昼と夜で分けて入れてください。'+help;
  const opts=q.id==='businessType'?q.options.filter(o=>!o.hidden&&(!cat||o.category===cat))
   :q.id==='salesModel'&&legacyChoose(state)&&valueOf(state,'businessType')==='cake'?q.options.filter(o=>o.value!=='salon')
   :q.options?q.options.filter(o=>!o.hidden||o.value===valueOf(state,q.id)):q.options;
- return {...q,label,unit,example:q[model+'Example']??q.examples?.[model]??q.example,options:opts};
+ return {...q,label,unit,...(help?{help}:{}),example:q[model+'Example']??q.examples?.[model]??q.example,options:opts};
 });}
