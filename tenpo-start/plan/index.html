@@ -660,7 +660,7 @@ function fresh(pid){const f={};for(const[k,o]of Object.entries(P[pid].fields))f[
  put('career',q.exp);put('when',q.when);put('hours',q.time);put('holiday',q.off);put('who',q.who);put('ownR',q.own);if(pid!=='c'&&q.time)put('late',q.time.includes('深夜')?'出す':'出さない');
  return{stage:'form',day:0,f,checks:{},events:[],obs:{},sup:null,k,kA,worry:q.worry}}
 function st(){if(!S[cur])S[cur]=fresh(cur);return S[cur]}
-function save(){try{S._cur=cur;localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.accSched)window.accSched()}
+function save(){try{S._cur=cur;localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.accSched)window.accSched();if(window.statTick)window.statTick()}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function log(t){const s=st();s.events.push({day:s.day,text:t})}
 const V=k=>st().f[k].v;
@@ -2065,6 +2065,26 @@ if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業�
 /* ===== 公開用：無料登録（LINE・Google・メール）。保存先は TENPO/OS の箱 db/box-start-v0.1。写真は端末に残し、アカウントには入れない ===== */
 const ACC={url:'https://bzftpxtnlubibhmobtmm.supabase.co',key:'sb_publishable_D-E5nVxOex1DdQktK8C6tQ_gIeGP7Gi'};
 let SB=null,SBP=null,ACCU=null,accT=null,accBusy=false,ACCMSG=null;
+/* ===== 2026-11-25 進み具合を数える（数だけ。人も端末も記録しない）=====
+   松尾さん「使われ方を数字で見る」。端末ごとに1回だけ、次の6つを足す（TENPO/OS の箱 db/box-usage-v0.2 の api.start_stat_put）：
+   open＝初めて開いた／iv_done＝5問を終えた／place＝物件か家賃を入れた／signup＝登録した／consult＝相談の文を用意した／back7＝7日以上あとに、もう1度開いた
+   送るのは「出来事の名前・初めて開いた週の月曜（日本時間）・業態の大項目」の3つだけ。入れた内容・相談番号・アカウントは送らない。
+   送ったかどうかは、この端末に覚える（tenpo-start:stat:v1）。届かなかった時は、次に開いた時にもう1度だけ試す。
+   送らない時：手元と試験（localhost・自動操作）、番地に ?nostat=1 がある時、ブラウザで「追跡しない」（Do Not Track・GPC）にしている時 */
+const STAT={key:'tenpo-start:stat:v1',tried:{},fail:0,err:''};   /* fail＝届かなかった回数、err＝最後のつまずき（この表示の間だけ。調べる時に STAT を見る） */
+function statGet(){try{return JSON.parse(localStorage.getItem(STAT.key)||'{}')||{}}catch(e){STAT.err='read';return{}}}
+function statOff(){const T=!!window.__startStatTest;return !PUB||location.protocol==='file:'||(!T&&(/^(localhost|127\.|\[::1\])/.test(location.hostname)||navigator.webdriver))||/[?&]nostat=1/.test(location.search)||navigator.doNotTrack==='1'||navigator.globalPrivacyControl===true}
+function statTick(){try{if(statOff())return;const z=statGet();
+ if(!z.t0){z.t0=(S&&S._t0)||Date.now();z.sent=z.sent||{};try{localStorage.setItem(STAT.key,JSON.stringify(z))}catch(e){STAT.err='store';return}}   /* 覚えられない端末では送らない（開くたびに数えてしまうため） */
+ z.sent=z.sent||{};const d0=new Date(z.t0+9*3600e3),mon=new Date(d0.getTime()-((d0.getUTCDay()+6)%7)*864e5).toISOString().slice(0,10);
+ const s=(S&&S[cur])||{},c0=(IVS&&IV.valueOf(IVS,'category'))||'',cat=({seated:'food',salon:'beauty'})[c0]||(['food','takeaway','beauty','school','space','life'].includes(c0)?c0:'');
+ const on={open:true,iv_done:!!(S&&S._ivDone),place:!!((s.pp||[]).length||s.rentSeen),signup:!!(S&&S._acc),consult:!!((s.asks||[]).length||(IVS&&IVS.consultation&&IVS.consultation.preparedCount>0)),back7:Date.now()-z.t0>=7*864e5};
+ for(const ev of Object.keys(on)){if(!on[ev]||z.sent[ev]||STAT.tried[ev])continue;STAT.tried[ev]=1;   /* 1回の表示につき、出来事ごとに1度だけ試す */
+  /* keepalive＝画面を離れる直前でも届くように。通信そのものが通らなかった時だけ、keepalive なしでもう1度。それでも届かなければ、次に開いた時に試す */
+  const post=ka=>fetch(ACC.url+'/rest/v1/rpc/start_stat_put',{method:'POST',...(ka?{keepalive:true}:{}),headers:{'Content-Type':'application/json',apikey:ACC.key,'Content-Profile':'api','Accept-Profile':'api'},body:JSON.stringify({p_event:ev,p_cohort:mon,p_cat:cat})}).then(r=>r.ok?r.json():null);
+  post(true).catch(()=>post(false)).then(j=>{if(j&&j.ok){const y=statGet();y.sent=y.sent||{};y.sent[ev]=1;try{localStorage.setItem(STAT.key,JSON.stringify(y))}catch(e){STAT.err='store'}}else STAT.fail++}).catch(()=>{STAT.fail++})}
+ }catch(e){STAT.err=String((e&&e.message)||e).slice(0,80)}}   /* 数える所でつまずいても、アプリは止めない */
+window.statTick=statTick;window.STAT=STAT;
 function accLoad(){if(SBP)return SBP;SBP=new Promise((res,rej)=>{const go=()=>{try{SB=window.supabase.createClient(ACC.url,ACC.key,{auth:{flowType:'pkce',detectSessionInUrl:true,persistSession:true,storageKey:'tenpo-start-auth'}});res(SB)}catch(e){SBP=null;rej(e)}};
  if(window.supabase)return go();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=go;s.onerror=()=>{SBP=null;rej(new Error('network'))};document.head.appendChild(s)});return SBP}
 const accRpc=(fn,a)=>SB.schema('api').rpc(fn,a||{}).then(r=>{if(r.error)throw r.error;return r.data});
@@ -2444,7 +2464,7 @@ function guideSheet(){const has=PUB?!!S._u:true;const G=[['home','ホーム','�
  openSheet(`<h3>TENPO/STARTでできること</h3><p class="shl">お店を開くまでの準備を、1つの場所で進められます。無料です。分からない所は、いつでも事務局に相談できます。</p>
  <div class="grp">流れ</div><ol class="gl"><li><b>質問に答える</b><span>分かることだけで大丈夫。未定のまま進めます。</span></li><li><b>いまの段階を選ぶ</b><span>いちばん上の「いまの段階」を押すと選べます。段階に合わせて、ホームに出るものが変わります。</span></li><li><b>物件の資料を入れる</b><span>家賃と広さから、その場所で続けるのに1日に何人要るかが出ます。</span></li><li><b>やることを1つずつ進める</b><span>開店の目標日から、期限の目安が付きます。</span></li><li><b>登録すると、続きから開ける</b><span>別の端末でも同じ計画を開けます。登録しなくても使えます。</span></li></ol>
  <div class="grp">下のメニュー</div>${G.map(g=>`<button class="nrow" ${has?`data-tab="${g[0]}" data-fg="1" data-act2="close"`:''}><span class="nic">${ic(g[0],18)}</span><span class="nt2"><b>${g[1]}</b><small>${g[2]}</small></span>${has?'<em>›</em>':''}</button>`).join('')}
- <div class="grp">知っておいてほしいこと</div><p class="shl" style="margin:0">出てくる数字は、あなたの答えと、仮に置いた条件からの計算です。結果を約束するものではありません。内容は、この端末のこのブラウザに保存されます。</p>`)}
+ <div class="grp">知っておいてほしいこと</div><p class="shl" style="margin:0">出てくる数字は、あなたの答えと、仮に置いた条件からの計算です。結果を約束するものではありません。内容は、この端末のこのブラウザに保存されます。</p><p class="shl" style="margin:8px 0 0">使いやすくするために、「質問を終えた」「物件を入れた」「登録した」「相談の文を用意した」「しばらくして、また開いた」の数だけを数えています。だれの端末かは記録しません。入れた内容も送りません。</p>`)}
 /* ---- あなたの登録 ---- */
 function meSheet(){const s=PUB&&!S._u?null:st(),asks=s?(s.asks||[]):[];const at=S._acc&&S._acc.at?new Date(S._acc.at):null;
  openSheet(`<h3>あなたの登録</h3>
