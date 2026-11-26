@@ -44,7 +44,7 @@ button{font:inherit;color:inherit;cursor:pointer}input{font:inherit}
 .plw{padding:4px 0}.plc{display:flex;align-items:center;gap:10px;width:100%;min-height:56px;padding:12px 16px;border:0;border-top:1px solid var(--line);background:none;text-align:left;font:inherit;color:var(--ink)}.plc:first-child{border-top:0}.plt{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}.plt b{font-size:16px}.plt small{font-size:13px;color:var(--sub)}.plc i{font-style:normal;color:var(--sub)}
 .plj{align-self:flex-start;font-size:12.5px;font-weight:700;border-radius:6px;padding:3px 8px;background:var(--lime2);color:var(--green);line-height:1.5}.plj.mid{background:#F6EBD2;color:#7a5a0e}.plj.ng{background:#FBEDE6;color:#9a4c22}.plj.now{background:#EEEBE4;color:#4F5751}
 .plb{display:flex;flex-direction:column;gap:8px;margin:12px 0}.plb .btn{margin:0;display:flex;align-items:center;justify-content:center;gap:8px}.mgp{margin-top:14px}.mgt{font-size:13px;font-weight:700;color:var(--sub);margin:0 4px 6px}
-.hask{margin-left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:var(--green);color:#fff;font:inherit;font-size:10px;font-weight:700;flex:none;line-height:1}.hask+.hbtn{margin-left:6px}
+.hask{margin-left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:56px;height:44px;padding:0;border:0;border-radius:12px;background:var(--green);color:#fff;font:inherit;font-size:10px;font-weight:700;flex:none;line-height:1}.hask+.hbtn{margin-left:6px}
 @media (max-width:420px){header.top img.lgi{max-width:96px}header.top .hstg{padding:5px 8px;margin-right:6px}}@media (max-width:380px){header.top img.lgi{max-width:84px}header.top .hstg b{font-size:12.5px}header.top .hstg{margin-right:4px}.hask+.hbtn{margin-left:4px}}
 .wrap{padding:14px 14px 0}
 .hero{background:var(--green);color:#fff;border-radius:18px;padding:20px 18px 18px}
@@ -701,7 +701,13 @@ function fresh(pid){const f={};for(const[k,o]of Object.entries(P[pid].fields))f[
  put('career',q.exp);put('when',q.when);put('hours',q.time);put('holiday',q.off);put('who',q.who);put('ownR',q.own);if(pid!=='c'&&q.time)put('late',q.time.includes('深夜')?'出す':'出さない');
  return{stage:'form',day:0,f,checks:{},events:[],obs:{},sup:null,k,kA,worry:q.worry}}
 function st(){if(!S[cur])S[cur]=fresh(cur);return S[cur]}
-function save(){try{S._cur=cur;localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.accSched)window.accSched();if(window.statTick)window.statTick()}
+function planSaveError(){
+ if(document.getElementById('plan-save-error'))return;
+ const el=document.createElement('div');el.id='plan-save-error';el.setAttribute('role','alert');
+ el.innerHTML='この端末に保存できませんでした。 <button type="button" data-report-error="計画の保存">この不具合を知らせる</button>';
+ document.body.appendChild(el);
+}
+function save(){try{S._cur=cur;localStorage.setItem(KEY,JSON.stringify(S));document.getElementById('plan-save-error')?.remove()}catch(e){planSaveError()}if(window.accSched)window.accSched();if(window.statTick)window.statTick()}
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function log(t){const s=st();s.events.push({day:s.day,text:t})}
 const V=k=>st().f[k].v;
@@ -758,10 +764,10 @@ const legend=(o)=>`<div class="legend"><span class="a">①の回答</span><span 
 /* おかえりなさいのカードは、出さない（11/24 松尾さん：大事でない・崩れていた） */
 function backCard(){return '';const s=st();if(s.day<1)return'';if(PUB){if(s.events.some(e=>e.day===s.day)||s._seen===s.day)return'';const ld=Math.max(0,...s.events.map(e=>e.day));const lastP=s.events.filter(e=>e.day===ld);s._seenNext=s.day;
   if(s.day-ld<7)return face('おかえりなさい',`前回は${lastP.length}つ、進みました`,'続きからで大丈夫です。','','',`<ul class="bk">${lastP.slice(-4).map(e=>`<li>${e.text}</li>`).join('')}</ul>`);
-  return face('おかえりなさい','少し間があきましたね。ここからで大丈夫です','止まっていた所から、そのまま続けられます。手が止まる理由があれば、聞かせてください。','','',`<div class="alt"><button data-ask="何から進めればいいか分からない">事務局に相談する</button></div>`)}
+  return face('おかえりなさい','少し間があきましたね。ここからで大丈夫です','止まっていた所から、そのまま続けられます。手が止まる理由があれば、聞かせてください。','','',`<div class="alt"><button data-ask="何から進めればいいか分からない">開業の相談をする</button></div>`)}
  const last=s.events.filter(e=>e.day===s.day-1);
  if(last.length)return face('おかえりなさい',`前回は${last.length}つ、進みました`,'続きからで大丈夫です。','','',`<ul class="bk">${last.slice(-4).map(e=>`<li>${e.text}</li>`).join('')}</ul>`);
- return face('おかえりなさい','少し間があきましたね。ここからで大丈夫です','止まっていた所から、そのまま続けられます。手が止まる理由があれば、聞かせてください。','','',`<div class="alt"><button data-ask="何から進めればいいか分からない">事務局に相談する</button></div>`)}
+ return face('おかえりなさい','少し間があきましたね。ここからで大丈夫です','止まっていた所から、そのまま続けられます。手が止まる理由があれば、聞かせてください。','','',`<div class="alt"><button data-ask="何から進めればいいか分からない">開業の相談をする</button></div>`)}
 const stp=(n,t,r)=>`<div class="sth"><span class="nn">${n}</span><b>${t}</b>${r?`<span class="sr2">${r}</span>`:''}</div>`;
 function recipeSheet(open){const s=st();s.rc=s.rc||[];const R=s.rc,ok=R.filter(x=>x.price>0),avg=ok.length?Math.round(ok.reduce((a,x)=>a+x.cost/x.price,0)/ok.length*100):null,cr=s.f.costRate,can=avg!=null&&cr&&ok.length>=3;
  openSheet(`<h3>${ic('ans')}メニューとレシピ</h3><p class="shl">1品ずつ入れると原価率が出ます。3品で、計画の仮の数字を自分の数字に替えられます。</p>
@@ -816,7 +822,7 @@ function askSheet(topic,id){if(askGate())return;const s=st(),p=P[cur],k=s.k||{},
  const rows=[['相談したいこと',topic],['お店',`${p.answers[0][3]===UND||(S._u&&S._u._iv)?'':p.answers[0][3]+'の'}${p.biz}`],['月の売上の見通し',man(r.sales)],[cur==='b'?'家賃を払う前に残る額':'家賃を払う前に残る額',man(metric())]].concat(s.rentSeen&&hmNeed(s.rentSeen)?[['募集で見た家賃',man(s.rentSeen)],['この家賃で要る人数',`${D1('')}${hmNeed(s.rentSeen).need}${hmNeed(s.rentSeen).unit}（計画は${hmNeed(s.rentSeen).have}${hmNeed(s.rentSeen).unit}）`]]:[]).concat([['まだ仮の数字',tmpN()+'つ'],['開店までの進み',`${rd}/${rn}件`]]);
  if(id)rows.push(['いっしょに渡す文',`${SERV[id].t}（${bCount(id)[0]}項目）`]);
  const nth=Math.max((s.asks||[]).length,askN())+1,who=[['相談番号',`${myId()}（${nth}回目）`]].concat(k.name?[['店名',k.name]]:[]).concat(k.area?[['エリア',k.area]]:[],k.when&&k.when!==UND?[['開きたい時期',k.when]]:[]);
- openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
+ openSheet(`<h3>開業の相談（公式LINE）</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${who.concat(rows).map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
   <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
  <button class="btn ln" id="askgo">LINEで、この内容を送る</button><p class="small" style="margin-top:8px">次の画面で「LINEを開く」を押すと、公式LINE「TENPO/OS」のトークが、この文の入った状態で開きます。送信を押すと届き、返事もLINEに届きます。事務局への相談は無料です。同じ内容が、事務局に控えとして届きます。</p>`);
@@ -883,7 +889,7 @@ function checkTop(){const s=st(),F=P[cur].fields;s.later=s.later||[];const sens=
   <dl class="why">${x.o.why?`<dt>なぜ</dt><dd>${x.o.why.replace('①では聞いていません。','')}</dd>`:''}${x.o.how?`<dt>やり方</dt><dd>${x.o.how}</dd>`:''}<dt>分かること</dt><dd>${cur==='b'?'家賃を払う前に残る額':'家賃を払う前に残る額'}が、最大${man(x.impact)}はっきりします。</dd></dl>`;
   h+=face('今日の1つ',cnt?(cur==='c'?'近くのサロンの前で10分、数えてみませんか':'お店の前で10分、数えてみませんか'):`「${x.o.label}」を、決めてみませんか`,`いまは ${fmtV(x.k,s.f[x.k].v)} で仮に置いています。`,cnt?'数えはじめる':'数字を入れる',cnt?'data-act="meas"':`data-edit="${x.k}"`,more)
    +`<div class="alt">${cnt?`<button data-edit="${x.k}">数えずに数字を入れる</button>`:''}${ord.length>1?`<button data-later="${x.k}">いまは難しい・あとにする</button>`:''}<button data-ask="「${x.o.label}」の決め方が分からない">分からない・相談する</button></div>`
-  if(s.later.length>=2)h+=`<div class="card soft"><h2>手が止まるのは、ふつうのことです</h2><p class="lead">初めてのことばかりなので、決められなくて当たり前です。ここまでの内容を見ながら、一緒に考えます。</p><div class="alt" style="margin:0"><button data-ask="確かめることが進まない">事務局に相談する</button></div></div>`}
+  if(s.later.length>=2)h+=`<div class="card soft"><h2>手が止まるのは、ふつうのことです</h2><p class="lead">初めてのことばかりなので、決められなくて当たり前です。ここまでの内容を見ながら、一緒に考えます。</p><div class="alt" style="margin:0"><button data-ask="確かめることが進まない">開業の相談をする</button></div></div>`}
  const rest=ord.slice(1,5);if(rest.length)h+=`<div class="card"><h2>そのあと</h2><p class="lead">急がなくて大丈夫です。</p>${rest.map((y,i)=>`<button class="nrow" data-edit="${y.k}"><span class="nn">${i+2}</span><span class="nt2"><b>${y.o.label}</b><small>${y.o.task?'10分・現地で':'3分'}・いま ${fmtV(y.k,s.f[y.k].v)}</small></span><span class="tag unk">最大${man(y.impact)}</span><em>›</em></button>`).join('')}</div>`;
  h+=`<div class="card"><h2>確かめたこと</h2>${done.length?done.map(k=>`<button class="nrow" data-edit="${k}"><span class="nn okc">✓</span><span class="nt2"><b>${F[k].label}　${fmtV(k,s.f[k].v)}</b><small>${srcLabel(k)}</small></span><em>›</em></button>`).join(''):'<p class="lead" style="margin:0">まだありません。最初の1つで、計画がぐっと確かになります。</p>'}</div>`;
  return h+measCard()}
@@ -1344,7 +1350,7 @@ function moreTab(){const s=st(),L=x=>(s[x]||[]).length,food=cur!=='c';
   +hrow('ans','GoogleとInstagramの紹介文','紹介文ができます','data-sv="web"')+hrow('ans','ロゴ・メニュー・看板の依頼','依頼の文ができます','data-sv="design"')+hrow('flag','プレオープンの段取り','日・呼ぶ人・試すこと・直す所','data-tl="tool:pre"'))}
  ${grp('人とお金のやり取り',hrow('who','連絡先と、やり取り','だれに何を頼んでいるか','data-tl="tool:ct"',L('ct')?L('ct')+'件':'')+hrow('who','頼むときの文','内装会社・公庫・税理士・募集など','data-svl="1"')+hrow('yen','公庫に出す計画の下書き','入れた内容から、下書きができます','data-sv="kouko"')+hrow('yen','税理士への相談','相談の文ができます','data-sv="zeiri"'))}
  ${grp('開店したあと',hrow('chart','最初の1か月の振り返り','実際の数字と計画の違いを見る','data-actsh="1"')+hrow('flag','開店したあとへ','引き継げる内容','data-tl="tool:os"'))}
- ${grp('あなたとこのアプリ',hrow('ans','ヒアリングの答えを見る・直す','直しても、入れた内容は残ります','data-ivopen="1"')+hrow('check','このアプリでできること','画面ごとの使い方','data-tl="guide:"')+hrow('ask','事務局に相談する','LINEで相談できます（無料）','data-tab="ask"'))}`}
+ ${grp('あなたとこのアプリ',hrow('ans','ヒアリングの答えを見る・直す','直しても、入れた内容は残ります','data-ivopen="1"')+hrow('check','このアプリでできること','画面ごとの使い方','data-tl="guide:"')+hrow('ask','開業の相談','LINEで相談できます（無料）','data-tab="ask"')+hrow('ask','不具合・改善要望','事務局に送る・返事を見る','data-report-open'))}`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ppopen]');if(!b)return;const s=st();s._ppOpen=b.dataset.ppopen;ppSheet()});
 
 /* ===== シート ===== */
@@ -1981,7 +1987,7 @@ function ivFinish(){S._ivDone=1;ivSave();const u=ivU();
  S._iv={mode:'memo',just:1};save();scrollTo(0,0);render()}
 const ivMode=()=>S._iv&&S._iv.mode?S._iv.mode:S._u?null:S._ivDone?'memo':'q';
 const ivHead=()=>{try{if(S._u&&S._u._iv&&S[cur])return header()}catch(e){}return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START"><span class="biz">開業支援</span>${HBTN}</header>`};
-const ivBanner=()=>(IVERR?`<div class="ivb">${IVERR}${IVRAW?`<br><button class="lk" data-ivcopy="raw">元の答えをコピーする</button>`:''}</div>`:'')+(IVNOTE?`<div class="ivb">${IVNOTE}<br><button class="lk" data-ivcopy="now">答えをコピーする</button></div>`:'');
+const ivBanner=()=>(IVERR?`<div class="ivb">${IVERR}${IVRAW?`<br><button class="lk" data-ivcopy="raw">元の答えをコピーする</button>`:''}</div>`:'')+(IVNOTE?`<div class="ivb">${IVNOTE}<br><button class="lk" data-ivcopy="now">答えをコピーする</button> <button class="lk" data-report-error="ヒアリングの保存">この不具合を知らせる</button></div>`:'');
 function planSteps(current){
  const labels=['お店の質問','試算','ホーム'];
  return '<ol class="flow-steps" aria-label="試算までとそのあと">'+labels.map((label,i)=>
@@ -2123,12 +2129,12 @@ function ivMemo(){const c=IV.calculationInput(IVS),v=id=>IV.valueOf(IVS,id),pr=v
  ${c.ready?`<div class="card"><h2>計算できる条件がそろいました</h2><p class="lead">いまの答えから、月の売上と家賃を払う前に残る額を、仮の数字で出せます。聞いていない所（原価や営業日数など）は仮で置き、根拠と変え方を一緒に見せます。</p><button class="btn dark" data-ivplan="1">計画を見る</button></div>`
  :`<div class="card"><h2>売上と、家賃を払う前に残る額</h2><p class="lead">条件を確かめると計算できます。いま足りないのは、次の答えです。未定の所を、ほかの数字で埋めることはしません。</p>
  ${c.missing.filter(id=>id!=='salesModel'||IV.questionsFor(IVS).some(q=>q.id==='salesModel')).map(id=>`<button class="nrow" data-ivedit="${id}" data-ivret="memo"><span class="nt2"><small>計算に使う答え</small><b>${missL[id]||ivLabel(id)}</b></span><span class="tag unk">＋ 書く</span><em>›</em></button>`).join('')}</div>`}
- <div class="alt"><button data-ivask="1">事務局に相談する</button><button data-ivopen="1">ヒアリングの答えを見る</button></div>
+ <div class="alt"><button data-ivask="1">開業の相談をする</button><button data-ivopen="1">ヒアリングの答えを見る</button></div>
  <p class="ftn" style="text-align:center">事務局への相談は無料です。${S._id?`<br>相談番号 ${S._id}`:''}${accFoot()}</p>${IVFT}</div>`}
 const askN=()=>Math.max((IVS&&IVS.consultation.preparedCount)||0,(S._acc&&S._acc.n)||0);
 function ivAsk(){if(askGate())return;const v=id=>IV.valueOf(IVS,id),bl=(IV.BUSINESSES.find(o=>o.value===v('businessType'))||{}).label,nth=askN()+1;
  const rows=[['相談番号',`${myId()}（${nth}回目）`],['相談したいこと','何から手をつければいいか相談したい'],bl&&['お店',bl],v('purpose')&&['来てほしい場面',v('purpose')],v('mainProduct')&&[ivLabel('mainProduct'),v('mainProduct')],v('area')&&['エリア',v('area')],v('openingTarget')&&['開きたい時期',v('openingTarget')],v('worry')&&['気になっていること',v('worry')]].filter(Boolean);
- openSheet(`<h3>事務局に相談する</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
+ openSheet(`<h3>開業の相談（公式LINE）</h3><p class="small" style="color:var(--ink)">ここまでの内容がそのまま伝わるので、最初から説明し直さなくて大丈夫です。</p>
  <div class="grp">事務局に伝わる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b style="text-align:right">${esc(x[1])}</b></li>`).join('')}</ul>
  <div class="field"><label>ひとこと（書かなくても送れます）</label><textarea id="askt" rows="3" placeholder="例：何から聞けばいいかも分からない"></textarea></div>
  <button class="btn ln" id="askgo">LINEで、この内容を送る</button><p class="small" style="margin-top:8px">次の画面で「LINEを開く」を押すと、公式LINE「TENPO/OS」のトークが、この文の入った状態で開きます。送信を押すと届き、返事もLINEに届きます。事務局への相談は無料です。同じ内容が、事務局に控えとして届きます。</p>`);
@@ -2273,12 +2279,12 @@ async function accGo(prov){const err=m=>{const e=document.getElementById('acc_er
   if(prov==='email')openSheet(`<h3>メールを送りました</h3><p class="shl">${esc(email)} に届いたリンクを、<b>この端末のこのブラウザ</b>で開いてください。開くと、いまの計画がアカウントに結びつきます。</p><p class="emp">届かない時は、迷惑メールのフォルダも見てください。</p><button class="btn ghost" data-act="close">閉じる</button>`)}
  catch(e){delete S._accP;save();err(accNice(e))}}
 async function accConsult(topic,body,nth){if(!PUB||!S._acc||!ACCU)return false;try{await accSync();const r=await accRpc('start_consult_put',{p_topic:topic,p_body:body,p_nth:nth});if(r&&r.ok){accSame(r.consult_no,r.nth);ivSave();save()}return true}catch(e){return false}}
-function askGate(){if(!PUB||S._acc)return false;openSheet(`<h3>事務局への相談は、登録した方が使えます</h3><p class="shl">登録は無料です。登録すると、ここまでの内容がそのまま事務局に伝わるので、最初から説明し直さなくて済みます。</p><button class="btn dark" data-accopen="1">無料で登録して、相談する</button><button class="btn ghost" data-act="close">あとで</button>`);return true}
+function askGate(){if(!PUB||S._acc)return false;openSheet(`<h3>開業の相談は、登録した方が使えます</h3><p class="shl">登録は無料です。登録すると、ここまでの内容がそのまま事務局に伝わるので、最初から説明し直さなくて済みます。</p><button class="btn dark" data-accopen="1">無料で登録して、相談する</button><button class="btn ghost" data-act="close">あとで</button>`);return true}
 function accOut(){const fin=()=>{delete S._acc;delete S._accP;ACCU=null;ACCMSG=null;save();closeSheet();render();toast('ログアウトしました。内容は、この端末に残っています')};(SB?SB.auth.signOut().catch(()=>{}):Promise.resolve()).then(fin)}
 function accCard(tab){if(S._acc||!S._u||!['shop','plan','home'].includes(tab))return'';const s=st();if(s.events.length<3&&s.day<1)return'';if(S._accLater!=null&&s.day-S._accLater<3)return'';
  if(tab!=='home')return `<div class="card soft acc1"><button class="nsrow" data-accopen="1"><span class="tx"><b>無料で登録して、この計画を続ける</b><small>ここまでの内容を引き継いで、別の端末でも開けます</small></span><i>›</i></button><button class="lk" data-acclater="1">あとで登録する</button></div>`;
  return `<div class="card soft"><h2>この計画を続ける</h2><p class="lead">ここまでの回答と、自分で残した変更を引き継げます。別の端末でも、続きから開けます。</p><button class="btn dark" data-accopen="1">無料で登録して、この計画を続ける</button><button class="lk" data-acclater="1" style="display:block;margin:6px auto 0">あとで登録する</button></div>`}
-const accFoot=()=>S._acc?`<br>${ACCMSG?esc(ACCMSG):'登録済みです。この計画は、アカウントに残っています。'}<br><button class="lk" data-accout="1">ログアウト</button>${ACCMSG&&!ACCU?' <button class="lk" data-accopen="login">ログインする</button>':''}`:(accCard((st()||{}).tab||'home')?'':`<br><button class="lk" data-accopen="1">無料で登録して、この計画を続ける</button>`);
+const accFoot=()=>S._acc?`<br>${ACCMSG?esc(ACCMSG)+' <button class="lk" data-report-error="アカウントへの保存・再開">この不具合を知らせる</button>':'登録済みです。この計画は、アカウントに残っています。'}<br><button class="lk" data-accout="1">ログアウト</button>${ACCMSG&&!ACCU?' <button class="lk" data-accopen="login">ログインする</button>':''}`:(accCard((st()||{}).tab||'home')?'':`<br><button class="lk" data-accopen="1">無料で登録して、この計画を続ける</button>`);
 if(PUB){document.addEventListener('click',e=>{const b=e.target.closest('[data-accopen],[data-accgo],[data-acclater],[data-accout]');if(!b)return;const D=b.dataset;
   if(D.accopen){accSheet(D.accopen==='login');return}if(D.accgo){accGo(D.accgo);return}
   if(D.acclater){S._accLater=S._u?st().day:0;save();render();return}
@@ -2441,7 +2447,7 @@ const STGC={
   trip:[['思ったよりお客さんが少ない','時間帯ごとに、店の前を通る人と入る人を数えると、知られていないのか、入りにくいのかが分かれます。','data-act="meas"','店の前で数える','お客さんを増やす方法を相談したい'],
    ['忙しすぎて、回らない','どの時間に手が足りないかを書き出して、その時間だけ人を頼む形から考えます。','data-x="hire"','採用','人手のことを相談したい'],
    ['2店舗目を、考え始めたい','今のお店の実際の数字が、次のお店の計画の土台になります。','data-actsh="1"','最初の1か月の振り返り','2店舗目のことを相談したい']]}};
-function stgTrip(g){const c=STGC[g];return `<div class="card stgt"><h2>この時期に、よくあるつまずき</h2>${c.trip.map(([q,a,at,lb,ask])=>`<details class="stgtr"><summary>${q}</summary><p>${a}</p><div class="alt"><button ${at}>${lb}</button><button data-ask="${ask}">事務局に相談する</button></div></details>`).join('')}</div>`}
+function stgTrip(g){const c=STGC[g];return `<div class="card stgt"><h2>この時期に、よくあるつまずき</h2>${c.trip.map(([q,a,at,lb,ask])=>`<details class="stgtr"><summary>${q}</summary><p>${a}</p><div class="alt"><button ${at}>${lb}</button><button data-ask="${ask}">開業の相談をする</button></div></details>`).join('')}</div>`}
 /* 思いを言葉にする（構想中） */
 function mustSheet(){const s=st(),k=s.k=s.k||{},w=k.mw||{};openSheet(`<h3>思いを言葉にする</h3><p class="shl">3つに短く答えると、1つの文になります。物件を見る時の軸になり、物件の判断にも出てきます。あとから何度でも直せます。</p>
  <div class="field"><label>だれに来てほしいですか</label><input id="mw_a" value="${esc(w.a||'')}" placeholder="例：記念日の2人／近所で働く人"></div>
@@ -2559,7 +2565,7 @@ function areaPage(id,v){const s=st(),i=HM.findIndex(x=>x[0]===id);if(i<0){s.area
  <div class="alt" style="margin-top:8px;justify-content:space-between">${pv?`<button data-hm="area:${pv[0]}">‹ ${pv[1]}</button>`:'<span></span>'}${nx?`<button data-hm="area:${nx[0]}">${nx[1]} ›</button>`:''}</div>`}
 
 function askTab(){const s=st(),asks=s.asks||[],T=['何から手をつければいいか相談したい','エリアと物件のことを相談したい','開業資金と借入のことを相談したい','内装と設備のことを相談したい','手続きのことを相談したい','そのほかのことを相談したい'];
- return `<div class="hmp"><h1>相談</h1><p>テンポスタート事務局への相談は無料です。やり取りは、いつものLINEでします。</p></div><div class="lnb"><b>LINEで相談する流れ</b><ol><li>下から、相談したいことを選ぶ</li><li>事務局に伝わる内容を確かめる</li><li>LINEが開くので、送信を押す</li></ol><p>ここまでの内容が文に入るので、最初から説明し直さなくて済みます。返事は、公式LINE「TENPO/OS」のトークに届きます。</p></div>
+ return `<div class="hmp"><h1>開業の相談</h1><p>テンポスタート事務局への相談は無料です。やり取りは、いつものLINEでします。</p></div><div class="lnb"><b>LINEで相談する流れ</b><ol><li>下から、相談したいことを選ぶ</li><li>事務局に伝わる内容を確かめる</li><li>LINEが開くので、送信を押す</li></ol><p>ここまでの内容が文に入るので、最初から説明し直さなくて済みます。返事は、公式LINE「TENPO/OS」のトークに届きます。</p></div>
  <div class="card"><h2>相談したいことを選ぶ</h2>${T.map(t=>`<button class="nrow" data-ask="${t}"><span class="nt2"><b>${t.replace('を相談したい','').replace('相談したい','')}</b></span><em>›</em></button>`).join('')}</div>
  <div class="card"><h2>これまでの相談</h2>${asks.length?asks.slice().reverse().map(a=>`<div class="lrow"><div class="lm"><b>${esc(a.t)}</b><small>${dLabel(a.day)}・相談の文を用意した</small></div></div>`).join(''):'<p class="emp">まだありません。</p>'}</div>
  <div class="card">${hrow('who','連絡先と、やり取り','だれに何を頼んでいるか','data-tl="tool:ct"')}${hrow('people','頼むときの文','内装会社・デザイン・公庫・税理士など','data-hm="area:build"')}</div>`}
@@ -2583,7 +2589,7 @@ function preSheet(){const s=st();s.pre=s.pre||{date:'',who:'',ck:{},fix:[]};cons
 function osSheet(){const s=st();const rows=[['メニューとレシピ',(s.rc||[]).length+'品'],['採用した人',(s.ap||[]).filter(a=>a.st===3).length+'人'],['連絡先',(s.ct||[]).length+'件'],['買った物・見積もり',((s.buy||[]).length+(s.qt||[]).length)+'件'],['写真',(s.ph||[]).length+'枚']];
  openSheet(`<h3>開店したあとへ</h3><p class="shl">開店したあとは、毎日の運営（シフト・日報・在庫・売上）に仕事が移ります。ここまでに入れた内容は、TENPO/OSの運営アプリに引き継げます。</p>
  <div class="grp">引き継げる内容</div><ul class="rows">${rows.map(x=>`<li><span>${x[0]}</span><b>${x[1]}</b></li>`).join('')}</ul>
- <p class="emp">引き継ぎは、事務局と相談しながら進めます。開店の1か月前ごろに声をかけてください。</p><button class="btn dark" data-ask="開店後の運営アプリ（TENPO/OS）への引き継ぎを相談したい">事務局に相談する</button><button class="btn ghost" data-act="close">閉じる</button>`)}
+ <p class="emp">引き継ぎは、事務局と相談しながら進めます。開店の1か月前ごろに声をかけてください。</p><button class="btn dark" data-ask="開店後の運営アプリ（TENPO/OS）への引き継ぎを相談したい">開業の相談をする</button><button class="btn ghost" data-act="close">閉じる</button>`)}
 
 const TOOL={money:()=>moneySheet('sum'),pay:paySheet,qt:qtSheet,ct:ctSheet,pp:ppSheet,buy:buySheet,pre:preSheet,os:osSheet};
 /* ---- できること ---- */
@@ -2595,7 +2601,7 @@ function guideSheet(){const has=PUB?!!S._u:true;const G=[['home','ホーム','�
 /* ---- あなたの登録 ---- */
 function meSheet(){const s=PUB&&!S._u?null:st(),asks=s?(s.asks||[]):[];const at=S._acc&&S._acc.at?new Date(S._acc.at):null;
  openSheet(`<h3>あなたの登録</h3>
- <div class="sec"><div class="grp">登録</div>${!PUB?'<p class="emp">確認用の画面では、登録は動きません。</p>':S._acc?`<p class="shl" style="margin:0">${ACCMSG?esc(ACCMSG):'登録済みです。この計画は、アカウントに残っています。'}${at?`<br>登録した日：${at.getFullYear()}/${at.getMonth()+1}/${at.getDate()}`:''}</p><button class="btn ghost" data-accout="1">ログアウト</button>`:`<p class="shl" style="margin:0">まだ登録していません。内容は、この端末のこのブラウザにだけ残っています。</p><button class="btn dark" data-accopen="1">無料で登録して、この計画を続ける</button><button class="btn ghost" data-accopen="login">登録済みの方は、ログイン</button>`}</div>
+ <div class="sec"><div class="grp">登録</div>${!PUB?'<p class="emp">確認用の画面では、登録は動きません。</p>':S._acc?`<p class="shl" style="margin:0">${ACCMSG?esc(ACCMSG)+' <button class="lk" data-report-error="アカウントへの保存・再開">この不具合を知らせる</button>':'登録済みです。この計画は、アカウントに残っています。'}${at?`<br>登録した日：${at.getFullYear()}/${at.getMonth()+1}/${at.getDate()}`:''}</p><button class="btn ghost" data-accout="1">ログアウト</button>`:`<p class="shl" style="margin:0">まだ登録していません。内容は、この端末のこのブラウザにだけ残っています。</p><button class="btn dark" data-accopen="1">無料で登録して、この計画を続ける</button><button class="btn ghost" data-accopen="login">登録済みの方は、ログイン</button>`}</div>
  <div class="sec"><div class="grp">事務局への相談</div><ul class="rows"><li><span>相談番号</span><b>${S._id||'まだありません'}</b></li></ul>${asks.slice(-5).reverse().map(a=>`<div class="lrow"><div class="lm"><b>${esc(a.t)}</b><small>相談の文を用意した・${dLabel(a.day)}</small></div></div>`).join('')||'<p class="emp">相談の記録は、まだありません。相談は無料です。</p>'}</div>
  <div class="sec"><div class="grp">内容</div>${PUB?'<button class="nrow" data-ivopen="1" data-act2="close"><span class="nt2"><b>ヒアリングの答えを見る・直す</b></span><em>›</em></button>':''}
  <button class="nrow" data-tl="guide:"><span class="nt2"><b>TENPO/STARTでできること</b></span><em>›</em></button>
@@ -2980,7 +2986,7 @@ function moneySheet(v){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const 
   <details class="cbw"><summary>公庫で借りる時のこと</summary><div class="kko">${kkoNote(N,k,f)}</div></details></div>
   ${!t3?'':miss?`<p class="cbhint">まだの欄が${miss}つあります。足りるかどうかは、そろってから確かめます。</p>`:d<0?`<p class="cbhint ng">あと ${man(-d)} 足りません。ここで分かってよかった数字です。工事の範囲・持つ月数・借りる額・物件のどれを動かすか、一緒に考えられます。</p>`:''}
   ${cbBtn('cost','毎月出ていくお金のもと（原価・経費・あなたの給料）')}${svBtn('kouko')}`}
- openSheet(`<h3>${ic('yen')}お金</h3>${seg}${head}${body}<div class="alt"><button data-ask="開業資金の組み立てを相談したい">事務局に相談する</button></div>`);shJump();
+ openSheet(`<h3>${ic('yen')}お金</h3>${seg}${head}${body}<div class="alt"><button data-ask="開業資金の組み立てを相談したい">開業の相談をする</button></div>`);shJump();
  const sh=$i('sheet'),back=()=>{const sc=sh.scrollTop;moneySheet();$i('sheet').scrollTop=sc};
  sh.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>moneySheet(b.dataset.mv));
  sh.querySelectorAll('[data-mi]').forEach(b=>b.onclick=()=>{const sc=sh.scrollTop;miSheet(b.dataset.mi,()=>{moneySheet();$i('sheet').scrollTop=sc})});
@@ -3289,7 +3295,7 @@ function planTop(v){if(cur==='b')return planTopB(v);
 
 /* 2026-11-23 ヘッダー：業態と日付をやめ、店名と開店までの日数（押すと直せる） */
 function header(sub,title){const g=stgOf();
- return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階 ${STG.findIndex(x=>x[0]===g)+1}/${STG.length}</small><b>${STGL[g]} ›</b></button><button class="hask" data-tab="ask" aria-label="事務局にLINEで相談する">${ic('ask',17)}<span>相談</span></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
+ return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階 ${STG.findIndex(x=>x[0]===g)+1}/${STG.length}</small><b>${STGL[g]} ›</b></button><button class="hask" data-tab="ask" aria-label="事務局にLINEで相談する">${ic('ask',17)}<span>開業の相談</span></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
 
 
 /* 2026-11-23 見直し：考える物件をアプリ全体で1つに保つ */
@@ -3305,6 +3311,372 @@ function pickSync(){const s=st(),pp=s.pp||[];/* 2026-11-26 段階は本人が変
 document.addEventListener('click',e=>{const b=e.target.closest('[data-mscam]');if(!b)return;e.preventDefault();let i=document.getElementById('ms_g');
  if(!i){i=document.createElement('input');i.type='file';i.accept='image/*,application/pdf';i.multiple=true;i.hidden=true;i.id='ms_g';document.body.appendChild(i);i.onchange=ev=>{const f=[...ev.target.files].slice(0,3);i.value='';msStart(f)}}
  i.click()},true);
+</script>
+<style>#plan-save-error{position:fixed;top:0;left:0;right:0;z-index:8001;background:#fff0df;color:#48291b;padding:8px 12px;text-align:center}#plan-save-error button{color:inherit;text-decoration:underline}</style>
+<!-- features/ask/ask.js (outta-inc/tenpo-os), embedded for the one-file START worker. -->
+<script>
+/* TENPO OS 束：なんでも相談（2026-11-17 Claude・松尾さんの依頼。最初の名前は「事務局に聞いてみる」）
+ * 画面の右端に細い「つまみ」を出す。押すと横からすべって出て、ひとこと書いて「送る」だけで事務局に届く（床の箱 db/box-voice-v0.1）。
+ * 種類（分かりにくい・こうしたい・うまく動かない）を1回押すだけでも送れる。文は書かなくてよい。
+ * 店・アプリ・画面・だれ（役割）・版は自動で付く。送った物と、事務局の返事は、同じ場所に出る（この端末から送った物だけ）。
+ * まず、よくある質問にその場で答える（共通の物＋店が渡す faq）。書いた文に近い質問を「もしかして」で出す。
+ *   答えを開いたら「解決した」か「解決しない → 事務局に送る」。解決しない物・答えの無い物が事務局に届く。どの質問が開かれたかも箱に残る（種類 faq）
+ * 書いて「聞いてみる」を押すと、まずアプリの中で答える：近い質問があればその答え、無ければ AI が店の説明書から答える（Edge Function voice-answer・箱 db/box-voice-v0.3）。
+ *   AI の答えにも「解決した」「まだ分からない」。まだ分からない・AI が分からない物だけが、事務局の受信箱に出る。聞かれた質問は、事務局に来ない物も全部残る
+ *   AI がまだ無い・呼べないときは、今までどおり事務局に届く（何も失わない）
+ * よく聞かれることは、画面ごとに出し分ける：faq の s に画面の名前（screen() が返す名前）を書くと、その画面を開いているときに先に出る。
+ * 事務局からのお知らせ（全部の店・選んだ店に出す連絡。db/box-office-v0.1）も、開いたときに一番上に出る。まだ読んでいない物があると、つまみに赤い印。
+ * 送れなかったとき（電波・箱がまだ無い）は、同じ文をコピーできる。lineId があれば公式LINEも開ける。
+ * 使い方：
+ *   TenpoAsk.mount({ store:"le bois", storeKey:"lebois", app:"管理アプリ", appId:"kanri", version:"1117",
+ *     who:    function(){ return { name:"岡田", role:"管理者" }; },   // 今ログインしている人（無ければ空でよい）
+ *     screen: function(){ return "シフトを作る"; },                  // 今の画面の名前
+ *     source: function(screen){ return ""; },                        // その画面の数字の出どころ（分かる画面だけ。「分かりにくい」を押すとその場で出す）
+ *     faq: [{ id:"lb-wish", q:"希望はどこから出しますか？", a:"下の「シフト希望」から…", k:["希望","休み"], app:"staff" }],   // 店ごとの質問と答え（app を書くとそのアプリだけ）
+ *     show:   function(){ return true; },                            // つまみを出すか（ログイン前は出さない、など）
+ *     label: "なんでも相談", color: "#2f4a3a", top: "58%", lineId: "",
+ *     tabColor: "#e0a82e", tabInk: "#1f3a2a",                        // つまみの色（目立つ金）と文字の色。開いた中の色は color
+ *     api: { url:"https://….supabase.co", key:"公開してよい鍵" },    // 省くと店の設定（TENPO_STORE.tenpo）
+ *     send: function(payload){ return Promise }, mine: function(){ return Promise } });   // 試験・見本用の差し替え
+ */
+(function(root){
+  "use strict";
+  var KINDS = [
+    { id:"hard", label:"分かりにくい",   hint:"どこが分かりにくいですか？（書かなくても送れます）" },
+    { id:"wish", label:"こうしたい",     hint:"どうなると使いやすいですか？（書かなくても送れます）" },
+    { id:"bug",  label:"うまく動かない", hint:"何をしたら、どうなりましたか？（書かなくても送れます）" }
+  ];
+  /* どの店・どのアプリでも同じ答えになる質問（店ごとの物は opts.faq で渡す） */
+  var COMMON = [
+    { id:"c-who",   q:"この相談は、だれが読みますか？", a:"TENPO OS の事務局だけが読みます。店長や、ほかのスタッフには見えません。", k:["だれが読","誰が読","読まれ","店長に見","店長にば","ばれ","バレ","匿名","相談はだれ","相談は誰"] },
+    { id:"c-reply", q:"返事は、どこに来ますか？", a:"この「不具合・改善要望」の中の「送った物と返事」に出ます。返事が来ると、つまみに赤い印が付きます。送ったときと同じスマホ・同じブラウザで開いてください。", k:["返事","返信","回答","どこに","いつ来"] },
+    { id:"c-home",  q:"ホーム画面にアプリを置きたい", a:"iPhone は、Safari で開いて、下の共有のボタン →「ホーム画面に追加」。Android は、Chrome の右上のメニュー →「ホーム画面に追加」です。", k:["ホーム画面","アイコン","インストール","ホームに","アプリを置"] },
+    { id:"c-old",   q:"画面が古いまま・直したのに変わらない", a:"アプリを一度閉じて、開き直してください。それでも変わらないときは、下の「事務局に送る」で知らせてください。", k:["古い","更新","変わらない","反映","最新","直らない","前のまま"] },
+    { id:"c-wish",  q:"機能を足してほしい・ここを変えてほしい", a:"そのまま書いて送ってください。事務局が読んで、ここに返事をします。すぐに足せる物と、話を聞いてから決める物があります。", k:["足して","足したい","機能","ほしい","欲しい","変えて","変えたい","要望"] },
+    { id:"c-role",  q:"人の権限・役割を変えたい", a:"権限の変更は、オーナーの方からの依頼だけ受けています。オーナーの方は「だれを・どの役割に」を書いて送ってください。", k:["権限","役割","管理者に","店長に","オーナーに"] }
+  ];
+  function norm(s){ return String(s == null ? "" : s).toLowerCase().replace(/[\s　、。,.!?！？・「」（）()]/g, ""); }
+  /* 店の質問を先に、共通を後ろに。app が書いてある物は、そのアプリだけ */
+  function faqList(extra, appId){ return (extra || []).concat(COMMON).filter(function(f){ return f && f.q && f.a && (!f.app || f.app === appId); }); }
+  /* 書いた文に近い質問を、近い順に返す（鍵の言葉がいくつ入っているか。質問の文そのものと重なれば加点） */
+  function scored(list, text){ var n = norm(text); if (n.length < 2) return [];
+    return (list || []).map(function(f, i){ var s = 0; (f.k || []).forEach(function(k){ if (n.indexOf(norm(k)) >= 0) s += 2; });
+        var q = norm(f.q); if (q.indexOf(n) >= 0 || (n.length >= 4 && n.indexOf(q) >= 0)) s += 3; return { f: f, s: s, i: i }; })
+      .filter(function(x){ return x.s > 0; }).sort(function(a, b){ return b.s - a.s || a.i - b.i; }); }
+  function match(list, text, max){ return scored(list, text).slice(0, max || 3).map(function(x){ return x.f; }); }
+  /* いちばん近い質問。strong＝はっきり近い（鍵が2つ以上、または質問の文そのもの）。弱い一致は、AI を先に試す */
+  function best(list, text){ var s = scored(list, text)[0]; return s ? { f: s.f, strong: s.s >= 4 } : null; }
+  var KIND_LABEL = { hard:"分かりにくい", wish:"こうしたい", bug:"うまく動かない", other:"そのほか", faq:"よくある質問", ask:"質問" };
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function stamp(d){ d = d || new Date(); var j = new Date(d.getTime() + 9 * 3600e3);
+    return j.getUTCFullYear() + "/" + pad(j.getUTCMonth() + 1) + "/" + pad(j.getUTCDate()) + " " + pad(j.getUTCHours()) + ":" + pad(j.getUTCMinutes()); }
+  function shortDay(iso){ var d = new Date(iso); if (isNaN(d)) return ""; var j = new Date(d.getTime() + 9 * 3600e3); return (j.getUTCMonth() + 1) + "/" + j.getUTCDate(); }
+  function clean(s){ return String(s == null ? "" : s).replace(/\s+/g, " ").trim(); }
+  /* 送る中身（画面を使わない。試験はここを見る） */
+  function payload(ctx, kindId, body){   // 種類 faq は「解決した」の記録だけに使う（mount の中で付ける）
+    var who = ctx.who || {};
+    return { store: clean(ctx.storeKey), app: clean(ctx.appId) || "app", screen: clean(ctx.screen).slice(0, 60), kind: KIND_LABEL[kindId] ? kindId : "other",
+      body: String(body == null ? "" : body).trim().slice(0, 1000), name: clean(who.name).slice(0, 40), role: clean(who.role).slice(0, 20), version: clean(ctx.version).slice(0, 20) };
+  }
+  function canSend(kindId, body){ return !!(KIND_LABEL[kindId] && kindId !== "other" && kindId !== "faq" && kindId !== "ask") || String(body == null ? "" : body).trim() !== ""; }
+  /* 送れなかったときにコピーする文 */
+  function compose(ctx, kindId, body, now){
+    var who = ctx.who || {}, lines = ["【不具合・改善要望】"];
+    lines.push("店：" + (clean(ctx.store) || "（未設定）") + (clean(ctx.app) ? "／" + clean(ctx.app) : ""));
+    if (clean(ctx.screen)) lines.push("画面：" + clean(ctx.screen));
+    if (clean(who.name) || clean(who.role)) lines.push("送った人：" + (clean(who.name) || "（名前なし）") + (clean(who.role) ? "（" + clean(who.role) + "）" : ""));
+    lines.push("種類：" + (KIND_LABEL[kindId] || KIND_LABEL.other));
+    lines.push("");
+    lines.push(String(body == null ? "" : body).trim() || "（文はありません）");
+    lines.push("");
+    lines.push("（" + stamp(now) + (clean(ctx.version) ? "・版 " + clean(ctx.version) : "") + "）");
+    return lines.join("\n");
+  }
+  function lineUrl(lineId, text){ var id = clean(lineId); if (!id) return "";
+    if (id.charAt(0) !== "@") id = "@" + id;
+    return "https://line.me/R/oaMessage/" + encodeURIComponent(id) + "/?" + encodeURIComponent(text); }
+  function uuid(){ var c = root.crypto; if (c && c.randomUUID) return c.randomUUID();
+    var b = []; for (var i = 0; i < 16; i++) b.push(c && c.getRandomValues ? c.getRandomValues(new Uint8Array(1))[0] : Math.floor(Math.random() * 256));
+    b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; var h = b.map(function(x){ return (x < 16 ? "0" : "") + x.toString(16); }).join("");
+    return h.slice(0, 8) + "-" + h.slice(8, 12) + "-" + h.slice(12, 16) + "-" + h.slice(16, 20) + "-" + h.slice(20); }
+
+  /* キャラクター（11/17 B案：角のまるい吹き出し・たて目・金のほっぺ）。fg＝吹き出しの色、ink＝顔の色 */
+  function face(size, fg, ink){ return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M13 7h22a8 8 0 0 1 8 8v14a8 8 0 0 1-8 8h-3.5L36 44l-12.5-7H13a8 8 0 0 1-8-8V15a8 8 0 0 1 8-8Z" fill="' + fg + '"/><rect x="16" y="16.5" width="3.6" height="8.5" rx="1.8" fill="' + ink + '"/><rect x="28.4" y="16.5" width="3.6" height="8.5" rx="1.8" fill="' + ink + '"/><circle cx="12.6" cy="27.2" r="2" fill="#b8975a"/><circle cx="35.4" cy="27.2" r="2" fill="#b8975a"/></svg>'; }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
+  function call(f, a){ try{ return typeof f === "function" ? f(a) : f; }catch(e){ return undefined; } }
+
+  /* 今の画面に合う質問を先に（faq の s に画面の名前を書いておく） */
+  function rank(list, screen){ var sc = clean(screen); if (!sc) return list.slice();
+    var hit = [], rest = []; list.forEach(function(f){ ((f.s || []).indexOf(sc) >= 0 ? hit : rest).push(f); }); return hit.concat(rest); }
+  var F = "font-family:inherit;font-style:normal;letter-spacing:normal;";   // 文字の指定は1つずつ書く（まとめて書くと無効になり、入力欄が小さい字になって iPhone でズームされた 11/17）
+
+  function mount(opts){
+    opts = opts || {}; var doc = root.document; if (!doc || doc.getElementById("tpa-tab")) return null;
+    var color = opts.color || "#2f4a3a", tabBg = opts.tabColor || "#e0a82e", tabInk = opts.tabInk || "#1f3a2a", label = !opts.label || opts.label === "なんでも相談" ? "不具合・改善要望" : opts.label, top = opts.top || "58%";
+    var T = (root.TENPO_STORE || {}).tenpo || {}, api = opts.api || {}, URL0 = api.url || T.url || "https://bzftpxtnlubibhmobtmm.supabase.co", KEY0 = api.key || T.key || "sb_publishable_D-E5nVxOex1DdQktK8C6tQ_gIeGP7Gi";   // 公開してよい鍵（usage.js と同じ）
+    var st = doc.createElement("style"); st.id = "tpa-style";
+    st.textContent = "#tpa-tab{position:fixed;right:0;top:" + top + ";transform:translateY(-50%);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:34px;padding:8px 0 12px;border:0;border-radius:10px 0 0 10px;background:" + tabBg + ";color:" + tabInk + ";box-shadow:-1px 0 0 rgba(0,0,0,.08);" + F + "font-size:12px;font-weight:700;line-height:1.15;letter-spacing:2px;cursor:pointer;-webkit-tap-highlight-color:transparent}"
+      + "#tpa-tab[hidden]{display:none}#tpa-tab span{writing-mode:vertical-rl;text-orientation:upright}#tpa-tab svg{display:block;flex:none}#tpa-tab.tpa-compact{width:46px;height:46px;padding:0 0 0 2px;border-radius:23px 0 0 23px}"
+      + "#tpa-tab b{position:absolute;left:-3px;top:-3px;width:10px;height:10px;border-radius:50%;background:#c9502f;border:2px solid #fff}#tpa-tab b[hidden]{display:none}"
+      + "#tpa-ov{position:fixed;inset:0;z-index:9001;background:rgba(0,0,0,0);transition:background .2s;display:flex;justify-content:flex-end}#tpa-ov[hidden]{display:none}#tpa-ov.tpa-on{background:rgba(0,0,0,.38)}"
+      + "#tpa-sheet{box-sizing:border-box;width:min(90vw,400px);height:100%;overflow:auto;-webkit-overflow-scrolling:touch;background:#fff;color:#2e2418;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));font-family:system-ui,-apple-system,'Hiragino Sans',sans-serif;font-size:16px;line-height:1.6;font-weight:400;text-align:left;-webkit-text-size-adjust:100%;transform:translateX(100%);transition:transform .2s ease-out}#tpa-ov.tpa-on #tpa-sheet{transform:none}"
+      + "@media (prefers-reduced-motion:reduce){#tpa-ov,#tpa-sheet{transition:none}}"
+      + "#tpa-sheet *{box-sizing:border-box}#tpa-sheet button,#tpa-sheet textarea{" + F + "margin:0}"
+      + "#tpa-sheet .tpa-top{display:flex;align-items:center;gap:8px}#tpa-sheet .tpa-top svg{flex:none}#tpa-sheet h3{flex:1;margin:0;font-size:20px;line-height:1.4;font-weight:700}#tpa-x{flex:none;width:40px;height:40px;border:1px solid #cfc7b6;border-radius:10px;background:#fff;color:#2e2418;font-size:20px;line-height:1;cursor:pointer}"
+      + "#tpa-sheet .tpa-say{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0}#tpa-sheet .tpa-say svg{flex:none;margin-top:4px}#tpa-sheet .tpa-bub{flex:1;padding:10px 12px;border-radius:4px 14px 14px 14px;background:#f1f4ec;font-size:15px;line-height:1.7}#tpa-sheet .tpa-bub b{display:block;font-size:15px;margin-bottom:4px}#tpa-sheet .tpa-bub p{margin:0;white-space:pre-wrap}"
+      + "#tpa-sheet .tpa-ab{display:flex;gap:8px;margin-top:12px}#tpa-sheet .tpa-ab button{flex:1;min-height:52px;padding:4px 8px;border-radius:10px;font-size:15px;font-weight:700;line-height:1.3;cursor:pointer}#tpa-ok,#tpa-aok{border:1px solid " + color + ";background:" + color + ";color:#fff}#tpa-ng,#tpa-ang{border:1px solid #cfc7b6;background:#fff;color:#2e2418}#tpa-ng small,#tpa-ang small{display:block;font-size:12px;font-weight:400;color:#6b5f4e}"
+      + "#tpa-sheet .tpa-lab{margin:18px 0 6px;font-size:14px;font-weight:700;color:#2e2418}#tpa-sheet .tpa-lab small{display:block;font-size:12px;font-weight:400;color:#6b5f4e}"
+      + "#tpa-sheet .tpa-q{display:flex;align-items:center;gap:6px;width:100%;min-height:52px;padding:8px 12px;margin:0 0 8px;border:1px solid #cfc7b6;border-radius:12px;background:#fff;color:#2e2418;text-align:left;font-size:15px;font-weight:400;line-height:1.4;cursor:pointer}#tpa-sheet .tpa-q:after{content:'›';margin-left:auto;color:#6b5f4e;font-size:20px}"
+      + "#tpa-sheet .tpa-more{display:block;width:100%;min-height:44px;border:0;background:transparent;color:" + color + ";font-size:14px;font-weight:700;text-decoration:underline;cursor:pointer}"
+      + "#tpa-sheet textarea{display:block;width:100%;min-height:92px;padding:12px;border:2px solid #cfc7b6;border-radius:12px;font-size:16px!important;line-height:1.6;font-weight:400;color:#2e2418;background:#fff;resize:vertical;-webkit-appearance:none;appearance:none}#tpa-sheet textarea:focus{outline:none;border-color:" + color + "}"
+      + "#tpa-sheet .tpa-maybe{margin:8px 0 0}#tpa-sheet .tpa-maybe>b{display:block;margin:0 0 4px;font-size:13px;color:#6b5f4e;font-weight:700}"
+      + "#tpa-sheet .tpa-kinds{display:flex;flex-wrap:wrap;gap:8px;margin:0}#tpa-sheet .tpa-kinds button{min-height:48px;padding:6px 16px;border:1px solid #cfc7b6;border-radius:24px;background:#fff;color:#2e2418;font-size:15px;font-weight:700;line-height:1.3;cursor:pointer}"
+      + "#tpa-sheet .tpa-kinds button[aria-pressed=true]{border-color:" + color + ";background:" + color + ";color:#fff}"
+      + "#tpa-sheet .tpa-src{margin:10px 0 0;padding:10px 12px;border:1px solid #cfc7b6;border-radius:10px;background:#f6f3ec;font-size:14px}#tpa-sheet .tpa-src b{display:block;font-size:13px;color:#6b5f4e;margin-bottom:2px}"
+      + "#tpa-sheet .tpa-note{margin:8px 0 0;font-size:12px;color:#6b5f4e}"
+      + "#tpa-send{display:block;width:100%;min-height:54px;margin-top:10px;border:1px solid " + color + ";border-radius:12px;background:" + color + ";color:#fff;font-size:17px;font-weight:700;line-height:1.2;cursor:pointer}#tpa-send[disabled]{opacity:.4;cursor:default}"
+      + "#tpa-sheet .tpa-err{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:#f8ece6;color:#8a3b1c;font-size:14px}"
+      + "#tpa-sheet .tpa-err button,#tpa-sheet .tpa-err a{display:inline-flex;align-items:center;min-height:44px;margin:8px 8px 0 0;padding:0 14px;border:1px solid #cfc7b6;border-radius:10px;background:#fff;color:#2e2418;font-size:14px;font-weight:700;text-decoration:none;cursor:pointer}"
+      + "#tpa-sheet h4{margin:24px 0 6px;font-size:14px;color:#2e2418;font-weight:700}#tpa-sheet .tpa-it{padding:10px 0;border-top:1px solid #e6dfd0;font-size:15px}#tpa-sheet .tpa-it small{display:block;font-size:12px;color:#6b5f4e}"
+      + "#tpa-sheet .tpa-nw{position:relative;margin:0 0 8px;padding:10px 12px;border:1px solid #e3dccb;border-radius:12px;background:#fff;font-size:14px;line-height:1.6}#tpa-sheet .tpa-nwu{border-color:#e3c98a;background:#fdf6e3}#tpa-sheet .tpa-nw b{display:block;font-size:15px;padding-right:44px}#tpa-sheet .tpa-nw small{position:absolute;right:12px;top:12px;font-size:12px;color:#6b5f4e}#tpa-sheet .tpa-nw p{margin:6px 0 0;white-space:pre-wrap;word-break:break-word}#tpa-sheet .tpa-nw button{display:block;width:100%;min-height:44px;margin-top:8px;border:1px solid " + color + ";border-radius:10px;background:#fff;color:" + color + ";font-size:15px;font-weight:700;" + F + "}#tpa-sheet .tpa-nwo{margin:0 0 8px;font-size:13px}#tpa-sheet .tpa-nwo summary{cursor:pointer;padding:6px 2px;color:#6b5f4e}"
+      + "#tpa-sheet .tpa-rw{display:flex;gap:6px;align-items:flex-start;margin-top:6px}#tpa-sheet .tpa-rw svg{flex:none;margin-top:2px}#tpa-sheet .tpa-it .tpa-re{flex:1;padding:8px 10px;border-radius:4px 12px 12px 12px;background:#f1f4ec;white-space:pre-wrap;word-break:break-word}#tpa-sheet .tpa-it .tpa-re b{display:block;font-size:12px;color:" + color + "}"
+      + "#tpa-sheet .tpa-pill{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:#f1ece1;font-size:12px;color:#6b5f4e}#tpa-sheet .tpa-pill.tpa-new{background:#c9502f;color:#fff}";
+    st.textContent += "#tpa-sheet .tpa-modes{display:grid;gap:6px;margin:16px 0}#tpa-sheet .tpa-modes button{padding:10px 14px;text-align:left;border:1px solid #cfc7b6;border-radius:10px;background:white;color:#2e2418;min-height:44px;font-size:15px}#tpa-sheet .tpa-modes button[aria-pressed=true]{border-color:"+color+";background:"+color+";color:white;font-weight:bold}#tpa-sheet label.tpa-lab{display:block}#tpa-sheet [data-result]{border:1px solid #cfc7b6;background:white;color:#2e2418}";
+    doc.head.appendChild(st);
+    var tab = doc.createElement("button"); tab.id = "tpa-tab"; tab.type = "button"; tab.title = label; tab.setAttribute("aria-label", label + "（TENPO OS の事務局に送る）");
+    tab.innerHTML = face(opts.compact ? 30 : 24, "#fffaf0", tabInk) + (opts.compact ? "" : "<span>" + esc(label) + "</span>") + "<b hidden></b>"; if (opts.compact) tab.className = "tpa-compact";
+    var ov = doc.createElement("div"); ov.id = "tpa-ov"; ov.hidden = true;
+    doc.body.appendChild(tab); doc.body.appendChild(ov);
+    var closeTimer = null;
+    var S = { request: null, issueScreen: "", kind: "bug", body: "", state: "", busy: false, mine: null, open: "", all: false, asked: "", ai: null };
+    function client(){ var k = opts.clientKey || "tenpo.voice.client", v = ""; try{ v = root.localStorage.getItem(k) || ""; }catch(e){}
+      if (!/^[0-9a-f-]{36}$/.test(v)){ v = uuid(); try{ root.localStorage.setItem(k, v); }catch(e){} } S.client = S.client || v; return S.client; }
+    function ctx(){ return { store: opts.store, storeKey: opts.storeKey || (root.TENPO_STORE || {}).storeId || (root.TENPO_STORE || {}).id, app: opts.app, appId: opts.appId, version: opts.version, screen: S.issueScreen || call(opts.screen), who: call(opts.who) || {} }; }
+    function rpc(fn, args){ return root.fetch(URL0 + "/rest/v1/rpc/" + fn, { method: "POST", busy: false, headers: { "Content-Type": "application/json", apikey: KEY0, "Content-Profile": "api", "Accept-Profile": "api" }, body: JSON.stringify(args) })
+      .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); }); }
+    function send(p){ if (opts.send) return Promise.resolve(opts.send(p));
+      if (p.kind === "bug" || p.kind === "wish") {
+        S.request = S.request || uuid();
+        return rpc("voice_report_put", { p_store:p.store, p_app:p.app, p_screen:p.screen, p_kind:p.kind,
+          p_body:p.body, p_name:p.name, p_role:p.role, p_version:p.version, p_client:client(), p_request:S.request });
+      }
+      return rpc("voice_put", { p_store: p.store, p_app: p.app, p_screen: p.screen, p_kind: p.kind, p_body: p.body, p_name: p.name, p_role: p.role, p_version: p.version, p_client: client() }); }
+    /* AI に聞く（Edge Function）。返す：{ok:true,id,sure,answer}／{ok:false,why}。呼べないときは失敗（→ 今までどおり事務局へ） */
+    function ask(p){ if (opts.ask) return Promise.resolve(opts.ask(p));
+      if (opts.ai === false || opts.send) return Promise.reject(new Error("ai_off"));   // 送り口を差し替えている画面（見本表示）では、AI も呼ばない
+      return root.fetch(URL0 + "/functions/v1/voice-answer", { method: "POST", busy: false, headers: { "Content-Type": "application/json", apikey: KEY0, Authorization: "Bearer " + KEY0 },
+        body: JSON.stringify({ store: p.store, app: p.app, screen: p.screen, question: p.body, name: p.name, role: p.role, version: p.version, client: client() }) })
+        .then(function(r){ if (!r.ok) throw new Error("http " + r.status); return r.json(); }); }
+    function feedback(id, solved){ if (opts.ask || opts.send) return Promise.resolve(opts.feedback ? opts.feedback(id, solved) : { ok: true });
+      return rpc("voice_ai_feedback", { p_id: id, p_client: client(), p_solved: solved }); }
+    function mine(){ var c = ctx(); if (opts.mine) return Promise.resolve(opts.mine());
+      return rpc("voice_mine", { p_store: clean(c.storeKey), p_client: client() }); }
+    function loadMine(){ return mine().then(function(rows){ S.mine = Array.isArray(rows) ? rows : []; }, function(){ if (!S.mine) S.mine = []; }).then(function(){ dot(); if (!ov.hidden) drawMine(); }); }
+    function dot(){ var b = tab.querySelector("b"); if (b) b.hidden = !((S.mine || []).some(function(x){ return x.new_reply; }) || (S.news || []).some(function(n){ return !n.seen; })) || !ov.hidden; }
+    /* 事務局からのお知らせ（db/box-office-v0.1）。全部の店・選んだ店に事務局が出す連絡。まだ読んでいない物があると、つまみに赤い印。箱がまだ無い・電波が無いときは何も出さない */
+    function feed(){ var c = ctx();
+      if (opts.feed) return Promise.resolve(opts.feed({ store: clean(c.storeKey), app: clean(c.appId) }));
+      if (opts.news === false || opts.send) return Promise.resolve([]);
+      return rpc("office_notice_feed", { p_store: clean(c.storeKey), p_app: clean(c.appId) || "app", p_client: client() }); }
+    function loadNews(){ return Promise.resolve().then(feed).then(function(rows){ S.news = Array.isArray(rows) ? rows : []; }, function(){ if (!S.news) S.news = []; }).then(function(){ dot(); var el = doc.getElementById("tpa-news"); if (el) el.innerHTML = newsHtml(); }); }
+    function newsHtml(){ var ns = S.news || []; if (!ns.length) return "";
+      var one = function(n){ return '<div class="tpa-nw' + (n.seen ? "" : " tpa-nwu") + '"><b>' + (n.important ? '<span class="tpa-pill tpa-new">重要</span> ' : "") + esc(n.title) + "</b><small>" + esc(shortDay(n.at)) + "</small>" + (n.body ? "<p>" + esc(n.body) + "</p>" : "")
+        + (n.seen ? "" : '<button type="button" data-seen="' + esc(n.id) + '">読みました</button>') + "</div>"; };
+      var un = ns.filter(function(n){ return !n.seen; }), old = ns.filter(function(n){ return n.seen; });
+      return (un.length ? '<p class="tpa-lab">事務局からのお知らせ</p>' + un.map(one).join("") : "")
+        + (old.length ? '<details class="tpa-nwo"><summary>前のお知らせ（' + old.length + "件）</summary>" + old.map(one).join("") + "</details>" : ""); }
+    function seen(id){ (S.news || []).forEach(function(n){ if (String(n.id) === String(id)) n.seen = true; }); dot(); var el = doc.getElementById("tpa-news"); if (el) el.innerHTML = newsHtml();
+      if (opts.feed || opts.send){ if (opts.seen) try{ opts.seen(id); }catch(e){} return; }
+      var c = ctx(); try{ rpc("office_notice_seen", { p_id: Number(id), p_store: clean(c.storeKey), p_app: clean(c.appId) || "app", p_client: client() }).then(function(){}, function(){}); }catch(e){} }
+    /* 入力欄を押したときに画面が勝手に拡大されないよう、開いている間だけ拡大の上限を1にする（閉じたら元に戻す） */
+    var vpOld = null;
+    function lock(on){ var m = doc.querySelector('meta[name="viewport"]'); if (!m) return;
+      if (on){ if (vpOld === null){ vpOld = m.getAttribute("content") || ""; m.setAttribute("content", vpOld.replace(/,?\s*(maximum-scale|user-scalable)\s*=\s*[^,]*/g, "") + ", maximum-scale=1"); } }
+      else if (vpOld !== null){ m.setAttribute("content", vpOld); vpOld = null; } }
+    function faqs(){ return rank(faqList(opts.faq, clean(opts.appId) || "app"), call(opts.screen)); }
+    function qBtn(f){ return '<button type="button" class="tpa-q" data-faq="' + esc(f.id) + '">' + esc(f.q) + "</button>"; }
+    /* 画面ごとの出し分け：今開いている画面の質問（faq の s にその画面の名前がある物）を先に全部出す。ほかの画面の質問と共通の質問は「ほかの質問も見る」の中。
+     * その画面の質問が1つも無いときは、今までどおり上から4つ */
+    function here(){ var sc = clean(call(opts.screen)); return sc ? faqs().filter(function(f){ return (f.s || []).indexOf(sc) >= 0; }) : []; }
+    function listHead(){ var sc = clean(call(opts.screen)); return here().length ? "「" + esc(sc) + "」でよく聞かれること" : "よく聞かれること"; }
+    function listHtml(){ var L = faqs(), h = here(), n;
+      if (!h.length) L = L.filter(function(f){ return !(f.s && f.s.length); }).concat(L.filter(function(f){ return f.s && f.s.length; }));   // この画面の質問が無いときは、どの画面でも使う質問を先に
+      n = S.all ? L.length : h.length ? Math.min(h.length, 6) : 4;
+      return L.slice(0, n).map(qBtn).join("") + (L.length > n ? '<button type="button" class="tpa-more" id="tpa-more">' + (h.length ? "ほかの画面の質問も見る" : "ほかの質問も見る") + "（あと" + (L.length - n) + "）</button>" : ""); }
+    function maybeHtml(){ var m = match(faqs(), S.body, 3); return m.length ? "<b>もしかして、これですか？</b>" + m.map(qBtn).join("") : ""; }
+    function mineHtml(){ var m = (S.mine || []).filter(function(x){ return x.kind !== "faq"; }); if (!m.length) return "";
+      return "<h4>送った内容と返事</h4>" + m.slice(0, 8).map(function(x){
+        var stt = x.reply ? '<span class="tpa-pill' + (x.new_reply ? " tpa-new" : "") + '">返事あり</span>' : (x.kind === "ask" && x.status === "done") ? '<span class="tpa-pill">解決</span>' : (x.kind === "ask" && x.status === "ai") ? '<span class="tpa-pill">答えました</span>' : x.read ? '<span class="tpa-pill">読みました</span>' : '<span class="tpa-pill">事務局に届いています</span>';
+        return '<div class="tpa-it"><small>' + esc(shortDay(x.at)) + "　" + esc(KIND_LABEL[x.kind] || "") + (x.screen ? "　" + esc(x.screen) : "") + stt + "</small>" + (x.body ? esc(x.body) : "（文なし）")
+          + (x.ai_answer ? '<div class="tpa-rw">' + face(26, color, "#f4efe5") + '<div class="tpa-re"><b>答え（自動）</b>' + esc(x.ai_answer) + "</div></div>" : "")
+          + (x.kind==="ask" && x.status==="ai" ? '<button type="button" data-ask-history="'+esc(x.id)+'">この答えを確認・事務局に相談</button>' : "")
+          + (x.reply ? '<div class="tpa-rw">'  + face(26, color, "#f4efe5") + '<div class="tpa-re"><b>事務局から</b>' + esc(x.reply) + "</div></div>" : "")
+          + (x.kind === "bug" && x.reply && x.replied_at ? (x.reporter_fixed == null
+            ? '<div class="tpa-ab"><button type="button" data-result="yes" data-report="' + esc(x.id) + '">直った</button><button type="button" data-result="no" data-report="' + esc(x.id) + '">まだ困る</button></div>'
+            : '<p>' + (x.reporter_fixed ? '直ったと伝えました' : 'まだ困ると伝えました') + '</p>') : "") + "</div>"; }).join(""); }
+    function drawMine(){ var el = doc.getElementById("tpa-mine"); if (el) el.innerHTML = mineHtml(); }
+    function btnLabel(){ return S.busy ? (S.state === "thinking" ? "調べています…" : "送っています…") : (S.body.trim() && !S.kind) ? "聞いてみる" : S.kind ? "事務局に送る" : "聞いてみる"; }
+    function say(html){ return '<div class="tpa-say">' + face(30, color, "#f4efe5") + '<div class="tpa-bub">' + html + "</div></div>"; }
+    function draw(keep){
+      var c = ctx(), src = !S.kind ? clean(call(opts.source, c.screen)) : "";
+      var f = S.open ? faqs().filter(function(x){ return x.id === S.open; })[0] : null, head;
+      if (f) head = say("<b>" + esc(f.q) + "</b><p>" + esc(f.a) + '</p><div class="tpa-ab"><button type="button" id="tpa-ok">解決した</button><button type="button" id="tpa-ng">まだ分からない<small>くわしい人に聞く</small></button></div>');
+      else if (S.ai) head = say("<b>" + esc(S.ai.q) + "</b><p>" + esc(S.ai.a) + '</p><p style="margin-top:6px;font-size:12px;color:#6b5f4e">自動の答えです。違っていたら「まだ分からない」を押してください。</p><div class="tpa-ab"><button type="button" id="tpa-aok">解決した</button><button type="button" id="tpa-ang" class="tpa-ng2">まだ分からない<small>くわしい人に聞く</small></button></div>');
+      else if (S.state === "thinking") head = say("調べています…");
+      else if (S.state === "passed") head = say("すぐに答えが見つかりませんでした。<br>くわしい人に確認して、ここに返事をします。何もしなくて大丈夫です。");
+      else if (S.state === "done") head = say("伝わりました。ありがとうございます。<br>事務局が読んで、必要なら、ここに返事をします。");
+      else if (S.state === "solved") head = say("よかったです。また、いつでもどうぞ。");
+      else if (S.state === "copied") head = say("コピーしました。");
+      else head = "";
+      var err = "";
+      if (S.state === "result-failed") err = '<p class="tpa-err" role="alert">確認結果を取得できません。履歴を更新して確かめてください。</p><button type="button" id="tpa-refresh">履歴を更新</button>';
+      else if (S.state === "feedback-failed") err = '<p class="tpa-err" role="alert">結果を確認できませんでした。通信を確認し、同じ質問でもう一度押してください。</p>';
+      else if (S.state === "limited") err = '<p class="tpa-err">少し時間をおいて、もう一度送ってください。</p>';
+      else if (S.state === "fail"){ var t = compose(c, S.kind, S.body), u = lineUrl(opts.lineId, t);
+        err = '<div class="tpa-err">受付結果を確認できません。履歴を更新し、同じ内容が届いていれば再送は不要です。<br><button type="button" id="tpa-refresh">送った物と返事を更新</button><button type="button" id="tpa-copy">文をコピーする</button>' + (u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">公式LINEで送る</a>' : "") + "</div>"; }
+      var sheet = doc.getElementById("tpa-sheet"), sc = (keep && sheet) ? sheet.scrollTop : 0;
+      ov.innerHTML = '<div id="tpa-sheet" role="dialog" aria-modal="true" aria-label="' + esc(label) + '"><div class="tpa-top">' + face(34, color, "#f4efe5") + "<h3>" + esc(label) + '</h3><button type="button" id="tpa-x" aria-label="閉じる">×</button></div>'
+        + '<div class="tpa-modes" role="group" aria-label="目的を選ぶ">' + [
+            ["bug","うまく動かない"],["wish","こうしてほしい"],["","使い方を知りたい"]
+          ].map(function(mode){ return '<button type="button" data-mode="' + mode[0] + '" aria-pressed="' + (S.kind === mode[0]) + '">' + mode[1] + '</button>'; }).join("") + '</div>'
+        + head
+        + (!S.kind && !f && !S.ai ? '<p class="tpa-lab">' + listHead() + '</p><div id="tpa-list">' + listHtml() + '</div>' : "")
+        + '<label class="tpa-lab" for="tpa-body">' + (S.kind ? "ひとこと（任意）" : "使い方を質問する") + '</label>'
+        + '<textarea id="tpa-body" maxlength="1000" placeholder="' + (S.kind === "bug" ? "例：保存を押しても進まない" : S.kind === "wish" ? "例：前回の入力を使いたい" : "どの操作を知りたいですか？") + '">' + esc(S.body) + '</textarea>'
+        + (S.kind ? '<p class="tpa-note">画面：' + esc(c.screen || c.app || "アプリ") + '</p>' : '<div class="tpa-maybe" id="tpa-maybe">' + ((f || S.ai) ? "" : maybeHtml()) + '</div>')
+        + '<button type="button" id="tpa-send"' + (canSend(S.kind, S.body) && !S.busy ? "" : " disabled") + ">" + btnLabel() + "</button>"
+        + (src ? '<div class="tpa-src"><b>この画面の数字の出どころ</b>' + esc(src) + "</div>" : "")
+        + err
+        + '<div id="tpa-news">' + newsHtml() + "</div>"
+        + '<p class="tpa-note">返事はこのブラウザで確認できます。個人情報は書かないでください。</p>'
+        + '<div id="tpa-mine">' + mineHtml() + "</div></div>";
+      if (S.busy) ov.querySelectorAll("button:not(#tpa-x),textarea").forEach(function(el){el.disabled=true;});
+      if (sc) doc.getElementById("tpa-sheet").scrollTop = sc;
+    }
+    /* 「聞いてみる」：種類を押してあれば、そのまま事務局へ（伝えたいこと）。文だけなら、まず中で答える */
+    function go(){ if (S.busy || !canSend(S.kind, S.body)) return;
+      if (S.kind || !S.body.trim()) return doSend();
+      var q = S.body.trim(), m = best(faqs(), q);
+      function useFaq(){ S.busy = false; S.asked = q; S.open = m.f.id; S.ai = null; S.state = ""; draw();
+        try{ Promise.resolve(send(payload(ctx(), "faq", "聞いた文：" + q + "｜出した答え：" + m.f.q))).then(function(){}, function(){}); }catch(e5){} }   // 書いて聞かれた文は、押されなくても残す（何が気になっているかを知るため）
+      if (m && m.strong){ useFaq(); return; }                                                     // はっきり近い質問があれば、その答えを出す
+      S.busy = true; S.state = "thinking"; S.ai = null; S.open = ""; draw();
+      var p = payload(ctx(), "", q);
+      Promise.resolve().then(function(){ return ask(p); }).then(function(r){ S.busy = false;
+        if (r && r.ok && r.sure && r.answer){ S.ai = { id: r.id, q: q, a: r.answer }; S.state = ""; S.body = ""; draw(); loadMine(); }
+        else if (r && r.ok){ S.state = "passed"; S.body = ""; draw(); loadMine(); }                 // AI が分からない → もう事務局の受信箱に入っている
+        else if (r && r.why === "limited"){ S.state = "limited"; draw(true); }
+        else if (m) useFaq(); else { S.state = ""; doSend(true); } },
+        function(){ if (m) return useFaq(); S.busy = false; S.state = ""; doSend(true); }); }       // AI を呼べない → 近い質問があればそれ、無ければ今までどおり事務局へ                               // AI を呼べない → 今までどおり事務局へ（何も失わない）
+    async function confirmFeedback(solved){
+      if(S.busy || !S.ai)return;
+      var question=S.ai;
+      S.busy=true; S.state=""; draw(true);
+      try{
+        var result=await feedback(question.id,solved);
+        if(!result || !result.ok){
+          // A lost response may have already moved the same question into the office inbox.
+          var rows=await mine();
+          var row=rows.find(function(x){return String(x.id)===String(question.id);});
+          if(!row || !(solved ? row.status==="done" : row.status==="new" || row.status==="read" || row.reply))throw Error("unconfirmed");
+        }
+        S.ai=null;S.state=solved?"solved":"passed";loadMine();
+      }catch(e){S.ai=question;S.state="feedback-failed";}
+      finally{S.busy=false;draw(true);}
+    }
+    function doSend(passed){ if (S.busy || !canSend(S.kind, S.body)) return; S.busy = true; S.state = ""; draw(true);
+      var p = payload(ctx(), S.kind, S.body);
+      send(p).then(function(r){ S.busy = false;
+        if (r && r.saved){ S.state = passed ? "passed" : "done"; S.kind = "bug"; S.request = null; S.issueScreen = ""; S.body = ""; S.open = ""; S.ai = null; draw(); loadMine(); }
+        else { S.state = (r && r.why === "limited") ? "limited" : "fail"; draw(true); } },
+        function(){ S.busy = false; S.state = "fail"; draw(true); }); }
+    function copy(){ var t = compose(ctx(), S.kind, S.body), ok = function(){ S.state = "copied"; draw(); };
+      var fb = function(){ var ta = doc.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; doc.body.appendChild(ta); ta.select(); try{ doc.execCommand("copy"); }catch(e){} ta.remove(); ok(); };
+      if (root.navigator && root.navigator.clipboard && root.navigator.clipboard.writeText) root.navigator.clipboard.writeText(t).then(ok, fb); else fb(); }
+    function open(){ if(closeTimer){root.clearTimeout(closeTimer);closeTimer=null;} if(S.busy){ov.hidden=false;ov.classList.add('tpa-on');lock(true);draw();return;} if(!S.body && !S.issueScreen) S.kind="bug"; S.state = ""; S.open = ""; S.all = false; S.ai = null; S.asked = ""; lock(true); draw(); ov.hidden = false; void ov.offsetWidth; ov.classList.add("tpa-on"); dot(); loadMine(); loadNews(); }
+    function reportError(screen){
+      if (S.busy) return;
+      // Retain the request ID if the very same failed submission is retried.
+      var same = S.kind === "bug" && S.issueScreen === screen && !S.body;
+      if (!same) S.request = null;
+      S.kind = "bug"; S.body = ""; S.issueScreen = clean(screen).slice(0,60); open(); doSend();
+    }
+    function close(){ ov.classList.remove("tpa-on"); lock(false); closeTimer=root.setTimeout(function(){ closeTimer=null; ov.hidden = true; ov.innerHTML = ""; dot(); }, 210); }
+    // 11/26：つまみは上下に引っぱって動かせる（長押しは要らない）。置いた所は端末に覚える。少しでも動かしたら「開く」にはしない
+    var TOPK = "tpa-top", drag = null, moved = false;
+    function place(y){ var h = root.innerHeight || 600, half = (tab.offsetHeight || 120) / 2; y = Math.max(70 + half, Math.min(h - 70 - half, y)); tab.style.top = y + "px"; return y; }
+    try{ var sv = Number(root.localStorage.getItem(TOPK)); if (sv > 0) place(sv * (root.innerHeight || 600)); }catch(e){}
+    tab.style.touchAction = "none";
+    tab.addEventListener("pointerdown", function(e){ drag = { y0: e.clientY, t0: tab.getBoundingClientRect().top + tab.offsetHeight / 2, id: e.pointerId }; moved = false; });
+    tab.addEventListener("pointermove", function(e){ if (!drag || e.pointerId !== drag.id) return; var dy = e.clientY - drag.y0; if (!moved && Math.abs(dy) < 8) return;
+      if (!moved){ moved = true; try{ tab.setPointerCapture(drag.id); }catch(x){} tab.style.transition = "none"; } place(drag.t0 + dy); e.preventDefault(); });
+    function drop(){ if (!drag) return; if (moved){ try{ root.localStorage.setItem(TOPK, String(parseFloat(tab.style.top) / (root.innerHeight || 600))); }catch(x){} } drag = null; }
+    tab.addEventListener("pointerup", drop); tab.addEventListener("pointercancel", drop);
+    tab.addEventListener("click", function(e){ if (moved){ moved = false; e.preventDefault(); return; } open(); });
+    ov.addEventListener("click", function(e){ var t = e.target, up = function(sel){ return t.closest && t.closest(sel); };
+      if (t === ov || t.id === "tpa-x"){ close(); return; }
+      var sn = up("[data-seen]"); if (sn){ seen(sn.getAttribute("data-seen")); return; }
+      if (S.busy) return;
+      if (t.id === "tpa-send"){ go(); return; }
+      if (up("#tpa-aok") || up("#tpa-ang")){ confirmFeedback(!!up("#tpa-aok")); return; }
+      var previous=up("[data-ask-history]");
+      if(previous && !S.busy){
+        var row=(S.mine || []).find(function(x){return String(x.id)===previous.dataset.askHistory;});
+        if(row && row.status==="ai"){S.kind="";S.ai={id:row.id,q:row.body,a:row.ai_answer};S.open="";S.state="";draw();}
+        return;
+      }
+      if (t.id === "tpa-refresh"){
+        var button=t;button.disabled=true;
+        Promise.resolve().then(mine).then(function(rows){S.mine=rows;drawMine();button.textContent="履歴を更新しました";},
+          function(){button.textContent="履歴を取得できません。もう一度更新";}).finally(function(){button.disabled=false;});
+        return;
+      }
+      if (t.id === "tpa-copy"){ copy(); return; }
+      if (t.id === "tpa-more"){ S.all = true; var l = doc.getElementById("tpa-list"); if (l) l.innerHTML = listHtml(); return; }
+      var fq = up("[data-faq]"); if (fq){ S.asked = S.body.trim(); S.open = fq.getAttribute("data-faq"); S.ai = null; S.state = ""; draw(); return; }
+      if (up("#tpa-ok")){ var f1 = faqs().filter(function(x){ return x.id === S.open; })[0]; S.open = ""; S.state = "solved"; S.body = ""; draw();
+        if (f1){ var p1 = payload(ctx(), "faq", "解決した：" + f1.q); S.asked = ""; try{ Promise.resolve(send(p1)).then(function(){}, function(){}); }catch(e2){} } return; }   // どの質問が役に立ったかを残す（失敗しても何もしない）
+      if (up("#tpa-ng")){ var f2 = faqs().filter(function(x){ return x.id === S.open; })[0];
+        S.body = "「" + (f2 ? f2.q : "") + "」の答えでは解決しませんでした。" + ((S.asked || S.body.trim()) ? "\n聞いた文：" + (S.asked || S.body.trim()) : ""); S.asked = ""; S.open = ""; doSend(true); return; }
+      var mode = up("[data-mode]");
+      if (mode) {
+        if (!mode.dataset.mode && opts.help) { close(); opts.help(); return; }
+        S.kind = mode.dataset.mode; S.request = null; S.issueScreen = ""; S.open = ""; S.ai = null; S.state = ""; draw(); return;
+      }
+      var response = up("[data-result]");
+      if (response) {
+        var row = (S.mine || []).find(function(x){ return String(x.id) === response.dataset.report; });
+        if (!row || !row.reply) return;
+        S.busy = true; draw(true);
+        rpc("voice_report_result", {p_id:row.id,p_client:client(),p_replied_at:row.replied_at,p_fixed:response.dataset.result==="yes"})
+          .then(function(r){ if (!r || !r.ok) throw Error("unconfirmed"); return loadMine(); })
+          .catch(function(){ S.state="result-failed"; }).finally(function(){ S.busy=false; draw(true); });
+      }
+    });
+    ov.addEventListener("input", function(e){ if (e.target.id !== "tpa-body") return; S.body = e.target.value; S.request = null;
+      var b = doc.getElementById("tpa-send"); if (b){ b.disabled = !canSend(S.kind, S.body) || S.busy; b.textContent = btnLabel(); }
+      if (!S.open && !S.ai){ var q = doc.getElementById("tpa-maybe"); if (q) q.innerHTML = maybeHtml(); } });
+    var shown = false;
+    function sync(){ var v = call(opts.show) !== false; tab.hidden = !v; if (v && !shown){ shown = true; loadMine(); loadNews(); } if (!v) shown = false; }
+    sync(); var timer = root.setInterval ? root.setInterval(sync, 1500) : null;
+    return { open: open, reportError: reportError, close: close, sync: sync, stop: function(){ if (timer) root.clearInterval(timer); lock(false); tab.remove(); ov.remove(); st.remove(); } };
+  }
+  var out = { mount: mount, compose: compose, payload: payload, canSend: canSend, lineUrl: lineUrl, KINDS: KINDS, COMMON: COMMON, faqList: faqList, match: match, best: best, rank: rank };
+  if (typeof module !== "undefined" && module.exports) module.exports = out;
+  root.TenpoAsk = out;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>
+const startDesk = TenpoAsk.mount({
+ store:"TENPO/START",storeKey:"tenpo-start",app:"テンポスタート",appId:"start",version:"20261126",
+ clientKey:"tenpo.start.voice.client",news:false,api:ACC,help:guideSheet,show:()=>Boolean(ivMode()),
+ screen:()=>ivMode() ? "初回ヒアリング" : (TABS.find(([key])=>key===st().tab)?.[1] || (st().tab==="ask" ? "開業の相談" : "ホーム"))
+});
+document.addEventListener("click",event=>{
+ const button=event.target.closest("[data-report-error]");
+ if(button){event.preventDefault();startDesk.reportError(button.dataset.reportError);}
+ if(event.target.closest("[data-report-open]"))startDesk.open();
+});
 </script>
 </body>
 </html>
