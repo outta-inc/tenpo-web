@@ -75,6 +75,37 @@ const HANDOFF=(()=>{
  }
  return Object.freeze({pack,parse});
 })();
+/* TENPO/START — same-origin handoff. No account, ad identifier or network. */
+const LP_BRIDGE=(()=>{
+ const KEY='tenpo-start:lp-handoff:v1';
+ const ENABLED=false; // only change with explicit release approval, on both surfaces
+ const loopback=l=>['localhost','127.0.0.1','[::1]'].includes(l.hostname)&&l.protocol==='http:';
+ const production=l=>l.origin==='https://start.tenpo-os.com';
+ function destination(l){
+  const q=new URLSearchParams(l.search);
+  if(loopback(l)&&q.get('bridge')==='preview')return '/app-preview.html?from=lp';
+  if(ENABLED&&production(l)&&/^\/lp\/?$/.test(l.pathname))return '/?from=lp';
+  return null;
+ }
+ function accepts(l){
+  if(new URLSearchParams(l.search).get('from')!=='lp')return false;
+  return (loopback(l)&&l.pathname==='/app-preview.html')||(ENABLED&&production(l)&&l.pathname==='/');
+ }
+ function put(storage,packet,parse,now=Date.now()){
+  const p=parse(packet,now);if(!p)return false;
+  try{storage.setItem(KEY,JSON.stringify(p));return true}catch(e){return false}
+ }
+ function clear(storage){try{storage.removeItem(KEY)}catch(e){}}
+ function take(storage,parse,now=Date.now()){
+  try{const raw=storage.getItem(KEY);if(raw==null)return null;
+   const p=raw.length<=12000?parse(JSON.parse(raw),now):null;
+   if(!p)clear(storage);return p;
+  }catch(e){clear(storage);return null}
+ }
+ return Object.freeze({KEY,destination,accepts,put,take,clear});
+})();
+
+
 const transfer=$('transfer'),transferBody=$('transfer-body');let previewPacket=null,transferOrigin=null;
 function packet(){return HANDOFF.pack(tool,stage,stagePicked,state[tool],entered,checked[tool]||new Set())}
 function tfButton(t,action,secondary=false){const b=node('button',t,secondary?'transfer-ghost':'button');b.type='button';b.onclick=action;return b}
@@ -83,9 +114,9 @@ function tfStage(p){return p.stage?ST.find(s=>s.id===p.stage).label:'未選択�
 function tfReview(){const p=packet();transferBody.replaceChildren();$('transfer-title').textContent='入力した内容を確認';if(!p){transferBody.append(node('p','入力した数字を確認してください。','transfer-hint'),tfButton('試算に戻る',()=>transfer.close(),true));return}
  const changed=Object.keys(p.values).length+p.checks.length;const ctx=node('div','','transfer-context');ctx.append(node('p','開業段階：'+tfStage(p)),node('p','続けたいこと：'+TOOLS[p.tool][0]));
  transferBody.append(node('div','1 / 2　引き継ぎ確認','transfer-step'),node('h3','入力した数字から、続きを考える。'),ctx,node('div',changed+'件の入力・確認候補','transfer-meta'),tfRows(p),node('p','仮の数字や、実際の手続きが済んだかどうかは本体で確認します。','transfer-hint'));
- const confirm=tfButton('引き継いで続ける（確認版） ›',()=>{previewPacket=HANDOFF.parse(p);if(previewPacket)tfReceiver(previewPacket);else tfReview()});confirm.id='transfer-confirm';
+ const destination=LP_BRIDGE.destination(location);const confirm=tfButton(destination?'引き継いで続ける ›':'引き継いで続ける（確認版） ›',()=>{previewPacket=HANDOFF.parse(p);if(!previewPacket){tfReview();return}if(!destination){tfReceiver(previewPacket);return}let ok=false;try{ok=LP_BRIDGE.put(sessionStorage,previewPacket,HANDOFF.parse)}catch(e){}if(ok){location.assign(destination);return}const err=node('p','このブラウザでは引き継ぎできませんでした。入力はここに残っています。','transfer-notice');transferBody.append(err)});confirm.id='transfer-confirm';
  const pub=node('a','公開アプリを開く（入力は引き継ぎません）','transfer-ghost');pub.href='https://start.tenpo-os.com/';pub.rel='noreferrer';
- transferBody.append(confirm,tfButton('数字を直す',()=>transfer.close(),true),pub,node('p','これは接続確認用の画面です。まだ公開アプリには接続していません。','transfer-notice'));
+ transferBody.append(confirm,tfButton('数字を直す',()=>transfer.close(),true),pub,node('p',destination?'同じタブで入力候補を一時的に引き継ぎます。計画は自動更新しません。':'これは接続確認用の画面です。まだ公開アプリには接続していません。','transfer-notice'));
 }
 function tfReceiver(p){$('transfer-title').textContent='引き継ぎ先の確認版';transferBody.replaceChildren();const ctx=node('div','','transfer-summary');ctx.append(node('p','開業段階：'+tfStage(p)),node('p','案内する機能：'+TOOLS[p.tool][0]),tfRows(p));
  transferBody.append(node('div','2 / 2　アプリ側の受け取りイメージ','transfer-step'),node('div','入力候補を受け取りました（確認版）','transfer-ok'),ctx,node('p','本体では初回5問のうち未回答の項目を確認してから計画を作成します。すでに計画がある場合は自動上書きしません。','transfer-hint'),tfButton('この確認を終了してLPに戻る',()=>transfer.close()),tfButton('引き継ぎの内容を確認し直す',tfReview,true),node('p','この画面は本体の実画面ではありません。入力は送信・保存されていません。','transfer-notice'));
