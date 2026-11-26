@@ -45,7 +45,6 @@ button{font:inherit;color:inherit;cursor:pointer}input{font:inherit}
 .plj{align-self:flex-start;font-size:12.5px;font-weight:700;border-radius:6px;padding:3px 8px;background:var(--lime2);color:var(--green);line-height:1.5}.plj.mid{background:#F6EBD2;color:#7a5a0e}.plj.ng{background:#FBEDE6;color:#9a4c22}.plj.now{background:#EEEBE4;color:#4F5751}
 .plb{display:flex;flex-direction:column;gap:8px;margin:12px 0}.plb .btn{margin:0;display:flex;align-items:center;justify-content:center;gap:8px}.mgp{margin-top:14px}.mgt{font-size:13px;font-weight:700;color:var(--sub);margin:0 4px 6px}
 .hask{margin-left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:56px;height:44px;padding:0;border:0;border-radius:12px;background:var(--green);color:#fff;font:inherit;font-size:10px;font-weight:700;flex:none;line-height:1}.hask+.hbtn{margin-left:6px}
-@media (max-width:420px){header.top img.lgi{max-width:96px}header.top .hstg{padding:5px 8px;margin-right:6px}}@media (max-width:380px){header.top img.lgi{max-width:84px}header.top .hstg b{font-size:12.5px}header.top .hstg{margin-right:4px}.hask+.hbtn{margin-left:4px}}
 .wrap{padding:14px 14px 0}
 .hero{background:var(--green);color:#fff;border-radius:18px;padding:20px 18px 18px}
 .hero .k{font-size:12px;opacity:.85}.hero h1{font-size:21px;line-height:1.45;margin:6px 0 8px}.hero p{margin:0;font-size:13px;line-height:1.7;opacity:.92}
@@ -1345,12 +1344,13 @@ function placeTab(){const s=st(),pp=s.pp||[],g=stgOf();
 function moreTab(){const s=st(),L=x=>(s[x]||[]).length,food=cur!=='c';
  const grp=(t,rows)=>`<div class="mgp"><p class="mgt">${t}</p><div class="card">${rows}</div></div>`;
  return `<div class="hmp"><h1>その他</h1><p>開店までの準備や、あとで使う物をまとめています。</p></div>
+ <div class="card">${hrow('ask','事務局に相談する','開業のことを、LINEで聞けます（無料）','data-tab="ask"')}</div>
  ${grp('開店までの準備',(food?hrow('ans','メニューとレシピ','売値と材料費から、原価率が出ます','data-x="recipe"',L('rc')?L('rc')+'品':''):hrow('yen','料金','1回の料金を見る・直す','data-edit="price"'))
   +hrow('people','採用','人手 → 募集 → 応募者','data-x="hire"',L('ap')?L('ap')+'人':'')+hrow('yen','買う物リスト','機器・家具・備品の予算と実際','data-tl="tool:buy"',L('buy')?L('buy')+'件':'')
   +hrow('ans','GoogleとInstagramの紹介文','紹介文ができます','data-sv="web"')+hrow('ans','ロゴ・メニュー・看板の依頼','依頼の文ができます','data-sv="design"')+hrow('flag','プレオープンの段取り','日・呼ぶ人・試すこと・直す所','data-tl="tool:pre"'))}
  ${grp('人とお金のやり取り',hrow('who','連絡先と、やり取り','だれに何を頼んでいるか','data-tl="tool:ct"',L('ct')?L('ct')+'件':'')+hrow('who','頼むときの文','内装会社・公庫・税理士・募集など','data-svl="1"')+hrow('yen','公庫に出す計画の下書き','入れた内容から、下書きができます','data-sv="kouko"')+hrow('yen','税理士への相談','相談の文ができます','data-sv="zeiri"'))}
  ${grp('開店したあと',hrow('chart','最初の1か月の振り返り','実際の数字と計画の違いを見る','data-actsh="1"')+hrow('flag','開店したあとへ','引き継げる内容','data-tl="tool:os"'))}
- ${grp('あなたとこのアプリ',hrow('ans','ヒアリングの答えを見る・直す','直しても、入れた内容は残ります','data-ivopen="1"')+hrow('check','このアプリでできること','画面ごとの使い方','data-tl="guide:"')+hrow('ask','開業の相談','LINEで相談できます（無料）','data-tab="ask"')+hrow('ask','不具合・改善要望','事務局に送る・返事を見る','data-report-open'))}`}
+ ${grp('あなたとこのアプリ',hrow('ans','ヒアリングの答えを見る・直す','直しても、入れた内容は残ります','data-ivopen="1"')+hrow('check','このアプリでできること','画面ごとの使い方','data-tl="guide:"')+hrow('ask','不具合・改善要望','事務局に送る・返事を見る','data-report-open'))}`}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ppopen]');if(!b)return;const s=st();s._ppOpen=b.dataset.ppopen;ppSheet()});
 
 /* ===== シート ===== */
@@ -2525,8 +2525,8 @@ document.addEventListener('click',e=>{let b=e.target.closest('[data-stg]');if(b)
 });
 document.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.hmo){st().hmo=e.target.open;save()}},true);
 
-function homeTab(){/* 2026-11-26 9つの索引（ほかの準備）はタブと「その他」へ移した。相談はヘッダー右上 */
- return `${stgTop()}${backCard()}`}
+function homeTab(){/* 2026-11-26 9つの索引（ほかの準備）はタブと「その他」へ移した。相談はホームの一番下と「その他」の一番上（ヘッダーには置かない） */
+ return `${stgTop()}${backCard()}<div class="card hmask">${hrow('ask','事務局に相談する','迷った時は、LINEで聞けます（無料）','data-tab="ask"')}</div>`}
 function hrow(icn,t,d,attr,tag){return `<button class="nrow" ${attr}><span class="nic">${ic(icn,18)}</span><span class="nt2"><b>${t}</b><small>${d}</small></span>${tag?`<em class="pl">${tag}</em>`:''}<em>›</em></button>`}
 /* 続けていけるか：見た家賃から、1日に要る人数を出す。差と、埋める道を見せる */
 function viaMain(){const s=st();if(cur==='b')return `<div class="card"><h2>${ic('chart')}計画の数字から見ます</h2><p class="lead">いまのお店の数字をもとに、家賃を払う前に残る額を出しています。</p><button class="btn ghost" data-tab="plan">計画を見る</button></div>`;
@@ -3295,7 +3295,7 @@ function planTop(v){if(cur==='b')return planTopB(v);
 
 /* 2026-11-23 ヘッダー：業態と日付をやめ、店名と開店までの日数（押すと直せる） */
 function header(sub,title){const g=stgOf();
- return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階 ${STG.findIndex(x=>x[0]===g)+1}/${STG.length}</small><b>${STGL[g]} ›</b></button><button class="hask" data-tab="ask" aria-label="事務局にLINEで相談する">${ic('ask',17)}<span>開業の相談</span></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
+ return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階 ${STG.findIndex(x=>x[0]===g)+1}/${STG.length}</small><b>${STGL[g]} ›</b></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
 
 
 /* 2026-11-23 見直し：考える物件をアプリ全体で1つに保つ */
