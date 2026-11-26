@@ -2517,11 +2517,11 @@ document.addEventListener('click',e=>{let b=e.target.closest('[data-stg]');if(b)
  b=e.target.closest('[data-stgset]');if(b){const g=b.dataset.stgset;closeSheet();stgSet(g,'you');toast(`段階を「${STGL[g]}」にしました`);return}
  b=e.target.closest('[data-stga]');if(b){applySheet();return}
  b=e.target.closest('[data-appre]');if(b){const s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(!p)return;p.pre=p.pre||{};p.pre[b.dataset.appre]=!p.pre[b.dataset.appre];save();const sh=document.getElementById('sheet'),sc=sh.scrollTop;applySheet();document.getElementById('sheet').scrollTop=sc;return}
- b=e.target.closest('[data-stgap]');if(b){const s=st(),p=(s.pp||[]).find(x=>x.id===b.dataset.stgap);if(!p)return;s.pick=p.id;s.rentSeen=p.rent;delete s._noPick;log(`「${esc(p.n)}」に申し込むことにした`);stgSet('apply','you');
-  openSheet(`<h3>物件が決まりそうですね</h3><p class="shl">ここからは、契約の前に確かめることと、お金の見通しが中心です。ホームの並びを入れ替えました。ほかの準備は、ホームの「ほかの準備」から、いつでも開けます。</p><button class="btn dark" data-stga="1">契約の前に確かめることを見る</button><button class="btn ghost" data-act="close">あとで</button>`);return}
- b=e.target.closest('[data-stgmv]');if(b){const g=b.dataset.stgmv,s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(g==='contract'){if(p)log(`「${esc(p.n)}」を契約した`);stgSet('contract','you');
-   openSheet(`<h3>物件が決まりましたね</h3><p class="shl">大きな判断でした。ここからは、手続き・工事・支払いの予定が中心です。ホームの並びを入れ替えました。決めたことは「ここまでの歩み」に残っています。</p><button class="btn dark" data-tab="road">やることを見る</button><button class="btn ghost" data-act="close">ホームへ</button>`)}
-  else{closeSheet();stgSet(g,'you');toast(`段階を「${STGL[g]}」に戻しました`)}return}
+ b=e.target.closest('[data-stgap]');if(b){const s=st(),p=(s.pp||[]).find(x=>x.id===b.dataset.stgap);if(!p)return;s.pick=p.id;s.rentSeen=p.rent;delete s._noPick;log(`「${esc(p.n)}」に申し込むことにした`);save();render();/* 2026-11-26 段階はヘッダーからだけ変える */
+  openSheet(`<h3>「${esc(p.n)}」に申し込むことにしました</h3><p class="shl">お金の計算も、この物件で見ます。段階を「物件が決まりそう」にする時は、上の「いまの段階」から変えてください。</p><button class="btn dark" data-stga="1">契約の前に確かめることを見る</button><button class="btn ghost" data-act="close">あとで</button>`);return}
+ b=e.target.closest('[data-stgmv]');if(b){const g=b.dataset.stgmv,s=st(),p=(s.pp||[]).find(x=>x.id===s.pick);if(g==='contract'){if(p)log(`「${esc(p.n)}」を契約した`);save();render();
+   openSheet(`<h3>契約しましたね</h3><p class="shl">大きな判断でした。決めたことは「ここまでの歩み」に残っています。段階を「物件が決まった」にする時は、上の「いまの段階」から変えてください。手続き・工事・支払いの予定が前に出ます。</p><button class="btn dark" data-stg="1">段階を変える</button><button class="btn ghost" data-act="close">あとで</button>`)}
+  else{if(p)log(`「${esc(p.n)}」の申し込みをやめた`);delete s.pick;save();closeSheet();render();toast('申し込みをやめました。段階は、上の「いまの段階」から戻せます')}return}
 });
 document.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.hmo){st().hmo=e.target.open;save()}},true);
 
@@ -3669,7 +3669,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-mscam]');i
 <script>
 const startDesk = TenpoAsk.mount({
  store:"TENPO/START",storeKey:"tenpo-start",app:"テンポスタート",appId:"start",version:"20261126",
- clientKey:"tenpo.start.voice.client",news:false,api:ACC,help:guideSheet,show:()=>Boolean(ivMode()),
+ clientKey:"tenpo.start.voice.client",news:false,api:ACC,help:guideSheet,compact:true,show:()=>true,/* 2026-11-26 松尾さん：右側の改善ボタンは、どの画面でも出す */
  screen:()=>ivMode() ? "初回ヒアリング" : (TABS.find(([key])=>key===st().tab)?.[1] || (st().tab==="ask" ? "開業の相談" : "ホーム"))
 });
 document.addEventListener("click",event=>{
