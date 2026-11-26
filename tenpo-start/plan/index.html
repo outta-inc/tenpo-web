@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="description" content="お店を始める人の、無料の開業支援。答えから最初の計画ができ、次に確かめることが1つずつ分かります。">
-<link rel="icon" type="image/svg+xml" href="./icon.svg">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="./icon.svg?v=1126b">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=1126b">
 <link rel="canonical" href="https://start.tenpo-os.com/">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="TENPO/START">
@@ -516,6 +516,9 @@ div.frow{min-height:44px;padding:8px 0;border-top:1px solid var(--line);font-siz
 
 .toast{white-space:normal;width:max-content;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;border-radius:18px}
 @media (min-width:900px){.toast{max-width:min(560px,calc(100vw - 260px))}}
+
+/* LP_RECEIPT CSS (gated candidate) */
+.lp-receipt{border-color:#e6e0d0;background:#f4eedb;margin:0 0 12px;padding:14px 16px}.lp-receipt summary{cursor:pointer;font-weight:700;color:#185534;min-height:44px;padding:10px 0}.lp-receipt-sub{font-size:12px;line-height:1.65;color:#5d6862;margin:6px 0}.lp-receipt-row{display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #e6e0d0;padding:8px 0;font-size:13px}.lp-receipt-row b{text-align:right;overflow-wrap:anywhere}.lp-receipt-actions{display:grid;gap:8px}.lp-receipt .btn,.lp-receipt .lk{min-height:44px}.lp-receipt .btn{width:100%;white-space:normal}.lp-receipt .lk{margin-top:8px}
 </style>
 </head>
 <body>
@@ -3178,6 +3181,140 @@ function pickSync(){const s=st(),pp=s.pp||[];if(s.stg==='idea'&&s.stgBy!=='you'&
 document.addEventListener('click',e=>{const b=e.target.closest('[data-mscam]');if(!b)return;e.preventDefault();let i=document.getElementById('ms_g');
  if(!i){i=document.createElement('input');i.type='file';i.accept='image/*,application/pdf';i.multiple=true;i.hidden=true;i.id='ms_g';document.body.appendChild(i);i.onchange=ev=>{const f=[...ev.target.files].slice(0,3);i.value='';msStart(f)}}
  i.click()},true);
+
+/* BEGIN: LP handoff candidate (PR #53; disabled in production) */
+(()=>{
+const HANDOFF=(()=>{
+ const stages=['idea','search','apply','contract','prep','open'];
+ const tools=['sales','property','capital','review','check','contractCheck'];
+ const schema={sales:{price:[0,100000,'yen'],guests:[0,10000,'integer'],days:[0,31,'integer']},property:{rent:[0,100000000,'yen'],price:[0,100000,'yen'],days:[0,31,'integer'],guests:[0,10000,'integer'],rate:[0,100,'percent'],fixed:[0,100000000,'yen'],owner:[0,100000000,'yen']},capital:{property:[0,100000000,'yen'],build:[0,100000000,'yen'],equip:[0,100000000,'yen'],other:[0,100000000,'yen'],reserve:[0,100000000,'yen'],own:[0,100000000,'yen']},review:{planned:[0,100000000,'yen'],actual:[0,100000000,'yen']},check:{},contractCheck:{}};
+ const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k), obj=o=>o!==null&&typeof o==='object'&&!Array.isArray(o), keys=(o,allowed)=>Object.keys(o).every(k=>allowed.includes(k));
+ function parse(raw,now=Date.now()){
+  if(!obj(raw)||!keys(raw,['version','createdAt','stage','tool','values','checks'])||Object.keys(raw).length!==6||raw.version!==1||!Number.isSafeInteger(raw.createdAt)||raw.createdAt>now+5000||now-raw.createdAt>1800000||!(raw.stage===null||stages.includes(raw.stage))||!tools.includes(raw.tool)||!obj(raw.values)||!Array.isArray(raw.checks))return null;
+  const rule=schema[raw.tool],values=Object.create(null);
+  for(const [k,v] of Object.entries(raw.values)){if(!own(rule,k)||!Number.isFinite(v)||v<rule[k][0]||v>rule[k][1]||(rule[k][2]!=='percent'&&!Number.isSafeInteger(v)))return null;values[k]=v}
+  const isCheck=raw.tool==='check'||raw.tool==='contractCheck';
+  if(raw.checks.length>5||new Set(raw.checks).size!==raw.checks.length||raw.checks.some(v=>!Number.isInteger(v)||v<0||v>=5)||(!isCheck&&raw.checks.length))return null;
+  return {version:1,createdAt:raw.createdAt,stage:raw.stage,tool:raw.tool,values,checks:raw.checks.slice()};
+ }
+ function pack(t,st,picked,values,touched,checks,now=Date.now()){
+  if(!tools.includes(t))return null;const isCheck=t==='check'||t==='contractCheck',out=Object.create(null);
+  if(!isCheck)for(const [k,rule] of Object.entries(schema[t]))if(touched.has(t+'.'+k)&&Number.isFinite(values?.[k])){const v=values[k],isMan=rule[2]==='yen'&&!(k==='price');const normalized=isMan?Math.round(v*10000):v;if(Number.isFinite(normalized))out[k]=normalized}
+  return parse({version:1,createdAt:now,stage:picked?st:null,tool:t,values:out,checks:isCheck?[...checks].sort((a,b)=>a-b):[]},now);
+ }
+ return Object.freeze({pack,parse});
+})();
+
+const LP_BRIDGE=(()=>{
+ const KEY='tenpo-start:lp-handoff:v1';
+ const ENABLED=false; // only change with explicit release approval, on both surfaces
+ const loopback=l=>['localhost','127.0.0.1','[::1]'].includes(l.hostname)&&l.protocol==='http:';
+ const production=l=>l.origin==='https://start.tenpo-os.com';
+ function destination(l){
+  const q=new URLSearchParams(l.search);
+  if(loopback(l)&&q.get('bridge')==='preview')return '/app-preview.html?from=lp';
+  if(ENABLED&&production(l)&&/^\/lp\/?$/.test(l.pathname))return '/?from=lp';
+  return null;
+ }
+ function accepts(l){
+  if(new URLSearchParams(l.search).get('from')!=='lp')return false;
+  return (loopback(l)&&l.pathname==='/app-preview.html')||(ENABLED&&production(l)&&l.pathname==='/');
+ }
+ function put(storage,packet,parse,now=Date.now()){
+  const p=parse(packet,now);if(!p)return false;
+  try{storage.setItem(KEY,JSON.stringify(p));return true}catch(e){return false}
+ }
+ function clear(storage){try{storage.removeItem(KEY)}catch(e){}}
+ function take(storage,parse,now=Date.now()){
+  try{const raw=storage.getItem(KEY);if(raw==null)return null;
+   const p=raw.length<=12000?parse(JSON.parse(raw),now):null;
+   if(!p)clear(storage);return p;
+  }catch(e){clear(storage);return null}
+ }
+ return Object.freeze({KEY,destination,accepts,put,take,clear});
+})();
+
+const LP_RECEIVER=(()=>{
+ const ST={idea:'構想中',search:'物件を探している',apply:'物件が決まりそう',contract:'物件が決まった',prep:'開店の準備中',open:'開店した'};
+ const TOOL={sales:'売上試算',property:'物件の採算判断',capital:'開業資金',review:'開店後の振り返り',check:'開店前の準備',contractCheck:'契約前の確認'};
+ const LABEL={price:'客単価',guests:'1日の想定客数',days:'月の営業日',rent:'月の家賃',rate:'変動費率（合計）',fixed:'家賃以外の固定費',owner:'手元に残したい額',property:'物件費用',build:'内装・工事',equip:'機器・備品',other:'開店前のその他費用',reserve:'続けるためのお金（総額）',own:'自己資金',planned:'計画した月売上',actual:'実際の月売上'};
+ function display(k,v){return k==='guests'?v+'人':k==='days'?v+'日':k==='rate'?v+'%':v.toLocaleString('ja-JP')+'円'}
+ function has(p,k){return Object.prototype.hasOwnProperty.call(p.values,k)}
+ function empty(input){return !!input&&!input.disabled&&String(input.value).trim()===''}
+ function fill(input,value){if(!empty(input))return false;input.value=String(value);input.dispatchEvent(new Event('input',{bubbles:true}));return true}
+ function install({doc,root,packet,parse,storage,bridge,protectedAtEntry,protectedNow,priceFields,canOpenRent,openRent}){
+  if(!root||!packet)return null;
+  let active=true,expanded=false,observer=null;
+  const guarded=()=>protectedAtEntry||protectedNow();
+  const el=(t,txt='',cls='')=>{const n=doc.createElement(t);n.textContent=txt;if(cls)n.className=cls;return n};
+  function dismiss(){active=false;bridge.clear(storage);observer?.disconnect();doc.getElementById('lp-receipt')?.remove()}
+  function current(){const p=parse(packet);if(!p){dismiss();return null}return p}
+  function actions(p){const box=el('div','','lp-receipt-actions');
+   if(guarded())return box;
+   if(has(p,'price')&&p.values.price>0)for(const item of priceFields())if(empty(item.input)){
+    const b=el('button','客単価 '+display('price',p.values.price)+(item.label?'を'+item.label+'に':'を')+'入れる','btn ghost');b.type='button';b.onclick=()=>{if(current()&&!guarded()&&priceFields().some(x=>x.input===item.input)&&fill(item.input,p.values.price)){b.disabled=true;b.textContent='入力しました。内容を確認して次へ'}};box.append(b);
+   }
+   if(has(p,'rent')&&p.values.rent>0&&canOpenRent()){
+    const b=el('button','家賃 '+display('rent',p.values.rent)+'で試す','btn ghost');b.type='button';b.onclick=()=>{if(!current()||guarded()||!canOpenRent())return;const input=openRent();if(input&&fill(input,p.values.rent/10000))input.focus()};box.append(b);
+   }return box;
+  }
+  function draw(){if(!active||doc.getElementById('lp-receipt'))return;const p=current();if(!p)return;const target=root.querySelector('.wrap')||root;if(!target.children.length)return;
+   const section=el('section','','card lp-receipt');section.id='lp-receipt';section.setAttribute('aria-label','LPの試算メモ');const details=el('details');details.open=expanded;details.addEventListener('toggle',()=>{expanded=details.open});
+   const summary=el('summary','LPの試算メモを持ってきました'+(Object.keys(p.values).length+p.checks.length?'（'+(Object.keys(p.values).length+p.checks.length)+'件）':''));details.append(summary);
+   details.append(el('p',TOOL[p.tool]+(p.stage?' ／ '+ST[p.stage]:''),'lp-receipt-sub'));
+   const rows=el('div','','lp-receipt-rows');for(const [k,v] of Object.entries(p.values)){const row=el('div','','lp-receipt-row');row.append(el('span',LABEL[k]),el('b',display(k,v)));rows.append(row)}
+   if(p.checks.length)rows.append(el('p','確認候補 '+p.checks.length+'件（実際に済んだ項目とは別です）','lp-receipt-sub'));
+   if(!rows.children.length)rows.append(el('p','入力済みの数字はありません。仮の数字は引き継いでいません。','lp-receipt-sub'));
+   details.append(rows,el('p',guarded()?'今の計画は変えません。試算は参考として見られます。':'必要な数字を、対応する画面で確認しながら使えます。','lp-receipt-sub'));
+   const close=el('button','試算メモを閉じる','lk');close.type='button';close.onclick=dismiss;details.append(close);section.append(details,actions(p));target.prepend(section);
+  }
+  observer=new MutationObserver(draw);observer.observe(root,{childList:true});draw();
+  return Object.freeze({draw,dismiss});
+ }
+ return Object.freeze({install,fill,empty,display});
+})();
+/* LP_HANDOFF_ADAPTER: start; gated off in production until accepted. */
+(function(){
+ if(!PUB||!LP_BRIDGE.accepts(location))return;
+ try {
+  const store=sessionStorage, packet=LP_BRIDGE.take(store,HANDOFF.parse);
+  if(!packet)return;
+  // Any previous local plan, interview, login, corrupt storage or pending account sync is protected.
+  // The ordinary app creates its blank state in the queued first render, after this snapshot.
+  function authOrStorageUnknown(){
+   try{return localStorage.getItem('tenpo-start-auth')!==null||!!(S._acc||S._accP||ACCU)||!!SBP}catch(e){return true}
+  }
+  let prior=true;
+  try{prior=localStorage.getItem(KEY)!==null||localStorage.getItem(IV.STORAGE_KEY)!==null||!!(S._u||S._uOld||S._ivDone||IVERR)||Object.keys(IVS.answers||{}).length>0||authOrStorageUnknown()}catch(e){}
+  let otherTab=false;
+  window.addEventListener('storage',e=>{if(e.key===null||[KEY,IV.STORAGE_KEY,'tenpo-start-auth'].includes(e.key))otherTab=true});
+  const guarded=()=>otherTab||authOrStorageUnknown()||!!IVERR;
+  const noOverlay=()=>!document.querySelector('#sheet.on');
+  const priceFields=()=>{
+    // LP uses per-visit customer spend. Never populate an unrelated model, membership or other question.
+    if(!noOverlay()||S._iv?.mode!=='q'||S._iv?.qid!=='averageSpendYen'||S._iv?.edit||IV.modelOf(IVS)!=='seated'||IV.isMonthly(IVS))return [];
+    const q=IV.questionsFor(IVS).find(x=>x.id==='averageSpendYen');
+    if(!q||!(packet.values.price>0)||packet.values.price<q.min||(q.max!==undefined&&packet.values.price>q.max))return [];
+    const dual=IV.questionsFor(IVS).some(x=>x.id==='secondSpendYen');
+    const items=[{input:document.querySelector('#app [data-ivi="v"]'),label:dual?'夜':''}];
+    if(dual)items.push({input:document.querySelector('#app [data-ivi="v2"]'),label:'昼'});
+    return items.filter((x,i)=>!(IVS.answers[i?'secondSpendYen':'averageSpendYen']?.value!=null)&&x.input);
+  };
+  const canOpenRent=()=>{
+   const z=S[cur];
+   return !!(S._u&&z&&!ivMode()&&noOverlay()&&!z.pick&&!z.rentSeen&&!(z.pp||[]).length&&packet.values.rent>0);
+  };
+  const openRent=()=>{
+   if(!canOpenRent())return null;
+   rentSheet();return document.getElementById('rs_v');
+  };
+  const root=document.getElementById('app');
+  LP_RECEIVER.install({doc:document,root,packet,parse:HANDOFF.parse,storage:store,bridge:LP_BRIDGE,protectedAtEntry:prior,protectedNow:guarded,priceFields,canOpenRent,openRent});
+ }catch(e){ /* A handoff error must never block the existing app. */ }
+})();
+/* LP_HANDOFF_ADAPTER: end */
+})();
+/* END: LP handoff candidate */
 </script>
 </body>
 </html>
