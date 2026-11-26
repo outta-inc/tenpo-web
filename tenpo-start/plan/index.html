@@ -1759,13 +1759,20 @@ return {VERSION,CATEGORIES,BUSINESSES,CAT_NOW,categoryOf,UNIT_WORDS,DAYS,WEEK_PR
 /*IV:END*/
 /* ===== 公開用：ヒアリング（質問の文・順番・分岐は interview-src/questions.mjs が正。ここは画面と、計画への受け渡し） ===== */
 let IVS=null,IVNOTE=null,IVERR=null,IVRAW=null;
-const IVL={schedule:'営業する曜日と時間帯',secondSpendYen:'もう一方の時間帯の金額',otherBand:'もう一方の時間帯',existingGuestsPerDay:'今のお店の1日のお客さん',existingSeats:'今のお店の席数',existingDaysPerMonth:'今のお店の営業日',existingCostRatePct:'今のお店の原価率',selfWork:'自分も働くか',openingWhen:'開きたい時期',category:'お店の種類',businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
+const IVL={feeModel:'料金の受け取り方',schedule:'営業する曜日と時間帯',secondSpendYen:'もう一方の時間帯の金額',otherBand:'もう一方の時間帯',existingGuestsPerDay:'今のお店の1日のお客さん',existingSeats:'今のお店の席数',existingDaysPerMonth:'今のお店の営業日',existingCostRatePct:'今のお店の原価率',selfWork:'自分も働くか',openingWhen:'開きたい時期',category:'お店の種類',businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
  averageSpendYen:{d:'1人が1回に使う金額',takeaway:'1回の会計の金額',salon:'中心のメニューの料金'},serviceMinutes:'施術時間',peakStaff:{d:'混む時間の人数',salon:'同時に施術する人数'},propertyStage:'物件探し',priorities:'大切にしたいこと・調整できること',
  openingTarget:'開きたい時期',area:'エリア',businessHours:'営業したい時間',workingHours:'仕事に使える時間',daysOffPerWeek:'休み（週）',operators:'運営する人',helperHoursPerDay:'補助を頼む時間（1日）',
  ownFundsYen:'自分で用意できるお金',desiredMonthlyTakeHomeYen:'毎月、あなたの生活に要る額',worry:'いちばん気になっていること',shopName:'店名',motive:'お店を始めたい理由',guestsPerDay:{d:'1日に来てほしい人数',takeaway:'1日の会計の数',salon:'1日の予約の数'},candidateRentYen:'気になる物件の家賃',borrowPlan:'お金を借りる予定',existingEvidence:'今の店で確かめたこと'};
 const ivNow=()=>new Date().toISOString();
 const ivModel=()=>IV.modelOf(IVS);
-const ivLabel=id=>{const L=IVL[id];return typeof L==='string'?L:(L[ivModel()]||L.d)};
+const ivLabel=id=>{
+ const words=IV.wordsOf(IVS);
+ if(id==='capacity'&&words.capShort)return words.capShort;
+ if(id==='averageSpendYen'&&words.priceShort)return words.priceShort;
+ const label=IVL[id];
+ if(!label)return IV.ALL.find(q=>q.id===id)?.label||'質問';
+ return typeof label==='string'?label:(label[ivModel()]||label.d);
+};
 const ivIsCore=id=>IV.CORE.some(q=>q.id===id);
 const ivTag=a=>a.status==='answered'?'<span class="tag ok">確かめた</span>':a.status==='provisional'?'<span class="tag ans">仮</span>':'';
 function ivWeekTxt(v){const z=IV.weekStats(v);return z?`営業 週${z.days}日・昼 週${z.l}回・夜 週${z.d}回・あなたが立つ 週${z.me}回`:null}
