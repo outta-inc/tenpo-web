@@ -241,6 +241,8 @@ body.pub{background:var(--bg)}body.pub .top{top:0}
 .sheet{max-height:88dvh;padding-bottom:calc(28px + env(safe-area-inset-bottom));overscroll-behavior:contain}
 .toast{bottom:calc(88px + env(safe-area-inset-bottom))}
 body.lock{overflow:hidden}
+/* 2026-11-26 シートが開いている間、後ろのページが動いてSafariのバーが縮まないように（縮むと、シートの下にすき間が出た） */
+html:has(body.lock){overflow:hidden;overscroll-behavior:none}.mask{touch-action:none}
 .fade{animation:f .35s ease}@keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .tdc{width:30px;height:30px;border-radius:50%;border:2px solid #c9cdc8;background:#fff;flex:none;padding:0;position:relative}.tdc.done{background:var(--green);border-color:var(--green)}.tdc.done::after{content:"";position:absolute;left:10px;top:5px;width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}.tdc.wait{border-color:var(--tmp);border-style:dashed}.tdc.doing{border-color:var(--green)}
 .tdg{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;color:var(--sub);margin:18px 0 2px}.tdg small{font-weight:500}.tdx{background:var(--lime2);border-radius:12px;padding:10px 12px;margin:12px 0;font-size:13px;line-height:1.7}.tdx .wl{display:flex;gap:6px;align-items:flex-start}.tdx .btn{margin-top:8px;display:flex;width:100%;justify-content:center}.tdx .sr{display:block}.tdf summary{font-size:13px;color:var(--sub);padding:10px 0;min-height:44px;display:flex;align-items:center;cursor:pointer}.shf0{margin-top:16px}
@@ -471,7 +473,7 @@ button.frow{min-height:44px}
 .nsf input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:28px;font-weight:800;background:none;color:var(--ink)}
 .nsf span{font-size:14px;color:var(--sub)}
 .nse{background:var(--lime2);border-radius:12px;padding:12px;margin-top:16px;font-size:13px;line-height:1.7}.nse:empty{display:none}.nse span{display:block;color:var(--sub);font-size:12px}.nse b{display:block}.nse em{font-style:normal;font-weight:700}.nse em.ng{color:var(--bad)}.nse em.ok{color:var(--ok)}
-.shf{position:sticky;bottom:0;background:#fff;margin:16px -20px 0;padding:12px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}.shf .btn{margin-top:0}
+.shf{position:sticky;bottom:0;background:#fff;margin:16px -20px 0;padding:12px 20px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}.shf .btn{margin-top:0}.shf{z-index:4}.shj{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}.shj button{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:0 12px;min-height:44px;font:inherit;font-size:13.5px;color:var(--ink)}.shf .btn+.btn,.shf .btn+.verdict{margin-top:8px}
 .sum2{background:var(--green);color:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin-top:12px}.sum2>div{flex:none}.sum2 small{display:block;font-size:11.5px;opacity:.85;white-space:nowrap}.sum2 b{font-size:22px;white-space:nowrap}.sum2>span{font-size:12px;line-height:1.55;opacity:.95;min-width:0}.sum2 em{font-style:normal;font-weight:700}.sum2 em.ok{color:#cfe9d4}.sum2 em.ng{color:#ffd9cf}
 .shn{display:flex;align-items:flex-end;gap:12px;margin:14px 2px 0}.shn>div{flex:1;min-width:0}.shn small{font-size:12px;color:var(--sub)}.shn h1{font-size:23px;margin:2px 0 0;line-height:1.35}
 
@@ -732,8 +734,8 @@ function recipeSheet(open){const s=st();s.rc=s.rc||[];const R=s.rc,ok=R.filter(x
  <div class="field"><label>材料と作り方（なくても足せます）</label><textarea id="rm" rows="2" placeholder="例：豆18g、牛乳200ml。"></textarea></div>
  <button class="btn ${can?'ghost':'dark'}" id="radd">この1品を足す</button>${R.length?'':'<button class="lk" id="rdemo">（試作用）例を3品入れる</button>'}</details></div>
  <div class="sec">${stp(2,'原価率',avg!=null?avg+'%':'—')}
- ${avg==null?'<p class="emp">1品入れると、ここに出ます。</p>':`<p class="shl" style="margin:0">${ok.length}品の平均です。${cr?`計画はいま ${cr.v}%（${SRC[cr.src]}）で計算しています。`:''}</p>${can?`<button class="btn dark" id="rcap">この${avg}%を計画に入れる</button>`:cr?`<p class="emp">あと${3-ok.length}品で、計画に入れられます。</p>`:''}`}</div>
- <p class="ftn">料理の写真は、フォルダの「メニュー・料理」に入れられます。</p>`);
+ ${avg==null?'<p class="emp">1品入れると、ここに出ます。</p>':`<p class="shl" style="margin:0">${ok.length}品の平均です。${cr?`計画はいま ${cr.v}%（${SRC[cr.src]}）で計算しています。`:''}</p>${can?'':cr?`<p class="emp">あと${3-ok.length}品で、計画に入れられます。</p>`:''}`}</div>
+ <p class="ftn">料理の写真は、フォルダの「メニュー・料理」に入れられます。</p>${avg!=null&&can?`<div class="shf"><button class="btn dark" id="rcap">この${avg}%を計画に入れる</button></div>`:''}`);
  const $=i=>document.getElementById(i),re=o=>{save();render();recipeSheet(o)};
  $('radd').onclick=()=>{const n=$('rn').value.trim(),p=+$('rp').value,c=+$('rc').value;if(!n||!(p>0)){toast('名前と売値を入れてください');return}R.push({n,price:p,cost:c||0,memo:$('rm').value.trim()});log(`レシピ「${esc(n)}」を足した`);re(R.length<3)};
  if($('rdemo'))$('rdemo').onclick=()=>{R.push({n:'温かいサンドイッチ',price:850,cost:280,memo:'パンを焼く。具材を温める。盛り付ける。'},{n:'ドリップコーヒー',price:500,cost:90,memo:'豆15g。'},{n:'カフェラテ',price:600,cost:150,memo:'豆18g、牛乳200ml。'});re()};
@@ -1218,10 +1220,10 @@ function svBtn(id){const s=st();s.sv=s.sv||{};const v=SERV[id],[f,n]=bCount(id);
 function svSheet(id){const s=st();s.sv=s.sv||{};const v=SERV[id],b=brief(id),[f,n]=bCount(id),txt=mailText(id);
  openSheet(`<h3>${ic(v.icon)}${v.t}</h3>
  <div class="kpi" style="margin-top:10px"><div class="kn">${f}<small>/${n}</small></div><div class="kb"><b>これまでに入れた情報から、できています</b>${pbar(f,n)}</div></div>
- ${b.map(([l,val,kk])=>`<button class="kr" ${kk&&!val?`data-brk="${kk}" data-bid="${id}"`:''}><span class="kl">${l}</span>${val?`<span class="kv">${esc(val)}</span>`:kk?`<span class="kadd">＋ 入れる</span>`:'<span class="small">—</span>'}</button>`).join('')}
+ ${f===n?`<details class="dt"><summary>入れた情報を見る（${n}つ）</summary>`:''}${b.map(([l,val,kk])=>`<button class="kr" ${kk&&!val?`data-brk="${kk}" data-bid="${id}"`:''}><span class="kl">${l}</span>${val?`<span class="kv">${esc(val)}</span>`:kk?`<span class="kadd">＋ 入れる</span>`:'<span class="small">—</span>'}</button>`).join('')}${f===n?'</details>':''}
  ${id==='os'?'':`<details class="dt" open><summary>${id==='kouko'?'下書きを見る':'依頼の文を見る'}</summary><div class="msg" id="svmsg">${esc(txt)}</div></details>`}
- ${v.copy?`<button class="btn dark" id="svcopy">${v.copy}</button>`:''}
- ${s.sv[id]?'<div class="verdict go">事務局に届いています。この内容がそのまま伝わっています。</div>':`<button class="btn ${v.copy?'':'dark'}" id="svgo">${v.ask}</button>`}
+ <div class="shf">${v.copy?`<button class="btn dark" id="svcopy">${v.copy}</button>`:''}
+ ${s.sv[id]?'<div class="verdict go">事務局に届いています。この内容がそのまま伝わっています。</div>':`<button class="btn ${v.copy?'':'dark'}" id="svgo">${v.ask}</button>`}</div>
  <p class="small" style="margin-top:8px">${FREE}</p>`);
  const c=document.getElementById('svcopy');if(c)c.onclick=()=>{log(`「${v.t}」の文をコピーした`);save();const done=()=>toast('コピーしました');const sel=()=>{const el=document.getElementById('svmsg'),r=document.createRange();r.selectNodeContents(el);const x=getSelection();x.removeAllRanges();x.addRange(r);toast('選択しました。コピーしてください')};
   try{navigator.clipboard.writeText(txt).then(done,sel)}catch(e){sel()}};
@@ -1283,7 +1285,33 @@ function openSheet(html){document.body.classList.add('lock');try{const hd=docume
  document.addEventListener('touchmove',e=>{if(y0==null)return;dy=Math.max(0,e.touches[0].clientY-y0);sh().style.transform=`translate(-50%,${dy}px)`},{passive:true});
  const end=()=>{if(y0==null)return;y0=null;const el=sh();el.style.transition='transform .18s ease-out';if(dy>90){el.style.transform='translate(-50%,100%)';setTimeout(()=>{closeSheet();el.style.transform='';el.style.transition=''},170)}else el.style.transform='';dy=0};
  document.addEventListener('touchend',end);document.addEventListener('touchcancel',end)})();
-function closeSheet(){document.body.classList.remove('lock');if(S[cur])delete S[cur]._ret;if(M&&M.t){clearInterval(M.t);M.t=null}document.getElementById('sheet').classList.remove('on');document.getElementById('mask').classList.remove('on')}
+function closeSheet(){document.body.classList.remove('lock');if(S[cur])delete S[cur]._ret;if(M&&M.t){clearInterval(M.t);M.t=null}const sh=document.getElementById('sheet');sh.classList.remove('on');sh.style.bottom='';sh.style.maxHeight='';document.getElementById('mask').classList.remove('on')}
+/* 2026-11-26 iPhoneでシートが上にずれる件：キーボードが出るとSafariが見える範囲だけを上へ動かすため、
+   下に付けたシートの題と×が画面の上に消え、閉じたあとは下にすき間が残った。見える範囲（visualViewport）に合わせて、
+   シートの下の端と高さを付け直す。キーボードが出ている間は、ヘッダーの分を空けずに見える範囲いっぱいまで使う */
+function shFit(){const sh=document.getElementById('sheet'),vv=window.visualViewport;if(!sh||!vv)return;
+ if(!sh.classList.contains('on')){sh.style.bottom='';sh.style.maxHeight='';return}
+ const H=window.innerHeight,low=H-(vv.offsetTop+vv.height),kb=vv.height<H-80;
+ if(low<1&&vv.offsetTop<1&&!kb){sh.style.bottom='';sh.style.maxHeight='';return}
+ const hh=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hh'))||64;
+ sh.style.bottom=Math.max(0,Math.round(low))+'px';sh.style.maxHeight=Math.round(vv.height-(kb?8:hh+8))+'px'}
+if(window.visualViewport){visualViewport.addEventListener('resize',shFit);visualViewport.addEventListener('scroll',shFit)}
+window.addEventListener('orientationchange',()=>setTimeout(shFit,300));
+/* シートの中の入力欄に入った時：キーボードが出たあと、その欄をシートの中で真ん中に寄せる。キーボードを閉じたら、ずれを戻す */
+document.addEventListener('focusin',e=>{const el=e.target;if(!el.closest||!el.closest('#sheet')||!/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))return;
+ setTimeout(()=>{shFit();try{el.scrollIntoView({block:'center'})}catch(x){}},320)});
+document.addEventListener('focusout',e=>{if(!e.target.closest||!e.target.closest('#sheet'))return;
+ setTimeout(()=>{shFit();if(document.body.classList.contains('lock')&&window.scrollY)window.scrollTo(0,window.scrollY)},320)});
+/* 2026-11-26 長いシートの目次：まとまり（.cbg）が3つ以上ある時、いちばん上に「どこに何があるか」を並べ、押すとそこへ移る。
+   スマホの1画面に収まらないシートでも、全体の中身が最初に見えるようにする */
+const SHJ=[['どの家賃','家賃'],['あなたの取り分','取り分'],['お客さんの入り方','売上'],['会員と売上','売上'],['時間帯','時間帯'],['店内以外','売り方'],['材料と経費','経費'],['人','人'],['広さ','広さ'],['どの物件','物件'],['開けるまで','開けるまで'],['続けるため','続けるため'],['どこから用意','用意する先']];
+function shJump(){const sh=document.getElementById('sheet'),h=sh&&sh.querySelector('.shh');if(!h)return;
+ const G=[...sh.querySelectorAll('.shb .cbg')].map((g,i)=>{const hd=g.querySelector('.cbh');if(!hd)return null;const t=(hd.firstChild&&hd.firstChild.textContent||hd.textContent).trim(),m=SHJ.find(([k])=>t.startsWith(k));if(!g.id)g.id='shj'+i;return [g.id,m?m[1]:t.slice(0,6)]}).filter(Boolean);
+ const fix=()=>{const k=sh.querySelector('.cbstick');if(k)k.style.top=h.offsetHeight+'px'};
+ if(G.length<3){fix();return}
+ const n=document.createElement('nav');n.className='shj';n.setAttribute('aria-label','このシートの中身');n.innerHTML=G.map(([id,t])=>`<button type="button" data-shj="${id}">${t}</button>`).join('');const bd=sh.querySelector('.shb');bd.insertBefore(n,bd.firstChild);fix();
+ n.onclick=e=>{const b=e.target.closest('[data-shj]'),el=b&&document.getElementById(b.dataset.shj);if(!el)return;const k=sh.querySelector('.cbstick'),off=h.offsetHeight+(k?k.offsetHeight:0)+8;
+  sh.scrollTo({top:sh.scrollTop+el.getBoundingClientRect().top-sh.getBoundingClientRect().top-off,behavior:'smooth'})}}
 function editSheet(k){return numSheet(k)}
 
 function applyEdit(k,v,src,quiet){const x=st().f[k],o=P[cur].fields[k],old=x.v;if(isNaN(v))return;x.v=v;if(src)x.src=src;if(!quiet)log(`${o.label}を ${fmtV(k,old)} → ${fmtV(k,v)} に変えた（${srcLabel(k)}）`)}
@@ -1297,7 +1325,7 @@ function supSheet(){const p=st().sup||{};
  <div class="field"><label>広さ（坪）</label><input type="number" id="s_tsubo" value="${p.tsubo||''}"></div>
  <div class="field"><label>現況</label><div class="seg" id="s_kind">${['居抜き','スケルトン'].map(t=>`<button data-v="${t}" class="${p.kind===t?'on':''}">${t}</button>`).join('')}</div></div>
  <div class="field"><label>重飲食についての記載</label><div class="seg" id="s_heavy">${['重飲食可','軽飲食のみ','記載なし'].map(t=>`<button data-v="${t}" class="${p.heavy===t?'on':''}">${t}</button>`).join('')}</div></div>
- <button class="btn dark" id="s_save">この内容で作り直す</button>`);
+ <div class="shf"><button class="btn dark" id="s_save">この内容で作り直す</button></div>`);
  let kind=p.kind||null,heavy=p.heavy||null,demo=!!p.demo;const $=i=>document.getElementById(i);
  const seg=(id,set)=>$(id).querySelectorAll('button').forEach(b=>b.onclick=()=>{set(b.dataset.v);demo=false;$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
  seg('s_kind',v=>kind=v);seg('s_heavy',v=>heavy=v);
@@ -2450,7 +2478,7 @@ function preSheet(){const s=st();s.pre=s.pre||{date:'',who:'',ck:{},fix:[]};cons
  <div class="field"><label>プレオープンの日</label>${dateField('pre_d',p.date,[['1週間後',7],['2週間後',14],['1か月後',30]])}</div><div class="field"><label>呼ぶ人</label><textarea id="pre_w" rows="2" placeholder="例：家族と友人6人。12時と13時に3人ずつ">${esc(p.who)}</textarea></div>
  <div class="grp">当日、試すこと</div>${PRE0.map((t,i)=>`<div class="lrow"><button class="tdc ${p.ck[i]?'done':''}" data-tl="preck:${i}"></button><div class="lm"><b class="${p.ck[i]?'tdd':''}">${cur==='c'?t.replace('注文から提供までの時間','受付から施術の始まりまでの時間').replace('注文が重なった時','予約が続いた時').replace('入店から注文まで','来店から受付まで'):t}</b></div></div>`).join('')}
  <div class="grp">直す所</div>${p.fix.map((x,i)=>`<div class="lrow"><button class="tdc ${x.d?'done':''}" data-tl="prefx:${i}"></button><div class="lm"><b class="${x.d?'tdd':''}">${esc(x.t)}</b></div></div>`).join('')||'<p class="emp">気づいた所を、その場で足してください。</p>'}
- <div class="field"><input id="pre_f" placeholder="例：伝票を置く場所がない"></div><button class="btn ghost" id="pre_fa">＋ 直す所を足す</button><button class="btn dark" id="pre_s">残す</button>`);
+ <div class="field"><input id="pre_f" placeholder="例：伝票を置く場所がない"></div><button class="btn ghost" id="pre_fa">＋ 直す所を足す</button><div class="shf"><button class="btn dark" id="pre_s">残す</button></div>`);
  const keep=()=>{p.date=$i('pre_d').value;p.who=$i('pre_w').value.trim()};
  $i('pre_fa').onclick=()=>{const t=$i('pre_f').value.trim();if(!t)return;keep();p.fix.push({t});save();preSheet()};$i('pre_s').onclick=()=>{keep();log('プレオープンの段取りを残した');save();render();closeSheet();toast('残しました')}}
 function osSheet(){const s=st();const rows=[['メニューとレシピ',(s.rc||[]).length+'品'],['採用した人',(s.ap||[]).filter(a=>a.st===3).length+'人'],['連絡先',(s.ct||[]).length+'件'],['買った物・見積もり',((s.buy||[]).length+(s.qt||[]).length)+'件'],['写真',(s.ph||[]).length+'枚']];
@@ -2641,17 +2669,17 @@ function ppSheet(){pickSync();save();const s=st();s.pp=s.pp||[];const r=cur==='b
  const open1=s.pp.length===1;
  const L=[...s.pp].map(p=>({p,j:ppJudge(p)})).sort((x,y)=>{const o=v=>!v?1:v.lv==='ok'?0:v.lv==='mid'?1:2,a=o(x.j)-o(y.j);if(a)return a;return x.p.rent-y.p.rent}).map(x=>x.p);
  const okN=L.filter(p=>{const j=ppJudge(p);return j&&j.lv==='ok'}).length;
- openSheet(`<h3>物件の比較</h3><p class="shl">物件の資料（不動産会社の募集のチラシ。マイソクとも言います）を撮ると、家賃や広さを読み取って並べます。物件ごとに、続けるには1日に何${pp?pp.unit:'人'}要るかが出ます。</p>
+ openSheet(`<h3>物件の比較</h3><p class="shl">募集のチラシ（マイソク）を撮ると、家賃と広さを読み取って並べます。</p>
  <div class="msbox"><div class="msb2"><button class="btn dark" id="ms_cam"><svg class="ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>物件の資料を撮る</button><button class="btn ghost" id="ms_pick">写真・PDFから選ぶ</button></div>
- ${s.pp.length?'':'<p>AIが家賃・広さ・保証金・居抜きかどうかなどを読み取ります。足す前に、読み取った中身を確かめられます。表と裏など、3枚まで一緒に入れられます。</p>'}
+ ${s.pp.length?'':'<p>保証金や居抜きかどうかも読み取ります。表と裏など、3枚まで一緒に入れられます。</p>'}
  <input type="file" id="ms_in1" accept="image/*" capture="environment" hidden><input type="file" id="ms_in2" accept="image/*,application/pdf" multiple hidden></div>
- ${pp?`<div class="ppbase"><span>いまの計画</span><b>${D1(' ')}${pp.have}${pp.unit}・1${pp.unit==='人'?'人':'件'}あたり ${yen(f.price)}</b><small>月の売上 ${man(r.sales)}</small></div>${cbBtn('cust','この人数のもと（客単価・回転数・あなたの給料など）')}`:''}
+ ${pp?cbBtn('cust',`いまの計画：${D1(' ')}${pp.have}${pp.unit}・1${pp.unit==='人'?'人':'件'}あたり ${yen(f.price)}（月の売上 ${man(r.sales)}）`):''}
  ${L.length?`<p class="pps">${L.length}件を、回る見込みの高い順に並べています。右は、続けるのに要る数です。押すと、くわしく開きます。${pp?(okN?`いまの計画で回るのは${okN}件です。`:'いまの計画のままで回る物件は、まだありません。'):''}</p>${L.map(p=>card(p)).join('')}`
    :`<ol class="pst"><li>街や不動産会社でもらった<b>物件の資料を撮る</b></li><li>読み取った家賃・広さを確かめて、足す</li><li>この家賃で続けるには<b>1日に何${pp?pp.unit:'人'}要るか</b>が出る</li></ol>`}
  <details class="addf"><summary>手で入れる</summary><div class="field"><label>呼び名（空なら「物件${(s.pp||[]).length+1}」）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
  <div class="f2"><div class="field"><label>家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal" placeholder="例：15"></div><div class="field"><label>広さ（坪・分かれば）</label><input id="pp_t" type="number" inputmode="decimal" placeholder="例：10"></div></div>
  <div class="field"><label>気づいたこと（なくても足せます）</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。"></textarea></div><button class="btn dark" id="pp_add">この物件を足す</button></details>
- <p class="ftn">要る人数は、いまの計画の1${pp&&pp.unit==='件'?'件':'人'}あたりの金額・原価・人件費・あなたの取り分から出しています。計画の数字を変えると、ここも変わります。</p>`);
+ <p class="ftn">要る${pp&&pp.unit==='件'?'件数':'人数'}は、計算のもとの数字から出しています。そこを変えると、ここも変わります。</p>`);
  $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim()||`物件${s.pp.length+1}`,r2=+$i('pp_r').value;if(!(r2>0)){toast('家賃を入れてください');$i('pp_r').focus();return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();const np=s.pp[s.pp.length-1];if(ppJudge(np))pfSheet(np.id);else ppSheet()};
  document.querySelectorAll('#sheet .ppd').forEach(d=>d.ontoggle=()=>{if(d.open)s._ppOpen=d.dataset.id;else if(s._ppOpen===d.dataset.id)delete s._ppOpen});
  $i('ms_cam').onclick=()=>$i('ms_in1').click();$i('ms_pick').onclick=()=>$i('ms_in2').click();
@@ -2851,7 +2879,7 @@ function moneySheet(v){const s=st(),k=s.k=s.k||{};s.m=s.m||{unM:3,seiM:3};const 
   <details class="cbw"><summary>公庫で借りる時のこと</summary><div class="kko">${kkoNote(N,k,f)}</div></details></div>
   ${!t3?'':miss?`<p class="cbhint">まだの欄が${miss}つあります。足りるかどうかは、そろってから確かめます。</p>`:d<0?`<p class="cbhint ng">あと ${man(-d)} 足りません。ここで分かってよかった数字です。工事の範囲・持つ月数・借りる額・物件のどれを動かすか、一緒に考えられます。</p>`:''}
   ${cbBtn('cost','毎月出ていくお金のもと（原価・経費・あなたの給料）')}${svBtn('kouko')}`}
- openSheet(`<h3>${ic('yen')}お金</h3>${seg}${head}${body}<div class="alt"><button data-ask="開業資金の組み立てを相談したい">事務局に相談する</button></div>`);
+ openSheet(`<h3>${ic('yen')}お金</h3>${seg}${head}${body}<div class="alt"><button data-ask="開業資金の組み立てを相談したい">事務局に相談する</button></div>`);shJump();
  const sh=$i('sheet'),back=()=>{const sc=sh.scrollTop;moneySheet();$i('sheet').scrollTop=sc};
  sh.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>moneySheet(b.dataset.mv));
  sh.querySelectorAll('[data-mi]').forEach(b=>b.onclick=()=>{const sc=sh.scrollTop;miSheet(b.dataset.mi,()=>{moneySheet();$i('sheet').scrollTop=sc})});
@@ -3031,7 +3059,7 @@ function cbSheet(focus){const s=st(),F=P[cur].fields;pickSync();const seatShop=c
  ${grp('ppl','人',['extra','staffH','hireH','wage','labor','share'])}
  ${!seatShop?grp('size','広さ',['perTsubo']):''}
  <div class="alt"><button data-ask="計算のもとの数字の決め方を相談したい">数字の決め方を、事務局に相談する</button></div>`);
- const sheet=$i('sheet'),hh=sheet.querySelector('.shh'),sk=$i('cbstick');if(hh&&sk)sk.style.top=hh.offsetHeight+'px';
+ shJump();const sheet=$i('sheet'),hh=sheet.querySelector('.shh'),sk=$i('cbstick');if(hh&&sk)sk.style.top=hh.offsetHeight+'px';
  const c=cbSum();$i('cbsum').innerHTML=`<div><small>${c.lab}</small><b>${c.big}</b></div><span>${c.sub}${c.gap?`<br><em class="${c.gapOk?'ok':'ng'}">${c.gap}</em>`:''}</span>`;
  const back=()=>{const sc=sheet.scrollTop;cbSheet();$i('sheet').scrollTop=sc};
  sheet.querySelectorAll('[data-ns]').forEach(b=>b.onclick=()=>{const sc=sheet.scrollTop;numSheet(b.dataset.ns,()=>{cbSheet();$i('sheet').scrollTop=sc})});
@@ -3109,7 +3137,7 @@ function rentSheet(){const s=st(),f=vals(),pp=s.pp||[],ts=(cur==='a'||cur==='d')
  <div class="grp">${pp.length?'まだ決めずに、見た額で考える':'まだ物件がない時は、見た額で考える'}</div>
  <div class="rsman ${sel&&!sel.id?'on':''}"><div class="rsstep"><button data-rsd="-1">−1万</button><span><input id="rs_v" type="number" inputmode="decimal" placeholder="例：15" value="${sel&&!sel.id?Math.round(sel.v/1000)/10:''}"><i>万円</i></span><button data-rsd="1">＋1万</button></div><small>共益費込み・税込みの月額</small>
  <details><summary>見た額の決め方</summary><p>募集サイトで、開きたいエリア${ts?`と、${ts}坪前後（${f.seats}席を${f.perTsubo}席/坪で置いた広さ）`:''}で探します。3〜5件見て、真ん中あたりの額を入れてください。アプリは相場を出しません。</p></details></div>
- <button class="btn dark" id="rs_ok">この家賃で考える</button>
+ <div class="shf"><button class="btn dark" id="rs_ok">この家賃で考える</button></div>
  ${s.rentSeen||s.pick?'<button class="lk rsoff" id="rs_no">家賃を外して、まだ決めていない状態に戻す</button>':''}`);
  const res=()=>{const r=curRent(),el=$i('rs_res');if(!r){el.className='rsres';el.innerHTML='<p>候補を選ぶか、見た額を入れると、ここに「1日に何人要るか」が出ます。</p>';$i('rs_ok').disabled=true;return}
   const j=verdict(r);$i('rs_ok').disabled=false;if(!j){el.className='rsres';el.innerHTML=`<b>${man(r)}</b>`;return}
