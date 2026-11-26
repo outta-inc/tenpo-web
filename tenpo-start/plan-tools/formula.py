@@ -104,6 +104,8 @@ class T:
         s.n+=1
         if not cond: s.ng.append(msg);print('   NG',msg)
 async def first_ok(pg,t,name,tag):
+    summary=pg.locator('#first-breakdown:not([open]) > summary')
+    if await summary.count(): await summary.click()
     d=await pg.evaluate("()=>({rows:[...document.querySelectorAll('.fr')].map(e=>e.innerText.replace(/\\s+/g,' ').trim()),text:document.body.innerText,steps:[...document.querySelectorAll('.fstep')].map(e=>e.innerText.replace(/\\s+/g,' ').trim())})")
     row=next((x for x in d['rows'] if x.startswith('月の売上')),'')
     tot,total,approx=line_sum(row)

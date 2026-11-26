@@ -520,6 +520,37 @@ div.frow{min-height:44px;padding:8px 0;border-top:1px solid var(--line);font-siz
 
 .toast{white-space:normal;width:max-content;max-width:calc(100vw - 32px);text-align:center;line-height:1.5;border-radius:18px}
 @media (min-width:900px){.toast{max-width:min(560px,calc(100vw - 260px))}}
+/* 質問と物件の案内。段階の色には番号と短い名前を添える。 */
+.flow-steps{isolation:isolate;display:flex;align-items:flex-start;list-style:none;padding:0;margin:8px 0 16px}
+.flow-steps li{position:relative;flex:1;text-align:center;font-size:14px;font-weight:700;color:var(--sub);line-height:1.4}
+.flow-steps li+li::before{content:"";position:absolute;z-index:-1;top:14px;left:-50%;width:100%;height:2px;background:var(--line)}
+.flow-steps b{position:relative;display:grid;place-items:center;width:30px;height:30px;margin:0 auto 4px;border:1px solid var(--line);border-radius:50%;background:#fff}
+.flow-steps [aria-current=step]{color:var(--green)}
+.flow-steps [aria-current=step] b{background:var(--green);color:white;border-color:var(--green)}
+.flow-steps .passed b{color:var(--green);border-color:var(--green)}
+.iv-progress{width:100%;height:5px;display:block;margin:8px 0 14px;border:none;border-radius:4px;background:var(--lime2);accent-color:var(--green)}
+.iv-progress::-webkit-progress-bar{background:var(--lime2);border-radius:4px}
+.iv-progress::-webkit-progress-value{border-radius:4px;background:var(--green)}
+.iv-progress::-moz-progress-bar{background:var(--green)}
+.iv-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.iv-options>button{display:flex;align-items:flex-start;flex-direction:column;justify-content:center;position:relative;min-height:80px;padding:12px;gap:5px;line-height:1.5}
+.iv-options>button::before{position:absolute;right:10px;top:10px;width:15px;height:15px}
+.iv-options>button.on::before{background:radial-gradient(circle,var(--green) 0 3px,#fff 3.5px)}
+.iv-options>button .ic{color:var(--green);margin:0}
+.iv-options .sub{grid-column:1/-1}
+.flow-details>summary{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:14px;font-weight:700;color:var(--green);min-height:44px;align-content:center;padding:9px 0}
+.flow-details>summary::after{content:"";margin:0 5px 3px auto;width:8px;height:8px;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+.flow-details[open]>summary::after{transform:rotate(225deg);margin-top:6px}
+.flow-details>summary:focus-visible,.iv-options button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+details.card.flow-details{padding-top:5px;padding-bottom:5px}
+.result-hero .frbig{margin:8px 0 14px;font-size:clamp(1.75rem,8vw,2.5rem);white-space:normal}
+.result-compare{display:flex;justify-content:space-between;gap:8px;align-items:baseline;border-top:1px solid var(--line);padding-top:10px;font-size:14px}
+.result-compare b{font-size:18px}
+.hmh .stage-heading{display:flex;align-items:center;gap:10px}
+.stage-heading .ic{color:var(--green);margin:0}
+.pst.compact-steps{margin:0 0 12px}
+.pst.compact-steps li{padding-top:4px;padding-bottom:4px;font-weight:700}
+.pst.compact-steps li::before{top:3px;width:21px;height:21px}
 </style>
 </head>
 <body>
@@ -972,7 +1003,17 @@ function renderC(){const s=st(),r=calc(),f=r.f;const est=s.f.util.src==='est';
  return{land:'plan',hero,plan,check:uncCard(),place}}
 
 /* ===== カルテ（その人の情報をまとめる場所） ===== */
-const IC2={chart:'<path d="M4 19V10M10 19V5M16 19v-7M21 19H3"/>',yen:'<path d="M6 4l6 8 6-8M12 12v8M7 12h10M7 16h10"/>',
+const IC2={
+ idea:'<path d="M9 18h6m-5 3h4M8.5 15.5c0-2-3.5-3.2-3.5-7a7 7 0 1 1 14 0c0 3.8-3.5 5-3.5 7"/>',
+ key:'<circle cx="8" cy="9" r="5"/><path d="m12 13 8 8m-4-4 3-3"/>',
+ file:'<path d="M14 2H5v20h14V7Zm0 0v5h5M8 12h8M8 16h6"/>',
+ book:'<path d="M12 5v16M3 3h4c3 0 5 2 5 2s2-2 5-2h4v16h-4c-3 0-5 2-5 2s-2-2-5-2H3z"/>',
+ food:'<path d="M5 3v5a3 3 0 0 0 6 0V3M8 3v18M17 13h3V3c-3 1-4 6-3 10Zm3 0v8"/>',
+ bag:'<path d="M5 7h14l1 14H4zM9 9V6a3 3 0 0 1 6 0v3"/>',
+ scissors:'<circle cx="6" cy="7" r="3"/><circle cx="6" cy="17" r="3"/><path d="m9 9 11 10M9 15 20 4"/>',
+ paw:'<ellipse cx="5" cy="10" rx="2" ry="2.7"/><ellipse cx="10" cy="6" rx="2" ry="2.7"/><ellipse cx="16" cy="6.5" rx="2" ry="2.7"/><ellipse cx="20" cy="11" rx="2" ry="2.7"/><path d="M6 17c0-2 4-6 6-6s6 4 6 6c0 3-3 3-6 2-3 1-6 1-6-2Z"/>',
+ camera:'<path d="M3 7h4l2-3h6l2 3h4v13H3z"/><circle cx="12" cy="13" r="3.5"/>',
+ chart:'<path d="M4 19V10M10 19V5M16 19v-7M21 19H3"/>',yen:'<path d="M6 4l6 8 6-8M12 12v8M7 12h10M7 16h10"/>',
  shop:'<path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9h16M9 20v-6h6v6"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
  people:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.2a3.2 3.2 0 010 5.6M18 14.5c1.8.9 3 2.9 3 5.5"/>',
  flag:'<path d="M5 21V4M5 5h11l-2 3.5 2 3.5H5"/>',who:'<path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/>'};
@@ -1748,13 +1789,20 @@ return {VERSION,CATEGORIES,BUSINESSES,CAT_NOW,categoryOf,UNIT_WORDS,DAYS,WEEK_PR
 /*IV:END*/
 /* ===== 公開用：ヒアリング（質問の文・順番・分岐は interview-src/questions.mjs が正。ここは画面と、計画への受け渡し） ===== */
 let IVS=null,IVNOTE=null,IVERR=null,IVRAW=null;
-const IVL={schedule:'営業する曜日と時間帯',secondSpendYen:'もう一方の時間帯の金額',otherBand:'もう一方の時間帯',existingGuestsPerDay:'今のお店の1日のお客さん',existingSeats:'今のお店の席数',existingDaysPerMonth:'今のお店の営業日',existingCostRatePct:'今のお店の原価率',selfWork:'自分も働くか',openingWhen:'開きたい時期',category:'お店の種類',businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
+const IVL={feeModel:'料金の受け取り方',schedule:'営業する曜日と時間帯',secondSpendYen:'もう一方の時間帯の金額',otherBand:'もう一方の時間帯',existingGuestsPerDay:'今のお店の1日のお客さん',existingSeats:'今のお店の席数',existingDaysPerMonth:'今のお店の営業日',existingCostRatePct:'今のお店の原価率',selfWork:'自分も働くか',openingWhen:'開きたい時期',category:'お店の種類',businessType:'お店の形',salesModel:'売上の形',experience:'お店を開いた経験',purpose:'来てほしい場面',mainProduct:{d:'中心の商品',salon:'中心のメニュー'},capacity:{d:'席数',salon:'施術の席・ベッド'},
  averageSpendYen:{d:'1人が1回に使う金額',takeaway:'1回の会計の金額',salon:'中心のメニューの料金'},serviceMinutes:'施術時間',peakStaff:{d:'混む時間の人数',salon:'同時に施術する人数'},propertyStage:'物件探し',priorities:'大切にしたいこと・調整できること',
  openingTarget:'開きたい時期',area:'エリア',businessHours:'営業したい時間',workingHours:'仕事に使える時間',daysOffPerWeek:'休み（週）',operators:'運営する人',helperHoursPerDay:'補助を頼む時間（1日）',
  ownFundsYen:'自分で用意できるお金',desiredMonthlyTakeHomeYen:'毎月、あなたの生活に要る額',worry:'いちばん気になっていること',shopName:'店名',motive:'お店を始めたい理由',guestsPerDay:{d:'1日に来てほしい人数',takeaway:'1日の会計の数',salon:'1日の予約の数'},candidateRentYen:'気になる物件の家賃',borrowPlan:'お金を借りる予定',existingEvidence:'今の店で確かめたこと'};
 const ivNow=()=>new Date().toISOString();
 const ivModel=()=>IV.modelOf(IVS);
-const ivLabel=id=>{const L=IVL[id];return typeof L==='string'?L:(L[ivModel()]||L.d)};
+const ivLabel=id=>{
+ const words=IV.wordsOf(IVS);
+ if(id==='capacity'&&words.capShort)return words.capShort;
+ if(id==='averageSpendYen'&&words.priceShort)return words.priceShort;
+ const label=IVL[id];
+ if(!label)return IV.ALL.find(q=>q.id===id)?.label||'質問';
+ return typeof label==='string'?label:(label[ivModel()]||label.d);
+};
 const ivIsCore=id=>IV.CORE.some(q=>q.id===id);
 const ivTag=a=>a.status==='answered'?'<span class="tag ok">確かめた</span>':a.status==='provisional'?'<span class="tag ans">仮</span>':'';
 function ivWeekTxt(v){const z=IV.weekStats(v);return z?`営業 週${z.days}日・昼 週${z.l}回・夜 週${z.d}回・あなたが立つ 週${z.me}回`:null}
@@ -1905,7 +1953,13 @@ function ivFinish(){S._ivDone=1;ivSave();const u=ivU();
 const ivMode=()=>S._iv&&S._iv.mode?S._iv.mode:S._u?null:S._ivDone?'memo':'q';
 const ivHead=()=>{try{if(S._u&&S._u._iv&&S[cur])return header()}catch(e){}return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START"><span class="biz">開業支援</span>${HBTN}</header>`};
 const ivBanner=()=>(IVERR?`<div class="ivb">${IVERR}${IVRAW?`<br><button class="lk" data-ivcopy="raw">元の答えをコピーする</button>`:''}</div>`:'')+(IVNOTE?`<div class="ivb">${IVNOTE}<br><button class="lk" data-ivcopy="now">答えをコピーする</button></div>`:'');
-const IVFT='<p class="ftn" style="text-align:center">この端末のこのブラウザに保存されます。<br>ブラウザや端末を変えると、引き継がれません。</p>';
+function planSteps(current){
+ const labels=['お店の質問','試算','ホーム'];
+ return '<ol class="flow-steps" aria-label="試算までとそのあと">'+labels.map((label,i)=>
+  `<li ${i===current?'aria-current="step"':i<current?'class="passed"':''}><b aria-hidden="true">${i<current?'✓':i+1}</b>${label}</li>`).join('')+'</ol>';
+}
+const choiceIcons={first:'idea',operating:'shop',worked:'people',opened:'flag',food:'food',takeaway:'bag',beauty:'scissors',school:'book',space:'key',life:'paw',seated:'food',salon:'scissors',other:'shop'};
+const IVFT='<p class="ftn" style="text-align:center">登録前の答えは、このブラウザに保存されます。</p>';
 function ivCur(opt){const qs=IV.questionsFor(IVS,{optional:opt}).filter(x=>!x.inline);let q=qs.find(x=>x.id===S._iv.qid);if(!q){q=qs.find(x=>!IVS.answers[x.id])||qs[0];S._iv.qid=q.id;S._iv.d=null}return{qs,q,i:qs.indexOf(q)}}
 function ivOwnMode(v){const z=IV.weekStats(v);if(!z||!z.st)return 'all';if(!z.me)return 'none';if(z.lme===z.l&&z.dst===z.d&&!z.lst&&!z.dme)return 'lunch';return 'custom'}
 const ivSlot=(own,t)=>own==='none'||(own==='lunch'&&t===1)?2:1;
@@ -1914,7 +1968,7 @@ function ivWeekBody(d){const v=Array.isArray(d.v)?d.v:IV.DAYS.map(()=>[0,0]),z=I
  const rows=v.map((x,i)=>`<div class="wkr"><span class="dl">${IV.DAYS[i]}</span>${['昼','夜'].map((n,t)=>`<button type="button" class="wkb ${x[t]?'on':''}" data-ivwd="${i}:${t}" aria-pressed="${!!x[t]}">${n}${x[t]?' ✓':''}</button>`).join('')}</div>`).join('');
  const orows=v.map((x,i)=>(x[0]||x[1])?`<div class="wkr"><span class="dl">${IV.DAYS[i]}</span>${['昼','夜'].map((n,t)=>x[t]?`<button type="button" class="wkb ${x[t]===1?'me':'st'}" data-ivwc="${i}:${t}">${n}：${x[t]===1?'自分':'任せる'}</button>`:'<span class="wkb off"></span>').join('')}</div>`:'').join('');
  return `<div class="ivo">${IV.WEEK_PRESETS.map((p,i)=>`<button type="button" data-ivwp="${i}" class="${d.preset===i?'on':''}"><span>${p[1]}</span></button>`).join('')}</div>
- <div class="wksec"><h3>曜日ごとに直す</h3><p class="ivv" style="margin:0 0 6px">押すと、開ける／休みが切り替わります。</p>${rows}</div>
+ <details class="wksec flow-details" id="week-days" ${d.daysOpen?'open':''}><summary>曜日ごとに直す</summary><p class="ivv">開ける時間帯を選んでください。</p>${rows}</details>
  ${has?`<div class="wksec"><h3>そのうち、あなたがお店に立つのは</h3><div class="ivo" style="margin-top:6px">${IV.OWNER_MODES.filter(o=>o.value!=='lunch'||(z.l&&z.d)).map(o=>`<button type="button" data-ivwo="${o.value}" class="${own===o.value?'on':''}"><span>${o.label}</span></button>`).join('')}</div>${own==='custom'?`<div style="margin-top:10px">${orows}<p class="ivv">押すと、自分／任せるが切り替わります。</p></div>`:''}</div>`:''}
  ${one?`<div class="wksec"><h3>${z.l?'夜':'昼'}は、条件が合えば開けてもよいですか？</h3><div class="ivo" style="margin-top:6px">${[['no','開けられない'],['maybe','条件が合えば'],['unk','まだ分からない']].map(o=>`<button type="button" data-ivob="${o[0]}" class="${d.other===o[0]?'on':''}"><span>${o[1]}</span></button>`).join('')}</div></div>`:''}
  ${has?`<div class="wksec"><div class="wks"><span>営業 週<b>${z.days}</b>日</span><span>昼 週<b>${z.l}</b>回</span><span>夜 週<b>${z.d}</b>回</span><span>あなたが立つ 週<b>${z.me}</b>回</span></div><p class="ivv">月にすると、営業はおよそ${Math.round(z.days*4.3)}日です（週×4.3で仮に数えます）。</p></div>`:''}`}
@@ -1924,7 +1978,8 @@ function ivQuestion(opt){if(!S._iv||S._iv.mode!==(opt?'opt':'q'))S._iv={mode:opt
   if(q.id==='averageSpendYen'){const v2=IV.valueOf(IVS,'secondSpendYen');I.d.v2=v2!=null?String(v2):''}
   if(q.id==='category'){const b=IV.valueOf(IVS,'businessType');I.d.biz=b&&IV.categoryOf(b)===I.d.v?b:null}}
  const d=I.d,pg=IV.progress(IVS,q.id,{optional:opt}),hello=!opt&&!I.edit&&i===0&&!S._ivDone&&!Object.keys(IVS.answers).length,core=ivIsCore(q.id),W=IV.wordsOf(IVS);let body,lead=q.help;
- const opts=(list,attr,val)=>`<div class="ivo">${list.map(o=>`<button type="button" data-${attr}="${o.value}" class="${val===o.value?'on':''}"><span>${o.label}${o.desc?`<small>${o.desc}</small>`:''}</span></button>`+(q.id==='category'&&attr==='ivopt'&&val===o.value&&o.value!=='other'?`<div class="ivo sub"><p class="ivv" style="margin:0">${o.label}の中では</p>${IV.BUSINESSES.filter(b=>!b.hidden&&b.category===o.value).map(b=>`<button type="button" data-ivbiz="${b.value}" class="${d.biz===b.value?'on':''}"><span>${b.label}</span></button>`).join('')}</div>`:'')).join('')}</div>`;
+ const tiles=q.id==='category'||q.id==='experience';
+ const opts=(list,attr,val)=>`<div class="ivo ${tiles?'iv-options':''}">${list.map(o=>`<button type="button" data-${attr}="${o.value}" aria-pressed="${val===o.value}" class="${val===o.value?'on':''}">${tiles?ic(choiceIcons[o.value]||'shop',22):''}<span>${o.label}${o.desc&&!tiles?`<small>${o.desc}</small>`:''}</span></button>`+(q.id==='category'&&attr==='ivopt'&&val===o.value&&o.value!=='other'?`<div class="ivo sub"><p class="ivv" style="margin:0">${o.label}の中では</p>${IV.BUSINESSES.filter(b=>!b.hidden&&b.category===o.value).map(b=>`<button type="button" data-ivbiz="${b.value}" aria-pressed="${d.biz===b.value}" class="${d.biz===b.value?'on':''}"><span>${b.label}</span></button>`).join('')}</div>`:'')).join('')}</div>`;
  if(q.type==='select')body=opts(q.options,'ivopt',d.v);
  else if(q.type==='week')body=ivWeekBody(d);
  else if(q.id==='averageSpendYen'){const w=IV.weekStats(IV.valueOf(IVS,'schedule')),u=ivULike(),
@@ -1933,14 +1988,16 @@ function ivQuestion(opt){if(!S._iv||S._iv.mode!==(opt?'opt':'q'))S._iv={mode:opt
     return `<div class="seatst ivpx">${[['安め',rd(base*0.7)],['ふつう',base],['高め',rd(base*1.4)]].map(([t,n])=>`<button type="button" data-ivpx="${k}:${n}" class="${now===n?'on':''}"><b>${n.toLocaleString()}円</b><small>${t}</small></button>`).join('')}</div>`},
    inp=(k,band,val)=>`<div class="ivband">${band?`<label>${band==='l'?'昼':'夜'}</label>`:''}<div class="ivn"><input data-ivi="${k}" type="text" inputmode="numeric" value="${esc(val)}" placeholder="例：${ivDefPrice(u,band||undefined).toLocaleString()}" autocomplete="off"><i>円</i></div>${px(k,band,val)}</div>`;
   const two=IV.questionsFor(IVS).some(x=>x.id==='secondSpendYen'),seat=ivModel()==='seated';
-  body=(two?inp('v2','l',d.v2)+inp('v','d',d.v):inp('v',seat&&w?(w.d?'d':'l'):null,d.v))+'<p class="ivy" id="ivy"></p><p class="ivv">近い金額を押すと、欄に入ります。数字を直接入れても大丈夫です。</p>';if(W.note)lead=(lead?lead+'<br>':'')+W.note}
- else if(q.id==='capacity')body=`<div class="ivst"><button type="button" data-ivstep="-1" aria-label="減らす">−</button><div class="ivn"><input data-ivi="v" type="text" inputmode="numeric" value="${esc(d.v)}" placeholder="例：${({席:12,台:2,人:8,室:1,件:2})[q.unit]||12}" autocomplete="off"><i>${q.unit}</i></div><button type="button" data-ivstep="1" aria-label="増やす">＋</button></div><p class="ivv">−／＋で1つずつ、または数を直接入れられます（200まで）。</p>`;
+  body=(two?inp('v2','l',d.v2)+inp('v','d',d.v):inp('v',seat&&w?(w.d?'d':'l'):null,d.v))+'<p class="ivy" id="ivy"></p><p class="ivv">候補を選ぶか、金額を入力してください。</p>';if(W.note)lead=(lead?lead+'<br>':'')+W.note}
+ else if(q.id==='capacity')body=`<div class="ivst"><button type="button" data-ivstep="-1" aria-label="減らす">−</button><div class="ivn"><input data-ivi="v" type="text" inputmode="numeric" value="${esc(d.v)}" placeholder="例：${({席:12,台:2,人:8,室:1,件:2})[q.unit]||12}" autocomplete="off"><i>${q.unit}</i></div><button type="button" data-ivstep="1" aria-label="増やす">＋</button></div><p class="ivv">数字で入力もできます（200まで）。</p>`;
  else if(q.type==='number')body=`<div class="ivn"><input data-ivi="v" type="text" inputmode="${q.integer?'numeric':'decimal'}" value="${esc(d.v)}" placeholder="例：${q.example}" autocomplete="off"><i>${q.unit}</i></div><p class="ivy" id="ivy"></p>`;
  else if(q.type==='text')body=`<textarea data-ivi="v" rows="3" maxlength="${q.maxLength}" placeholder="例：${esc(q.example)}">${esc(d.v)}</textarea>`;
  else body=q.fields.map(f=>`<label class="ivl">${f.label}</label><textarea data-ivi="${f.id}" rows="2" maxlength="${f.maxLength}" placeholder="例：${esc(f.example)}">${esc(d.v[f.id]||'')}</textarea>`).join('');
  const stg=q.type==='select'||q.type==='week'||core?'':`<div class="ivs"><button type="button" data-ivst="provisional" class="${d.st!=='answered'?'on':''}">${IV.ACTIONS.provisional}</button><button type="button" data-ivst="answered" class="${d.st==='answered'?'on':''}">${IV.ACTIONS.confirmed}</button></div>`;
- return ivHead()+`<div class="wrap ${I.fresh===false?'':'fade'}">${ivBanner()}${hello?face('はじめまして','まだ決まっていなくても大丈夫です','5つの質問に答えると、あなたのお店の試算がすぐに見られます。決めていない所は「まだ決めていない」で進めます。'):''}
- <div class="card"><div class="ivp">${I.edit?'答えを直す':pg.label}</div><h2 class="ivh">${q.label}</h2>${lead?`<p class="lead">${lead}</p>`:''}${body}${stg}
+ return ivHead()+`<div class="wrap ${I.fresh===false?'':'fade'}">${ivBanner()}${!opt&&!I.edit&&!S._u?planSteps(0):''}
+ <div class="card"><div class="ivp">${I.edit?'答えを直す':pg.label}</div>
+ ${I.edit?'':`<progress class="iv-progress" aria-label="${pg.label}" value="${pg.position}" max="${pg.total}"></progress>`}
+ <h2 class="ivh">${q.label}</h2>${hello?'<p class="lead">お店の条件から、月の売上を試算します。</p>':''}${lead?(q.id==='experience'?(d.v==='operating'?`<p class="lead">${lead}</p>`:''):`<p class="lead">${lead}</p>`):''}${body}${stg}
  ${q.type==='text'||q.type==='group'?`<p class="ivv">${IV.ACTIONS.voice}。文字になった内容を見てから、進んでください。</p>`:''}<p class="iverr" id="iverr">${I.err||''}</p>
  <button class="btn dark" data-ivnext="1">${I.edit?'この内容にする':!opt&&ivLastCore(q)?'試算を見る':IV.ACTIONS.next}</button>
  <div class="alt"><button data-ivalt="undecided">${IV.ACTIONS.unknown}</button>${core?'':`<button data-ivalt="skipped">${IV.ACTIONS.skip}</button>`}${q.private?`<button data-ivalt="declined">${IV.ACTIONS.decline}</button>`:''}</div></div>
@@ -1994,22 +2051,24 @@ function ivFirst(){const s=st(),f=vals(),r=calc(),lo=ivLow(),u=S._u||{},[n1,n2]=
  if(r.off)salesLines(r).filter(l=>l.k==='tk'||l.k==='dv').forEach(l=>lines.push(`${l.band}：${yen(l.price)} × 1日${qn(l.n)}件 × 月${l.days}日`));
  const hw=(F.staffH&&F.extra&&F.extra.v?F.staffH.why:F.hireH&&F.hireH.v?F.hireH.why:F.staffH?F.staffH.why:F.hireH?F.hireH.why:'')||'';
  const ow=s.ow,mgr=ow?!ow.work:f.keep>0;
- return header()+`<div class="wrap fade">
- <div class="card"><div class="ivp">${esc(P[cur].biz||'お店')}・ここまでの答えから</div><h2 class="ivh">こんな日が続くと、毎月こうなります</h2>
- <p class="lead">${memOn()?'入ってくれる会員の数':'来てくれる人数'}は、まだ誰にも分かりません。いくつか試して、感じをつかんでください。</p>${steps}<p class="ivv">${note}${memOn()?'最初の会員の数は仮です。':'最初の人数は仮です。'}</p></div>
- <div class="card"><div class="ivp">家賃を払う前に、毎月残る額</div><div class="frbig">${man(r.cap)}</div>
- <p class="ivv" style="margin-top:2px">月の売上 ${man(r.sales)}から、仮の原価・経費・人件費・返済を引いた額です。${memOn()?'会員':'人数'}が7割だと ${man(lo.cap)}。</p>
- <p class="ivv">${mgr?'お店を人に任せるので、店長の給料を引いています。':'あなたの給料は、この中から取ります。'}家賃は、物件が決まってから引きます。</p></div>
- <div class="card"><h2 style="font-size:16px;margin:0 0 4px">中身</h2>
+ const countLabel=memOn()?'会員数':cur==='t'?'会計件数':'来店人数';
+ return header()+`<div class="wrap fade">${planSteps(1)}
+ <section class="card result-hero"><div class="ivp">${esc(P[cur].biz||'お店')}・月の試算（仮）</div>
+ <h2>${ic('yen')}家賃を払う前に残る額</h2><div class="frbig">${man(r.cap)}</div>
+ <div class="result-compare"><span>${countLabel}が7割のとき</span><b>${man(lo.cap)}</b></div>
+ <p class="ivv">月の売上 ${man(r.sales)}から、原価・経費・人件費・返済を引いた試算です。${mgr?'店長の給料を引いた額です。':'あなたの給料はこの中から取ります。'}</p></section>
+ <div class="card"><h2>${ic('people')}${countLabel}を変えて試す</h2>${steps}
+ <p class="ivv">最初の${countLabel}は仮の数字です。</p>
+ <details class="flow-details" id="first-count"><summary>${countLabel}の目安</summary><p class="lead">${note}</p></details></div>
+ <details class="card flow-details" id="first-breakdown"><summary>${ic('chart')}売上・費用の内訳</summary>
  <div class="fr"><span>月の売上${lines.map(l=>`<small>${l}</small>`).join('')}</span><span class="v">${yen(r.sales)}</span></div>
  <div class="fr"><span>原価（売上の${f.costRate}%）${tg(ans('costRate'))}</span><span class="v">−${yen(r.cost)}</span></div>
  <div class="fr"><span>その他の経費（${f.otherRate}%）${tg(false)}<small>光熱費・消耗品・カードの手数料など</small></span><span class="v">−${yen(r.other)}</span></div>
  <div class="fr"><span>人件費${tg(false)}${hw?`<small>${hw}</small>`:''}</span><span class="v">${r.labor?'−':''}${yen(r.labor)}</span></div>
  <div class="fr"><span>借入の返済${tg(ans('loan'))}<small>借りる額と期間が決まったら直します</small></span><span class="v">${f.loan?'−':''}${yen(f.loan)}</span></div>
  ${f.keep>0?`<div class="fr"><span>${mgr?'店長の給料':'あなたの給料'}${tg(false)}</span><span class="v">−${yen(f.keep)}</span></div>`:''}
- <div class="fr tot"><span>家賃を払う前に残る額</span><span class="v">${yen(r.cap)}</span></div></div>
- <div class="card"><h2 style="font-size:16px;margin:0 0 4px">もっと確かにするには</h2><p class="lead">${memOn()?'会員の数は、体験に来た人と入会した人を数えると確かめられます。退会の割合や、1人が月に来る回数も直せます。':cur==='t'?'金額だけでは、売れる数は決まりません。':`${IV.wordsOf(IVS).capShort||'席数'}だけでは、来られる人数の上限は決まりません。`}営業時間や、1人がいる時間を入れると確かめられます。家賃・原価・人件費を自分の数字に替えると、お店に残る額に近づきます。</p>
- <button class="btn ghost" data-cb="">計算のもとを見る・直す</button></div>
+ <div class="fr tot"><span>家賃を払う前に残る額</span><span class="v">${yen(r.cap)}</span></div></details>
+ <button class="btn ghost" data-cb="">計算のもとを見る・直す</button>
  <button class="btn dark" data-fgo="home">この試算で、お店の画面へ進む</button><button class="btn ghost" data-fgo="edit">答えを直す</button>${IVFT}</div>`}
 function ivFst(k,dv){const s=st(),f=vals();
  if(cur==='a'||cur==='d'){if(k==='b2'&&s.band2){const n=Math.max(0,Math.round(f.seats*s.band2.turns)+dv);s.band2.turns=n/Math.max(1,f.seats)}else{const n=Math.max(0,Math.round(f.seats*f.turns)+dv);s.f.turns={v:n/Math.max(1,f.seats),src:'you'}}}
@@ -2068,7 +2127,13 @@ if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業�
  document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.ivi;if(!k||!S._iv||!S._iv.d)return;const d=S._iv.d;if(k==='v')d.v=e.target.value;else if(k==='v2')d.v2=e.target.value;else d.v[k]=e.target.value;
   if(S._iv.err)ivErr('');const y=document.getElementById('ivy');if(y){const q=IV.ALL.find(x=>x.id===S._iv.qid),n=q&&q.unit==='円'?ivRead(q):null;y.textContent=typeof n==='number'&&!Number.isNaN(n)&&n>=10000?`＝ ${man(n)}`:''}});
  document.addEventListener('click',e=>{const b=e.target.closest('[data-ivbiz],[data-ivwp],[data-ivwd],[data-ivwo],[data-ivwc],[data-ivob],[data-ivstep],[data-ivpx],[data-fst],[data-fgo],[data-ivopt],[data-ivst],[data-ivnext],[data-ivalt],[data-ivback],[data-ivedit],[data-ivfin],[data-ivmore],[data-ivquit],[data-ivplan],[data-ivopen],[data-ivask],[data-ivcopy]');if(!b)return;const D=b.dataset;
-  const rr=()=>{S._iv.err='';S._iv.fresh=false;render()};
+  const rr=()=>{
+   const dayList=document.getElementById('week-days');
+   if(dayList)S._iv.d.daysOpen=dayList.open;
+   const attr=b.getAttributeNames().find(name=>name.startsWith('data-iv'));
+   S._iv.err='';S._iv.fresh=false;render();
+   if(attr)document.querySelector(`[${attr}="${CSS.escape(b.getAttribute(attr))}"]`)?.focus({preventScroll:true});
+  };
   if(D.ivopt){const d=S._iv.d;if(d.v!==D.ivopt)d.biz=null;d.v=D.ivopt;rr();return}
   if(D.ivbiz){S._iv.d.biz=D.ivbiz;rr();return}
   if(D.ivwp||D.ivwd||D.ivwo||D.ivwc){const d=S._iv.d;if(!Array.isArray(d.v))d.v=IV.DAYS.map(()=>[0,0]);const own=d.own||'all';
@@ -2080,7 +2145,13 @@ if(PUB){document.body.classList.add('pub');document.title='TENPO/START｜開業�
   if(D.ivob){S._iv.d.other=D.ivob;rr();return}
   if(D.ivstep){const d=S._iv.d,q=IV.questionsFor(IVS).find(x=>x.id==='capacity'),n0=ivNum(d.v,q||{unit:'席'}),base=Number.isFinite(n0)?n0:(({席:12,台:2,人:8,室:1,件:2})[(q||{}).unit]||12)-(+D.ivstep);d.v=String(Math.min(200,Math.max(1,base+(+D.ivstep))));rr();return}
   if(D.ivpx){const[k,n]=D.ivpx.split(':'),d=S._iv.d,t=(+n).toLocaleString();if(k==='v2')d.v2=t;else d.v=t;rr();return}
-  if(D.fst){const[k,dv]=D.fst.split(':');ivFst(k,+dv);return}
+  if(D.fst){
+   const openDetails=[...document.querySelectorAll('#app details[open][id]')].map(el=>el.id);
+   const[k,dv]=D.fst.split(':');ivFst(k,+dv);
+   for(const id of openDetails){const el=document.getElementById(id);if(el)el.open=true}
+   document.querySelector(`[data-fst="${D.fst}"]`)?.focus({preventScroll:true});
+   return
+  }
   if(D.fgo){if(D.fgo==='home'){S._iv=null;save();scrollTo(0,0);render()}else{S._iv={mode:'review'};save();scrollTo(0,0);render()}return}
   if(D.ivst){S._iv.d.st=D.ivst;document.querySelectorAll('[data-ivst]').forEach(x=>x.classList.toggle('on',x===b));return}
   if(D.ivnext){ivCommit();return}if(D.ivalt){ivCommit(D.ivalt);return}if(D.ivback){ivBack();return}
@@ -2307,20 +2378,21 @@ function hmState(){const s=st(),f=vals(),p=P[cur],rc0=roadCount(),rd=rc0[0],rn=r
  const ids=HM.map(x=>x[0]);let next=ids.find(id=>R[id][0]==='todo')||ids.find(id=>R[id][0]==='doing');if(n&&n.gap<0&&!s._viaSeen)next='viable';return{R,next}}
 /* ===== 2026-11-23 段階：いまの段階をヘッダーで選び、ホームとやることを段階に合わせて並べ替える。機能は消さず「ほかの準備」にたたむ ===== */
 const STG=[['idea','構想中','どんなお店にするかを考えている'],['search','物件を探している','エリアを見ている・内見をしている'],['apply','物件が決まりそう','申し込んだ・契約の前'],['contract','物件が決まった','契約した'],['prep','開店の準備中','工事が進み、メニュー・人・告知を整えている'],['open','開店した','お店を開けた']];
+const stageIcons={idea:'idea',search:'place',apply:'file',contract:'key',prep:'check',open:'shop'};
 const STGL=Object.fromEntries(STG.map(x=>[x[0],x[1]]));
 function stgOf(){const s=st();if(s.stg&&STGL[s.stg])return s.stg;let g=null;try{const u=S._u&&S._u._iv?S._u:null;g=u?{idea:'idea',area:'search',viewing:'search',contracted:'contract',existing:'contract'}[u.stage]:null}catch(e){}
  if(!g||g==='idea')g=(s.pp||[]).length?'search':'idea';return g}
 function stgSet(g,by){const s=st(),old=stgOf();if(!STGL[g])return;s.stg=g;if(by)s.stgBy=by;if(old!==g)log(`段階を「${STGL[g]}」にした`);s.tab='home';s.area=null;save();render()}
-function stgSheet(){const g=stgOf();openSheet(`<h3>いまの段階</h3><p class="shl">段階に合わせて、ホームの並びが変わります。どの段階でも、ほかの準備は「ほかの準備」から開けます。いつでも選び直せます。</p>
- <div class="stgl">${STG.map(([id,t,d],i)=>`<button class="${id===g?'on':''}" data-stgset="${id}"><span class="nn">${i+1}</span><span><b>${t}</b><small>${d}</small></span>${id===g?'<em>いまここ</em>':''}</button>`).join('')}</div>
+function stgSheet(){const g=stgOf();openSheet(`<h3>いまの段階</h3><p class="shl">段階を選ぶと、ホームに今の準備が並びます。</p>
+ <div class="stgl">${STG.map(([id,t,d],i)=>`<button class="${id===g?'on':''}" data-stgset="${id}" aria-pressed="${id===g}"><span class="nn">${i+1}</span><span><b>${t}</b><small>${d}</small></span>${id===g?'<em>いまここ</em>':''}</button>`).join('')}</div>
  <button class="btn ghost" data-act="close">閉じる</button>`)}
 /* 段階ごとの中身：この段階ですること・終わりの目印・よくあるつまずき（2026-11-23） */
 const STGC={
- idea:{h:'まず、あなたのお店と、気になる物件から',d:'どんなお店で、だれに来てほしいかを言葉にして、気になる募集を1つ入れてみる時期です。',done:'大切にしたいことを書いて、募集を1つ入れたら、次の段階へ進みます。',
+ idea:{h:'お店の形と、気になる物件',d:'どんなお店で、だれに来てほしいかを言葉にして、気になる募集を1つ入れてみる時期です。',done:'大切にしたいことを書いて、募集を1つ入れたら、次の段階へ進みます。',
   trip:[['やりたいことが多くて、絞れない','来てほしい人を1人思い浮かべて、その人が何を頼むかから書くと、形が見えてきます。','data-mustw="1"','思いを言葉にする','やりたいお店の形を、一緒に整理してほしい'],
    ['いくら要るのか、見当がつかない','開けるまでのお金と、続けるためのお金に分けて、分かる所だけ入れます。未定のままで大丈夫です。','data-x="money"','お金のざっくりを見る','開業資金の見当をつけたい'],
    ['物件を見に行くのは、まだ早い気がする','募集を見るだけで大丈夫です。入れてみると、その家賃で1日に何人要るかが分かります。','data-tl="tool:pp"','募集を1つ入れてみる','物件探しの始め方を相談したい']]},
- search:{h:'物件を見ながら、お店の形を決めていきます',d:'物件を見ながら、あなたの希望と、その場所でできることをすり合わせていく時期です。',done:'申し込む物件が1つ決まったら、物件の「この場所での形」から「この物件で申し込む」を押します。',
+ search:{h:'気になる物件を比べる',d:'物件を見ながら、あなたの希望と、その場所でできることをすり合わせていく時期です。',done:'申し込む物件が1つ決まったら、物件の「この場所での形」から「この物件で申し込む」を押します。',
   trip:[['どの物件も、ピンとこない','希望を1つだけ動かすと届く物件があるかもしれません。物件ごとの「この場所での形」で試せます。元の希望は変わりません。','data-tl="tool:pp"','物件の比較を開く','物件の選び方を相談したい'],
    ['家賃が高いか安いか、分からない','家賃の額ではなく、その家賃で「1日に何人来れば続けられるか」で見ます。','data-cb=""','計算のもとを見る','この家賃で続けられるか、一緒に見てほしい'],
    ['人通りが、よく分からない','気になる物件の前で、開けたい時間に10分だけ数えてみます。見込みが「仮」から「確かめた数」に変わります。','data-act="meas"','店の前で数える','人通りの見方を相談したい']]},
@@ -2328,15 +2400,15 @@ const STGC={
   trip:[['不動産会社に、何を聞けばいいか分からない','確かめることから、そのまま送れる文ができます。','data-stga="1"','契約の前に確かめること','契約の前に確かめることを相談したい'],
    ['工事にいくらかかるか、分からない','契約の前に、内装会社に見積もりを頼むと、開業資金の大きな未定が埋まります。','data-sv="naiso"','見積もりを頼む文','工事の見積もりの取り方を相談したい'],
    ['お金を借りられるか、不安','開業資金の合計と、自分で用意できるお金から、借りる額の目安が出ます。','data-x="money"','お金を見る','借入のことを相談したい']]},
- contract:{h:'物件が決まりました。開店までの段取りです',d:'契約から工事が終わるまで。手続き・工事・支払いの順番を整える時期です。',done:'工事が終わりに近づいたら、次の「開店の準備中」へ進みます。',
+ contract:{h:'契約後の手続きと工事',d:'契約から工事が終わるまで。手続き・工事・支払いの順番を整える時期です。',done:'工事が終わりに近づいたら、次の「開店の準備中」へ進みます。',
   trip:[['工事の打ち合わせで、何を決めればいいか','入れてきた内容から、内装会社に渡す文ができます。席の数・厨房の形・予算が先です。','data-sv="naiso"','内装会社への依頼の文','工事の打ち合わせを相談したい'],
    ['支払いが重なって、不安','いつ、いくら出ていくかを月ごとに並べると、足りない月が先に分かります。','data-tl="tool:pay"','支払いの予定表','支払いの順番を相談したい'],
    ['手続きの順番が、分からない','保健所・消防署・税務署などを、時期の順に並べています。窓口と期限も出ます。','data-tab="road"','やることを見る','手続きの順番を相談したい']]},
- prep:{h:'開店に向けて、中身を整えます',d:'工事の終わりから開店まで。出す物・人・知らせ方を整える時期です。',done:'プレオープンを終えて、お店を開けたら、次の段階へ進みます。',
+ prep:{h:'開店前にそろえるもの',d:'工事の終わりから開店まで。出す物・人・知らせ方を整える時期です。',done:'プレオープンを終えて、お店を開けたら、次の段階へ進みます。',
   trip:[['試作の原価が、思ったより高い','売値と材料費を入れると、原価率が出ます。1品ずつ、どこを変えるか見られます。','data-x="recipe"','メニューとレシピ','メニューと原価を相談したい'],
    ['人が集まらない','募集の文を作って、出す所を変えてみます。','data-x="hire"','採用','採用のことを相談したい'],
    ['開店を、どう知らせればいいか','GoogleとInstagramの準備と、近所の人を呼ぶプレオープンから始めます。','data-tl="tool:pre"','プレオープンの段取り','開店の告知を相談したい']]},
- open:{h:'開店、おつかれさまです',d:'開けてから最初の1か月。実際の数字で、計画を直していく時期です。',done:'',
+ open:{h:'開店後の振り返り',d:'開けてから最初の1か月。実際の数字で、計画を直していく時期です。',done:'',
   trip:[['思ったよりお客さんが少ない','時間帯ごとに、店の前を通る人と入る人を数えると、知られていないのか、入りにくいのかが分かれます。','data-act="meas"','店の前で数える','お客さんを増やす方法を相談したい'],
    ['忙しすぎて、回らない','どの時間に手が足りないかを書き出して、その時間だけ人を頼む形から考えます。','data-x="hire"','採用','人手のことを相談したい'],
    ['2店舗目を、考え始めたい','今のお店の実際の数字が、次のお店の計画の土台になります。','data-actsh="1"','最初の1か月の振り返り','2店舗目のことを相談したい']]}};
@@ -2380,8 +2452,8 @@ function actSheet(){const s=st(),a=s.act||{},f=vals(),u=cur==='c'?'件':cur==='t
   setX('price',v.price);setX('days',v.days);setX('costRate',v.cost);log('計画の数字を、開店してからの実際の数字に替えた');save();render();closeSheet();toast('計画を、実際の数字に替えました')}}
 function stgTop(){const s=st(),g=stgOf(),c=STGC[g],L=x=>(s[x]||[]).length,food=cur!=='c',k=s.k||{},rc0=roadCount(),pk=(s.pp||[]).find(x=>x.id===s.pick);let b='';
  if(g==='idea'){const R=hmState().R;
-  b=`<div class="card stgc"><p class="hmk">あなたのお店</p><b class="stgb">${R.concept[1]}</b>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead">だれに来てほしいか、何を守りたいかを言葉にしておくと、物件を見る時の軸になります。</p>'}<div class="alt"><button data-mustw="1">${k.must?'言葉を直す':'思いを言葉にする'}</button><button data-hm="area:concept">お店の形を見る</button></div></div>
-  <div class="card stgc"><p class="hmk">気になる物件</p>${L('pp')?`<b class="stgb">${L('pp')}件</b>`:'<b class="stgb">まだありません</b><p class="lead">ネットで見た募集で大丈夫です。物件の資料の写真か、家賃と広さだけでも入れられます。</p>'}<button class="btn dark" data-tl="tool:pp">${L('pp')?'物件の比較を開く':'募集を1つ入れてみる'}</button><button class="btn ghost" data-mscam="1">物件の資料を撮る・選ぶ</button><p class="ftn">物件を入れると、あなたのお店がその場所で続けられるかと、守れる所・変える所が出ます。</p></div>${moneyRough()}`}
+  b=`<div class="card stgc"><p class="hmk">あなたのお店</p><b class="stgb">${R.concept[1]}</b>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead">だれに、どんな時間を過ごしてほしいですか？</p>'}<div class="alt"><button data-mustw="1">${k.must?'言葉を直す':'思いを言葉にする'}</button><button data-hm="area:concept">お店の形を見る</button></div></div>
+  <div class="card stgc"><p class="hmk">気になる物件</p>${L('pp')?`<b class="stgb">${L('pp')}件</b>`:'<b class="stgb">まだありません</b><p class="lead">募集で見た家賃だけでも試せます。</p>'}<button class="btn dark" data-tl="tool:pp">${L('pp')?'物件の比較を開く':'募集を1つ入れてみる'}</button><button class="btn ghost" data-mscam="1">物件の資料を撮る・選ぶ</button></div>${moneyRough()}`}
  if(g==='search')b=`<div class="card">${hrow('files','物件の資料を撮る・選ぶ','家賃と広さを読み取って、そのまま比較に足します','data-mscam="1"')}${hrow('place','物件の比較と、この場所での形','物件を入れると、1日に何人要るかと、試せる案が出ます','data-tl="tool:pp"',L('pp')?L('pp')+'件':'')}${hrow('clock','店の前で数える','人通りと入る人を数えて、見込みを確かめる','data-act="meas"',L('meas')?L('meas')+'回':'')}${hrow('who','内装会社に、内見へ来てもらう','その時に送る文ができます','data-sv="naiso"')}</div>${k.must?`<div class="card soft"><p class="hmk">物件を見る時の軸</p><p class="stgq">「${esc(k.must)}」</p></div>`:''}${homeCalcCard()}`;
  if(g==='apply')b=`<div class="card">${pk?`<p class="hmk">申し込む物件</p><b class="stgb">${esc(pk.n)}　家賃 ${man(pk.rent)}</b>`:'<p class="lead">申し込む物件を、物件の比較で選んでください。</p>'}${hrow('check','契約の前に確かめること','用途・営業できる時間・出る時の決まりなど','data-stga="1"',pk&&pk.pre?Object.values(pk.pre).filter(Boolean).length+'件 済み':'')}${hrow('yen','この物件での開業資金と、借りる額','合計と、公庫に相談する時の目安','data-x="money"')}${hrow('who','工事の見積もりを取る','内装会社に送る文ができます','data-sv="naiso"')}</div>`;
  if(g==='contract')b=`<div class="card">${hrow('check','手続き','保健所・消防署・税務署など。順番と期限','data-tab="road"',`${rc0[0]}/${rc0[1]}`)}${hrow('who','工事の見積もり','お金の中で、項目ごとに並べて選ぶ','data-tl="tool:qt"',L('qt')?L('qt')+'件':'')}${hrow('yen','月ごとの支払いの予定','いつ、いくら出ていくか','data-tl="tool:pay"')}</div>${buildSteps()}`;
@@ -2389,8 +2461,7 @@ function stgTop(){const s=st(),g=stgOf(),c=STGC[g],L=x=>(s[x]||[]).length,food=c
  if(g==='open'){const a=s.act,ac=a&&a.guests?actCalc(a):null;
   b=`<div class="card stgc"><p class="hmk">最初の1か月の振り返り</p>${ac?`<b class="stgb">実際は1日${a.guests}${ac.unit}・${pfGap(ac.gapA)}計算</b><p class="lead">計画では1日${ac.planG}${ac.unit}・${pfGap(ac.gapP)}計算でした。（仮）</p>`:'<p class="lead">開けてから分かった数字を入れると、計画との違いが出ます。その数字が、次の判断と2店舗目の計画の土台になります。</p>'}<button class="btn dark" data-actsh="1">${ac?'振り返りを直す':'実際の数字を入れる'}</button></div>
   <div class="card">${hrow('flag','開店したあとへ','開けてからの準備','data-tl="tool:os"')}${food?hrow('ans','メニューと原価','実際の材料費で、原価率を見直す','data-x="recipe"',L('rc')?L('rc')+'品':''):hrow('yen','料金','1回の料金を見る・直す','data-edit="price"')}</div>${homeCalcCard()}`}
- const i=STG.findIndex(x=>x[0]===g);
- return `<div class="hmh"><h1>${c.h}</h1><p>${c.d}</p></div>${b}${stgTrip(g)}`}
+ return `<div class="hmh"><h1 class="stage-heading">${ic(stageIcons[g],23)}${c.h}</h1></div>${b}${stgTrip(g)}`}
 document.addEventListener('click',e=>{let b=e.target.closest('[data-mustw]');if(b){mustSheet();return}
  b=e.target.closest('[data-actsh]');if(b){actSheet();return}
  b=e.target.closest('[data-bs]');if(b){const s=st();s.bs=s.bs||{};const id=b.dataset.bs;s.bs[id]=!s.bs[id];if(s.bs[id])log(`工事の進め方：「${b.parentElement.querySelector('b').textContent.replace(/^\d+\. /,'')}」を済みにした`);save();render();return}
@@ -2421,7 +2492,7 @@ document.addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.hmo
 
 function homeTab(){const s=st(),h=hmState(),R=h.R,c=k=>HM.filter(x=>R[x[0]][0]===k).length,g=stgOf(),calcTop=g==='search'||g==='open';
  return `${stgTop()}
- <details class="hmo" data-hmo="1" ${s.hmo?'open':''}><summary><b>ほかの準備</b><small>段階に関係なく、お店を始めるまでの全部（9つ）をここから開けます・決まった${c('done')}・仮で進行中${c('doing')}・これから${c('todo')}</small></summary>
+ <details class="hmo" data-hmo="1" ${s.hmo?'open':''}><summary><b>ほかの準備</b><small>お店を始めるまでの全部（9つ）・決まった${c('done')}・仮で進行中${c('doing')}・これから${c('todo')}</small></summary>
  ${calcTop?'':homeCalcCard()}<div class="card hml">${HM.map(([id,t],i)=>{const stt=R[id][0],now=id===h.next;return `<button class="hmr ${stt} ${now?'now':''}" data-hm="area:${id}"><span class="hmn">${stt==='done'?'✓':i+1}</span><span class="hmt"><b>${t}</b><small>${R[id][1]}</small></span>${now?'<em class="nx">次はここ</em>':`<em>${{done:'決まった',doing:'仮で進行中',todo:'これから'}[stt]}</em>`}<i>›</i></button>`}).join('')}</div></details>
  ${backCard()}<div class="alt hma"><button class="ln" data-tab="ask">どれも、LINEで事務局に相談できます（無料）</button><button data-tl="guide:">このアプリでできること</button></div>`}
 function hrow(icn,t,d,attr,tag){return `<button class="nrow" ${attr}><span class="nic">${ic(icn,18)}</span><span class="nt2"><b>${t}</b><small>${d}</small></span>${tag?`<em class="pl">${tag}</em>`:''}<em>›</em></button>`}
@@ -2671,16 +2742,18 @@ function ppSheet(){pickSync();save();const s=st();s.pp=s.pp||[];const r=cur==='b
  const open1=s.pp.length===1;
  const L=[...s.pp].map(p=>({p,j:ppJudge(p)})).sort((x,y)=>{const o=v=>!v?1:v.lv==='ok'?0:v.lv==='mid'?1:2,a=o(x.j)-o(y.j);if(a)return a;return x.p.rent-y.p.rent}).map(x=>x.p);
  const okN=L.filter(p=>{const j=ppJudge(p);return j&&j.lv==='ok'}).length;
- openSheet(`<h3>物件の比較</h3><p class="shl">募集のチラシ（マイソク）を撮ると、家賃と広さを読み取って並べます。</p>
- <div class="msbox"><div class="msb2"><button class="btn dark" id="ms_cam"><svg class="ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>物件の資料を撮る</button><button class="btn ghost" id="ms_pick">写真・PDFから選ぶ</button></div>
- ${s.pp.length?'':'<p>保証金や居抜きかどうかも読み取ります。表と裏など、3枚まで一緒に入れられます。</p>'}
+ openSheet(`<h3>物件の比較</h3>
+ ${L.length?'':'<ol class="pst compact-steps" aria-label="物件比較の手順"><li>募集の家賃を入れる</li>'+(pp?'<li>必要な'+(memOn()?'会員数':pp.unit==='件'?'件数':'来店人数')+'を見る</li>':'')+'<li>候補を足して比べる</li></ol>'}
+ <details class="addf flow-details"><summary>家賃を手で入れる</summary><div class="field"><label for="pp_n">呼び名（空なら「物件${(s.pp||[]).length+1}」）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
+ <div class="f2"><div class="field"><label for="pp_r">家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal" placeholder="例：15"></div><div class="field"><label for="pp_t">広さ（坪・分かれば）</label><input id="pp_t" type="number" inputmode="decimal" placeholder="例：10"></div></div>
+ <div class="field"><label for="pp_m">メモ（任意）</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。"></textarea></div><button class="btn dark" id="pp_add">この物件を足す</button></details>
+ <div class="msbox"><div class="msb2"><button class="btn dark" id="ms_cam">${ic('camera')}資料を撮る</button><button class="btn ghost" id="ms_pick">${ic('file')}写真・PDF</button></div>
+ <p>AI読み取りは無料登録後、1日${MS_DAY}回まで。3枚まで一緒に読み取り、内容を確認して追加できます。</p>
  <input type="file" id="ms_in1" accept="image/*" capture="environment" hidden><input type="file" id="ms_in2" accept="image/*,application/pdf" multiple hidden></div>
  ${pp?cbBtn('cust',`いまの計画：${D1(' ')}${pp.have}${pp.unit}・1${pp.unit==='人'?'人':'件'}あたり ${yen(f.price)}（月の売上 ${man(r.sales)}）`):''}
- ${L.length?`<p class="pps">${L.length}件を、回る見込みの高い順に並べています。右は、続けるのに要る数です。押すと、くわしく開きます。${pp?(okN?`いまの計画で回るのは${okN}件です。`:'いまの計画のままで回る物件は、まだありません。'):''}</p>${L.map(p=>card(p)).join('')}`
-   :`<ol class="pst"><li>街や不動産会社でもらった<b>物件の資料を撮る</b></li><li>読み取った家賃・広さを確かめて、足す</li><li>この家賃で続けるには<b>1日に何${pp?pp.unit:'人'}要るか</b>が出る</li></ol>`}
- <details class="addf"><summary>手で入れる</summary><div class="field"><label>呼び名（空なら「物件${(s.pp||[]).length+1}」）</label><input id="pp_n" placeholder="例：駅前の1階"></div>
- <div class="f2"><div class="field"><label>家賃（共益費込み・万円）</label><input id="pp_r" type="number" inputmode="decimal" placeholder="例：15"></div><div class="field"><label>広さ（坪・分かれば）</label><input id="pp_t" type="number" inputmode="decimal" placeholder="例：10"></div></div>
- <div class="field"><label>気づいたこと（なくても足せます）</label><textarea id="pp_m" rows="2" placeholder="例：居抜き。排気のダクトあり。"></textarea></div><button class="btn dark" id="pp_add">この物件を足す</button></details>
+ ${L.length?`<p class="pps">候補 ${L.length}件（続けやすい順）。${pp?(okN?`いまの計画で回るのは${okN}件です。`:'いまの計画のままで回る物件は、まだありません。'):''}</p>${L.map(p=>card(p)).join('')}`
+   :''}
+
  <p class="ftn">要る${pp&&pp.unit==='件'?'件数':'人数'}は、計算のもとの数字から出しています。そこを変えると、ここも変わります。</p>`);
  $i('pp_add').onclick=()=>{const n=$i('pp_n').value.trim()||`物件${s.pp.length+1}`,r2=+$i('pp_r').value;if(!(r2>0)){toast('家賃を入れてください');$i('pp_r').focus();return}s.pp.push({id:uid(),n,rent:Math.round(r2*10000),tsubo:+$i('pp_t').value||0,memo:$i('pp_m').value.trim()});log(`物件「${esc(n)}」を比較に足した`);save();render();const np=s.pp[s.pp.length-1];if(ppJudge(np))pfSheet(np.id);else ppSheet()};
  document.querySelectorAll('#sheet .ppd').forEach(d=>d.ontoggle=()=>{if(d.open)s._ppOpen=d.dataset.id;else if(s._ppOpen===d.dataset.id)delete s._ppOpen});
@@ -2741,7 +2814,7 @@ function pfSheet(id){const s=st(),p=(s.pp||[]).find(x=>x.id===id);if(!p){ppSheet
  const off=Object.entries(w.no).filter(([,v])=>v);
  openSheet(`<h3>この場所での形</h3><p class="shl"><b>${esc(p.n)}</b>　家賃 ${man(p.rent)}${p.tsubo?`・${p.tsubo}坪`:''}${p.floor?`・${esc(p.floor)}`:''}</p>
  <div class="card pfc"><p class="hmk">あなたの希望どおりにやると</p><p class="pfh">${hope||esc(P[cur].biz)}</p>
- <h2 style="font-size:19px;line-height:1.5;margin:6px 0 4px">この場所で続けるには、<b>${D1('に')}${n.need}${u}</b>が要ります</h2>
+ <h2 style="font-size:19px;line-height:1.5;margin:6px 0 4px">${ic('people')}必要な${memOn()?'会員数':u==='件'?'件数':'来店人数'}　<b>${D1('に')}${n.need}${u}</b></h2>
  <p class="lead">${pfSeatShop()&&f.seats?`${f.seats}席だと、1日${tn}回転です。`:''}いまの見込みは${D1('')}${n.have}${u}。${ok?`毎月 ${man(n.gap)} 残る計算です。（仮）`:`毎月 ${man(-n.gap)} 足りません。（仮）`}</p>
  </div>${ppCmp(p,1)}
  ${trial}${other}
@@ -3091,7 +3164,7 @@ function shopTab(v){const s=st(),k=s.k||{},p=P[cur];s.ph=s.ph||[];const c=cbSum(
  <button class="edit" data-kk="name" data-kt="text">${k.name?'店名を変える':'＋ 店名'}</button></div></div>`:`<div class="shn"><div><small>${p.biz}${p.exist?'・2店舗目':''}</small><h1>${k.name?esc(k.name):'店名はこれから'}</h1></div><button class="edit" data-kk="name" data-kt="text">${k.name?'店名を変える':'＋ 店名'}</button></div>`;
  h+=`
  <div class="sum2"><div><small>${c.lab}${bandOn()?`（${n1}）`:''}</small><b>${c.big}</b></div><span>${c.sub}${c.gap?`<br><em class="${c.gapOk?'ok':'ng'}">${c.gap}</em>`:''}</span></div>
- <div class="card"><h2 class="nsh">あなたのお店</h2>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead" style="margin:4px 0 0">だれに来てほしいか、何を守りたいかを言葉にしておくと、物件を見る時の軸になります。</p>'}
+ <div class="card"><h2 class="nsh">あなたのお店</h2>${k.must?`<p class="stgq">「${esc(k.must)}」</p>`:'<p class="lead" style="margin:4px 0 0">だれに、どんな時間を過ごしてほしいですか？</p>'}
   <div class="nsrows">${row('ans',k.must?'思いの言葉を直す':'思いを言葉にする','3つに答えると1つの文になります','data-mustw="1"')}${row('shop','5項目のメモ','来てほしい場面・中心の商品・仕事に使える時間 など','data-memo5="1"')}${row('flag','お店の細かいこと','お店の感じ・営業・人と資格・お金・物件',`data-blks="1"`,`${kf}/${kn}`)}</div></div>
  <div class="card"><h2 class="nsh">数字${(()=>{const n=Object.keys(s.f).filter(q=>s.f[q].src==='tmp'&&P[cur].fields[q]&&q!=='rentRate'&&P[cur].fields[q].min!=null).length;return n?`<em>仮が${n}つ</em>`:''})()}</h2>
   <div class="nsrows">${(memOn()?['price','members','churn','visits']:NS_KEY[cur]||[]).map(nsRow).join('')}${bandOn()?row('',`${n2}の時間帯`,`${n2}だけで毎月 ${man(r.b2.sales)}・1日${r.b2.have}${cur==='t'?'件':'人'}`,'data-cb="band"'):''}${(()=>{const o=r.off;return o?row('','店内以外の売り方',`${[st().off.tk?'持ち帰り':'',st().off.dv?'デリバリー':''].filter(Boolean).join('・')}で毎月 ${man(o.sales)}・1日${o.orders}件`,'data-cb="off"'):''})()}${row('',bandOn()||cur==='b'||cur==='c'?'ほかの数字':`ほかの数字・${n2}の時間帯`,`原価・経費・人・あなたの取り分・家賃${offOk()&&!r.off?'・持ち帰りやデリバリー':''}`,'data-cb=""')}</div></div>
@@ -3192,7 +3265,7 @@ function planTop(v){if(cur==='b')return planTopB(v);
 
 /* 2026-11-23 ヘッダー：業態と日付をやめ、店名と開店までの日数（押すと直せる） */
 function header(sub,title){const g=stgOf();
- return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階</small><b>${STGL[g]} ›</b></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
+ return `<header class="top"><img class="lgi" src="${LOGO}" alt="TENPO/START テンポスタート"><button class="hstg" data-stg="1"><small>いまの段階 ${STG.findIndex(x=>x[0]===g)+1}/${STG.length}</small><b>${STGL[g]} ›</b></button>${HBTN}</header>${title?`<div class="ptitle"><h1>${title}</h1></div>`:''}`}
 
 
 /* 2026-11-23 見直し：考える物件をアプリ全体で1つに保つ */
