@@ -3666,16 +3666,302 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-mscam]');i
   root.TenpoAsk = out;
 })(typeof window !== "undefined" ? window : globalThis);
 </script>
+<script>/* AIに相談（outta-inc/tenpo-os の features/aibou/aibou.js をそのまま入れた物。ここでは直さない。11/28 松尾さん「全てのアプリに導入」） */
+/* TENPO OS 束：AIに相談（2026-11-28 Claude・松尾さんの依頼。最初はル・ボアのスタッフアプリで試す）
+ * 右端の「AIに相談」を押すと、AI との会話が開く。写真・PDF・CSV・Excel を渡しながら話せる。
+ *   ・相談ごとに番号が付き、会話と添付は番号ごとのフォルダ（aibou/店/番号/）に残る。事務局アプリの「AIに相談」で同じ物が見える
+ *   ・役割で出し分ける（11/28 松尾さん「スタッフは使い方をサポートする。管理者は改変伴走する」）。役割は箱（api.aibou_me）が決める
+ *     スタッフ：使い方の案内。見え方の変更や「こうしたい」は「店長に提案する」になり、その場では変わらない。うまく動かない物は事務局へ
+ *     店長・オーナー：見え方を変えると店の全員の画面に効く（いつでも「元に戻す」）。スタッフの提案を採用・見送り。無い機能は依頼書にして事務局へ
+ *   ・AI が質問するときは答えの候補をボタンで出し、押すとそのまま送る（11/28 21時「AI 初心者でもコミュニケーションできるように」）
+ *   ・画面の作り（コード）は変えない。カードの見出しを見つけて、隠す・上に出す・呼び方を変えるだけ
+ * 中身：床の箱 db/box-aibou-v0.1（tenpo-tokyo）、AI は Edge Function aibou-chat。AI には名前を渡さない（画面の見出しにある本人の名前も伏せる）
+ * 使い方：
+ *   TenpoAibou.mount({ appId:"staff",
+ *     session: function(){ return "今のログインを表す文字（変わったら札を取り直す）"; },
+ *     token:   function(){ return Promise<床の番号札>; },
+ *     who:     function(){ return "本人の名前（画面の見出しから伏せるため）"; },
+ *     screen:  function(){ return "今の画面の名前"; },
+ *     show:    function(){ return true; },                    // つまみを出すか
+ *     cards: "#view section.card, #view details.card",       // 見え方を変えてよいカード
+ *     api: { url, key },                                      // 省くと店の設定（TENPO_STORE.tenpo）
+ *     color:"#55663a", tabColor:"#e0a82e", tabInk:"#1f3a2a" });
+ *   TENPO/START（ログインしない人）は session・token の代わりに client を渡す（11/28 23時「全てのアプリに導入」）：
+ *   TenpoAibou.mount({ appId:"start", client: function(){ return "端末の番号(uuid)"; }, screen, show, api })
+ *     使い方の案内と事務局への依頼書だけ。見え方の変更・提案・添付は出さない
+ */
+(function(root){
+  "use strict";
+  var MIMES = { jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", webp:"image/webp", heic:"image/heic", pdf:"application/pdf", csv:"text/csv", txt:"text/plain",
+    xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" };
+  var APPN = { staff:"スタッフアプリ", kanri:"管理アプリ", regi:"レジ", yoyaku:"予約" };
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
+  function call(f, a){ try { return typeof f === "function" ? f(a) : f; } catch(e){ return undefined; } }
+  function norm(s){ return String(s == null ? "" : s).replace(/\s+/g, " ").trim(); }
+  function mimeOf(file){ var t = file.type; if (t && Object.keys(MIMES).some(function(k){ return MIMES[k] === t; })) return t;
+    var ext = (String(file.name || "").split(".").pop() || "").toLowerCase(); return MIMES[ext] || ""; }
+  /* 見出しの文字（中の札や小さい字は除く） */
+  function headText(card){ var h = card.querySelector("h2, h3, summary b, summary"); if (!h) return { el:null, text:"" };
+    var c = h.cloneNode(true); Array.prototype.forEach.call(c.querySelectorAll(".pill, .sub, small, button, a"), function(x){ x.remove(); });
+    return { el:h, text:norm(c.textContent).slice(0, 40) }; }
+  /* 提案の説明（画面に出す文） */
+  function describe(a){ if (a.op === "rename") return "「" + a.target + "」の呼び方を「" + a.value + "」に変える";
+    if (a.op === "hide") return "「" + a.target + "」を隠す"; if (a.op === "top") return "「" + a.target + "」を一番上に出す"; return ""; }
+  /* 試験用に外へ出す（画面を使わない部分） */
+  var pure = { mimeOf: mimeOf, describe: describe, norm: norm };
+
+  function mount(opts){
+    opts = opts || {}; var doc = root.document; if (!doc || doc.getElementById("aib-tab")) return null;
+    var store = root.TENPO_STORE || {}, api = opts.api || store.tenpo || {};
+    var color = opts.color || "#2f4a3a", tabColor = opts.tabColor || "#e0a82e", tabInk = opts.tabInk || "#1f3a2a";
+    var cardSel = opts.cards || "#view section.card, #view details.card";
+    var style = doc.createElement("style");
+    style.textContent =
+      "#aib-tab{position:fixed;z-index:9000;right:0;top:30%;writing-mode:vertical-rl;background:" + tabColor + ";color:" + tabInk + ";border:0;border-radius:10px 0 0 10px;padding:12px 6px;font-family:inherit;font-weight:700;font-size:13px;letter-spacing:.08em;line-height:1.4;cursor:pointer;box-shadow:0 2px 8px #0003}" +
+      "#aib-tab .up{text-combine-upright:all;-webkit-text-combine:horizontal;letter-spacing:0}" +
+      "#aib-tab[hidden]{display:none}#aib-tab[data-dot]::after{content:'';position:absolute;left:-4px;top:-4px;width:11px;height:11px;border-radius:50%;background:#b44330;border:2px solid #fff}" +
+      "#aib{box-sizing:border-box;position:fixed;inset:auto 0 0 0;margin:0 auto;width:min(100vw,520px);height:min(92dvh,760px);max-height:none;max-width:none;padding:0;border:0;border-radius:18px 18px 0 0;background:#faf8f3;color:#26352b;font-family:inherit;line-height:1.6;box-shadow:0 -8px 40px #15231e40;display:flex;flex-direction:column}" +
+      "#aib:not([open]){display:none}#aib::backdrop{background:#18271fa8}" +
+      "#aib .hd{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid #e3dccf;background:" + color + ";color:#fff;border-radius:18px 18px 0 0}" +
+      "#aib .hd b{flex:1;min-width:0;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#aib .hd b small{font-size:12px;font-weight:400;opacity:.85;margin-left:4px}#aib .hd{gap:6px}#aib .hd button{flex:none;background:transparent;color:#fff;border:1px solid #ffffff66;border-radius:8px;padding:5px 7px;font:inherit;font-size:12px;cursor:pointer}" +
+      "#aib .log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}" +
+      "#aib .me,#aib .ai{max-width:86%;padding:9px 12px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:15px}" +
+      "#aib .me{align-self:flex-end;background:" + color + ";color:#fff;border-bottom-right-radius:4px}" +
+      "#aib .ai{align-self:flex-start;background:#fff;border:1px solid #e3dccf;border-bottom-left-radius:4px}" +
+      "#aib .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}#aib .chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;background:#efe9dd;color:#26352b;border-radius:999px;padding:3px 9px;border:0;font-family:inherit}" +
+      "#aib .me .chip{background:#ffffff2e;color:#fff}" +
+      "#aib .act{align-self:flex-start;max-width:86%;border:1px solid " + tabColor + ";background:#fffaf0;border-radius:12px;padding:10px 12px;font-size:14px}" +
+      "#aib .act p{margin:0 0 8px}#aib .act .req{white-space:pre-wrap;font-size:13px;color:#4a564d;margin:0 0 8px}" +
+      "#aib .btn{width:auto;margin:0;float:none;display:inline-block;min-height:40px;padding:8px 14px;border-radius:10px;border:0;background:" + color + ";color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer}" +
+      "#aib .btn.ghost{background:#fff;color:" + color + ";border:1px solid #cfc6b5}#aib .btn:disabled{opacity:.5;cursor:default}" +
+      "#aib .done{color:#4f6b3a;font-weight:600}#aib .quick{display:flex;flex-wrap:wrap;gap:6px}" +
+      "#aib .ft{border-top:1px solid #e3dccf;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:#fff}" +
+      "#aib .row{display:flex;gap:8px;align-items:flex-end}" +
+      "#aib textarea{width:auto;min-width:0;margin:0;flex:1;box-sizing:border-box;min-height:44px;max-height:140px;resize:none;font-family:inherit;font-size:16px;line-height:1.5;padding:9px 10px;border:1px solid #cfc6b5;border-radius:10px;background:#fff;color:#26352b}" +
+      "#aib .clip{width:44px;height:44px;border-radius:10px;border:1px solid #cfc6b5;background:#fff;color:" + color + ";font-size:20px;cursor:pointer;flex:none}" +
+      "#aib .send{height:44px;flex:none}#aib .note{font-size:12px;color:#784627;margin:4px 0 0;min-height:1em}" +
+      "#aib .list > button{display:block;width:100%;text-align:left;padding:10px 12px;margin:0 0 8px;border:1px solid #e3dccf;border-radius:10px;background:#fff;font:inherit;font-size:14px;color:#26352b;cursor:pointer}" +
+      "#aib .list > button small{display:block;color:#7a7f73;font-size:12px}" +
+      "#aib .typing{align-self:flex-start;color:#7a7f73;font-size:13px}" +
+      "[data-aib-hide]{display:none!important}";
+    var tab = doc.createElement("button"); tab.type = "button"; tab.id = "aib-tab"; tab.innerHTML = '<span class="up">AI</span>に相談'; tab.setAttribute("aria-label", "AIに相談"); tab.hidden = true;
+    var panel = doc.createElement("dialog"); panel.id = "aib"; panel.setAttribute("aria-label", "AIに相談");
+    doc.head.appendChild(style); doc.body.appendChild(tab); doc.body.appendChild(panel);
+
+    var guest = typeof opts.client === "function";
+    var GUESTFN = { aibou_start:"aibou_guest_start", aibou_thread:"aibou_guest_thread", aibou_threads:"aibou_guest_threads", aibou_accept:"aibou_guest_accept" };
+    var S = { thread:null, no:null, msgs:[], pending:[], tweaks:[], view:"chat", busy:false, token:"", session:null, err:"", mgr:false, npro:0 };
+
+    function session(){ var s = guest ? (call(opts.client) ? "guest:" + call(opts.client) : "") : String(call(opts.session) || ""); if (s !== S.session){ S.session = s; S.token = ""; S.thread = null; S.no = null; S.msgs = []; S.pending = []; S.tweaks = []; S.mgr = false; S.npro = 0; loadTweaks(); loadMe(); } return s; }
+    function token(){ session(); if (S.token) return Promise.resolve(S.token);
+      if (guest){ var c = call(opts.client); if (!c) return Promise.reject(new Error("login_required")); S.token = c; return Promise.resolve(c); }
+      return Promise.resolve(call(opts.token)).then(function(t){ if (!t) throw new Error("login_required"); S.token = t; return t; }); }
+    function rpc(fn, args){ return root.fetch(api.url + "/rest/v1/rpc/" + fn, { method:"POST", busy:false, headers:{ "Content-Type":"application/json", apikey:api.key, "Content-Profile":"api", "Accept-Profile":"api" }, body:JSON.stringify(args) })
+      .then(function(r){ return r.json().then(function(j){ if (!r.ok){ var m = (j && j.message) || "network"; if (/login_required/.test(m)) S.token = ""; throw new Error(m); } return j; }); }); }
+    function withToken(fn, args){
+      if (guest){ if (fn === "aibou_me") return Promise.resolve({ mgr:false, proposals:0 }); if (fn === "aibou_tweaks") return Promise.resolve([]);
+        if (!GUESTFN[fn]) return Promise.reject(new Error("not_available"));
+        return token().then(function(c){ var a = Object.assign({ p_client:c }, args || {}); delete a.p_app; if (fn === "aibou_start") a.p_app = opts.appId; return rpc(GUESTFN[fn], a); }); }
+      return token().then(function(t){ return rpc(fn, Object.assign({ p_token:t }, args || {})); }); }
+
+    /* ===== 見え方の変更をカードに当てる ===== */
+    function cards(){ return Array.prototype.slice.call(doc.querySelectorAll(cardSel)).filter(function(c){ return !panel.contains(c); }); }
+    function origOf(card){ if (card.dataset.aibOrig != null) return card.dataset.aibOrig; return headText(card).text; }
+    function apply(){
+      var list = cards(); if (!list.length) return;
+      list.forEach(function(c){
+        var o = origOf(c), hide = false, top = false, name = null;
+        S.tweaks.forEach(function(w){ if (w.target !== o) return; if (w.op === "hide") hide = true; if (w.op === "top") top = true; if (w.op === "rename") name = w.value; });
+        if (hide) { if (!c.hasAttribute("data-aib-hide")) c.setAttribute("data-aib-hide", ""); } else if (c.hasAttribute("data-aib-hide")) c.removeAttribute("data-aib-hide");
+        var h = headText(c);
+        if (name && h.el){ if (c.dataset.aibOrig == null) c.dataset.aibOrig = o;
+          var tn = Array.prototype.find.call(h.el.childNodes, function(n){ return n.nodeType === 3 && norm(n.nodeValue); });
+          if (tn && norm(tn.nodeValue) !== name) tn.nodeValue = name + " "; }
+        else if (!name && c.dataset.aibOrig != null && h.el){
+          var tn2 = Array.prototype.find.call(h.el.childNodes, function(n){ return n.nodeType === 3 && norm(n.nodeValue); });
+          if (tn2 && norm(tn2.nodeValue) !== c.dataset.aibOrig) tn2.nodeValue = c.dataset.aibOrig + " "; delete c.dataset.aibOrig; }
+        if (top && c.parentNode){ var first = Array.prototype.find.call(c.parentNode.children, function(x){ return x.matches(cardSel) && !x.hasAttribute("data-aib-hide"); });
+          if (first && first !== c) c.parentNode.insertBefore(c, first); }
+      });
+    }
+    var frame = 0, applying = false;
+    function schedule(){ if (frame || applying) return; frame = root.requestAnimationFrame(function(){ frame = 0; applying = true; try { apply(); } finally { root.setTimeout(function(){ applying = false; }, 0); } }); }
+    var observer = new MutationObserver(function(rs){ if (rs.some(function(r){ return !panel.contains(r.target) && r.target !== tab; })) schedule(); });
+    observer.observe(doc.body, { childList:true, subtree:true });
+    function loadMe(){ if (!session()) return Promise.resolve(); return withToken("aibou_me").then(function(m){ S.mgr = !!m.mgr; S.npro = m.proposals || 0; tab.toggleAttribute("data-dot", S.mgr && S.npro > 0); if (panel.open && S.view === "chat") render(); }).catch(function(){}); }
+    function loadTweaks(){ if (guest || !session()) return; withToken("aibou_tweaks", { p_app:opts.appId }).then(function(t){ S.tweaks = t || []; schedule(); }).catch(function(){}); }
+
+    /* 画面に出ているカードの見出し（本人の名前は伏せる） */
+    function view(){ var me = norm(call(opts.who) || ""), seen = {};
+      return cards().filter(function(c){ return !c.hasAttribute("data-aib-hide"); }).map(origOf)
+        .map(function(t){ return me && me.length >= 2 ? t.split(me).join("（本人）") : t; })
+        .filter(function(t){ if (!t || seen[t]) return false; seen[t] = 1; return true; }).slice(0, 30); }
+
+    /* ===== 画面 ===== */
+    var FACE = '<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true" style="vertical-align:-4px;margin-right:4px"><path d="M13 7h22a8 8 0 0 1 8 8v14a8 8 0 0 1-8 8h-3.5L36 44l-12.5-7H13a8 8 0 0 1-8-8V15a8 8 0 0 1 8-8Z" fill="' + tabColor + '"/><rect x="16" y="16.5" width="3.6" height="8.5" rx="1.8" fill="' + tabInk + '"/><rect x="28.4" y="16.5" width="3.6" height="8.5" rx="1.8" fill="' + tabInk + '"/></svg>';
+    function header(title, extra, sub){ return '<div class="hd"><b>' + esc(title) + (sub ? "<small>" + esc(sub) + "</small>" : "") + '</b>' + (extra || "") + '<button type="button" data-a="close">閉じる</button></div>'; }
+    function fileChips(fs, rm){ return fs && fs.length ? '<div class="files">' + fs.map(function(f, i){ return '<button type="button" class="chip" ' + (rm ? 'data-a="unpend" data-i="' + i + '"' : 'data-a="file" data-id="' + esc(f.id) + '"') + '>' + (/^image/.test(f.mime) ? "写真" : "ファイル") + "・" + esc(f.name) + (f.up ? "（送っています）" : "") + (rm ? " ×" : "") + "</button>"; }).join("") + "</div>" : ""; }
+    var DONE = { applied:"変えました（店の全員の画面）", sent:"事務局で受け付けました", proposed:"店長に提案しました", adopted:"店長が採用しました", declined:"店長が見送りました" };
+    function actCard(m, a, i){
+      var st = (m.done || {})[String(i)], bug = a.op === "request" && a.kind === "bug";
+      var label = guest ? "事務局に送る" : S.mgr ? (a.op === "request" ? "事務局に送る" : "変える") : (bug ? "事務局に送る" : "店長に提案する");
+      var head = a.op === "request" ? "<p><b>" + (bug ? "うまく動かないことの報告" : S.mgr || guest ? "事務局への依頼書" : "店長への提案") + '</b></p><p class="req">' + esc(a.title) + "\n" + esc(a.body) + "</p>"
+        : "<p>" + esc(describe(a)) + (S.mgr ? '<br><small style="color:#7a7f73">店の全員の画面に効きます</small>' : "") + "</p>";
+      var foot = st ? '<span class="done">' + esc(DONE[st] || "済み") + (st === "sent" && S.no ? "（相談 #" + esc(S.no) + "）" : "") + "</span>"
+          + (st === "sent" ? '<p class="req" style="margin:6px 0 0">' + (guest ? "事務局が、入れるかどうかを含めて検討します。" : "24時間以内に、入れるかどうかと見通しを LINE でお返事します。") + "</p>" : "")
+          + (st === "proposed" ? '<p class="req" style="margin:6px 0 0">店長が採用すると、みんなの画面に反映されます。</p>' : "")
+          + (st === "applied" && S.mgr ? '　<button type="button" class="btn ghost" data-a="undo-by" data-t="' + esc(a.target) + '" data-op="' + esc(a.op) + '">元に戻す</button>' : "")
+        : '<button type="button" class="btn" data-a="accept" data-m="' + m.id + '" data-i="' + i + '">' + label + "</button>";
+      return '<div class="act">' + head + foot + "</div>";
+    }
+    function chat(){
+      var log = '<div class="ai">' + FACE + (guest ? "TENPO/START の使い方で分からないこと、困っていることを書いてください。\n「こうなると助かる」は、事務局への依頼書にできます。" : S.mgr ? "店のアプリを一緒に直していきます。困っていること、変えたいことを書いてください。写真やファイル（今使っている表など）も渡せます。\n見え方はその場で変えられます（店の全員の画面に効きます）。無い機能は、事務局に作ってもらう依頼書にします。"
+        : "使い方で分からないこと、困っていることを書いてください。写真やファイルも渡せます。\n「こうなると助かる」は、店長への提案にできます。") + "</div>";
+      if (!S.msgs.length) log += '<div class="quick">' + (guest ? ["この画面の使い方を知りたい", "うまく動かない", "こんな機能がほしい"] : S.mgr ? ["この画面を使いやすくしたい", "今使っている表を取り込みたい", "こんな機能がほしい"] : ["この画面の使い方を知りたい", "うまく動かない", "こうなると助かる"]).map(function(q){ return '<button type="button" class="btn ghost" data-a="quick">' + esc(q) + "</button>"; }).join("") + "</div>";
+      S.msgs.forEach(function(m){
+        if (m.role === "user") log += '<div class="me">' + esc(m.body || "（添付）") + fileChips(m.files) + "</div>";
+        else { log += '<div class="ai">' + FACE + esc(m.body) + "</div>"; (m.actions || []).forEach(function(a, i){ log += actCard(m, a, i); });
+          /* 答えの候補：いちばん新しい AI の返事にだけ出す。押すとそのまま送る（AI に慣れていない人でも進められる） */
+          if (m === S.msgs[S.msgs.length - 1] && !S.busy && (m.choices || []).length)
+            log += '<div class="quick">' + m.choices.map(function(c){ return '<button type="button" class="btn ghost" data-a="choice">' + esc(c) + "</button>"; }).join("") + "</div>"; }
+      });
+      if (S.busy) log += '<div class="typing">考えています…</div>';
+      var nT = S.tweaks.length;
+      panel.innerHTML = header("AIに相談", (S.mgr ? '<button type="button" data-a="props">提案' + (S.npro ? "（" + S.npro + "）" : "") + "</button>" : "") + '<button type="button" data-a="list">履歴</button>' + (S.msgs.length ? '<button type="button" data-a="new">新しく</button>' : ""), S.no ? "#" + S.no : "") +
+        '<div class="log">' + log + "</div>" +
+        '<div class="ft">' + fileChips(S.pending, true) + '<div class="row">' + (guest ? "" : '<button type="button" class="clip" data-a="clip" aria-label="写真・ファイルを付ける">＋</button>') +
+        '<textarea id="aib-text" rows="1" maxlength="1000" placeholder="書く・マイクで話す"></textarea><button type="button" class="btn send" data-a="send">送る</button></div>' +
+        '<p class="note" role="status">' + esc(S.err) + (S.mgr && !S.err ? '<a href="#" data-a="tweaks" style="color:inherit">この店で変えていること' + (nT ? "（この画面のアプリ " + nT + "）" : "") + "</a>" : "") + "</p>" +
+        '<input type="file" id="aib-file" hidden multiple accept="image/*,.pdf,.csv,.txt,.xlsx"></div>';
+      var ta = panel.querySelector("#aib-text"); ta.value = S.draft || ""; sendState();
+      var lg = panel.querySelector(".log"); lg.scrollTop = lg.scrollHeight;
+    }
+    function sendState(){ var b = panel.querySelector("[data-a=send]"), ta = panel.querySelector("#aib-text"); if (!b || !ta) return;
+      b.disabled = S.busy || S.pending.some(function(f){ return f.up; }) || (!ta.value.trim() && !S.pending.length); }
+    function listView(rows){
+      panel.innerHTML = header("これまでの相談", '<button type="button" data-a="back">戻る</button>') + '<div class="log list">' +
+        (rows.length ? rows.map(function(r){ return '<button type="button" data-a="open" data-id="' + esc(r.id) + '">#' + esc(r.no) + "　" + esc(r.title) + "<small>" + esc(new Date(r.at).toLocaleString("ja-JP", { month:"numeric", day:"numeric", hour:"2-digit", minute:"2-digit" })) + (r.sent ? "・事務局に送った" : "") + "</small></button>"; }).join("") : "<p>まだ相談はありません。</p>") + "</div>";
+    }
+    function tweakView(list){
+      panel.innerHTML = header("この店で変えていること", '<button type="button" data-a="back">戻る</button>') + '<div class="log list">' +
+        (list && list.length ? list.map(function(w){ return '<div class="act" style="max-width:none"><p>' + esc(describe(w)) + '<br><small style="color:#7a7f73">' + esc(APPN[w.app] || w.app || "") + "・相談 #" + esc(w.no) + "</small></p>" +
+          '<button type="button" class="btn ghost" data-a="undo" data-id="' + w.id + '">元に戻す</button></div>'; }).join("") : "<p>変えていることはありません。</p>") + "</div>";
+    }
+    function propView(list){
+      var open = list.filter(function(x){ return x.state === "proposed"; }), done = list.filter(function(x){ return x.state !== "proposed"; });
+      var one = function(x){ var what = x.op === "request" ? "こうしたい：" + x.title + "\n" + (x.body || "") : describe(x);
+        return '<div class="act" style="max-width:none"><p><b>' + esc(x.who || "スタッフ") + "</b>（" + esc(APPN[x.app] || x.app) + "）</p>" + (x.said ? '<p class="req">「' + esc(x.said) + "」</p>" : "") + '<p class="req">' + esc(what) + "</p>" +
+          (x.state === "proposed" ? '<button type="button" class="btn" data-a="adopt" data-id="' + x.id + '">' + (x.op === "request" ? "採用して事務局に送る" : "採用する（全員の画面に効く）") + '</button>　<button type="button" class="btn ghost" data-a="decline" data-id="' + x.id + '">見送る</button>'
+            : '<span class="done">' + (x.state === "adopted" ? "採用しました" : "見送りました") + "</span>") + "</div>"; };
+      panel.innerHTML = header("スタッフからの提案", '<button type="button" data-a="back">戻る</button>') + '<div class="log list">' +
+        (open.length ? open.map(one).join("") : "<p>待っている提案はありません。</p>") + (done.length ? "<p><small>この30日に決めた物</small></p>" + done.map(one).join("") : "") + "</div>";
+    }
+    function loadProps(){ return withToken("aibou_proposals").then(function(l){ S.npro = l.filter(function(x){ return x.state === "proposed"; }).length; tab.toggleAttribute("data-dot", S.npro > 0); propView(l); }); }
+    function render(){ if (S.view === "chat") chat(); }
+    function fail(e){ var m = String(e && e.message || e);
+      S.err = /login_required/.test(m) ? "ログインし直してから、もう一度送ってください。" : /limited/.test(m) ? "今日はたくさん相談がありました。少し時間を置いてください。"
+        : /bad_type/.test(m) ? "この種類のファイルは渡せません（写真・PDF・CSV・Excel）。" : /too_big/.test(m) ? "ファイルが大きすぎます（10MBまで）。" : "うまく送れませんでした。電波を確かめて、もう一度送ってください。"; }
+
+    /* ===== 添付 ===== */
+    function shrink(file){ /* 写真は長い辺 1600px の JPEG にして送る（iPhone の HEIC もここで JPEG になる） */
+      return new Promise(function(resolve){
+        var url = URL.createObjectURL(file), im = new Image();
+        im.onload = function(){ var s = Math.min(1, 1600 / Math.max(im.width, im.height)), c = doc.createElement("canvas");
+          c.width = Math.max(1, Math.round(im.width * s)); c.height = Math.max(1, Math.round(im.height * s));
+          var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+          c.toBlob(function(b){ resolve(b ? { blob:b, mime:"image/jpeg", name:String(file.name || "photo").replace(/\.\w+$/, "") + ".jpg" } : { blob:file, mime:mimeOf(file), name:file.name }); }, "image/jpeg", 0.8); };
+        im.onerror = function(){ URL.revokeObjectURL(url); resolve({ blob:file, mime:mimeOf(file), name:file.name }); };
+        im.src = url; });
+    }
+    function ensureThread(){ if (S.thread) return Promise.resolve(S.thread);
+      return withToken("aibou_start", { p_app:opts.appId }).then(function(t){ S.thread = t.id; S.no = t.no; return t.id; }); }
+    function attach(files){
+      Array.prototype.slice.call(files || [], 0, 5 - S.pending.length).forEach(function(file){
+        var item = { id:"", name:file.name || "file", mime:mimeOf(file), up:true }; S.pending.push(item); S.err = ""; render();
+        (/^image\//.test(item.mime) || /^image\//.test(file.type) ? shrink(file) : Promise.resolve({ blob:file, mime:mimeOf(file), name:file.name }))
+          .then(function(f){ if (!f.mime) throw new Error("bad_type"); item.mime = f.mime; item.name = f.name;
+            return ensureThread().then(function(tid){ return withToken("aibou_file_begin", { p_thread:tid, p_name:f.name, p_mime:f.mime, p_bytes:f.blob.size }); })
+              .then(function(b){ return root.fetch(api.url + "/storage/v1/object/" + b.bucket + "/" + b.path, { method:"POST", busy:false, headers:{ apikey:api.key, "Content-Type":f.mime, "x-upsert":"false" }, body:f.blob })
+                .then(function(r){ if (!r.ok) throw new Error("upload"); return withToken("aibou_file_done", { p_id:b.id }); }).then(function(){ item.id = b.id; item.up = false; }); }); })
+          .catch(function(e){ S.pending.splice(S.pending.indexOf(item), 1); fail(e); })
+          .then(function(){ if (S.view === "chat" && panel.open) render(); });
+      });
+    }
+
+    /* ===== 送る ===== */
+    function send(text){
+      var body = String(text == null ? "" : text).trim(); if (S.busy || (!body && !S.pending.length) || S.pending.some(function(f){ return f.up; })) return;
+      var files = S.pending.slice(); S.busy = true; S.err = ""; S.draft = "";
+      S.msgs.push({ role:"user", body:body, files:files.map(function(f){ return { id:f.id, name:f.name, mime:f.mime }; }) }); S.pending = []; render();
+      token().then(function(t){
+        return root.fetch(api.url + "/functions/v1/aibou-chat", { method:"POST", busy:false, headers:{ "Content-Type":"application/json", apikey:api.key, Authorization:"Bearer " + api.key },
+          body:JSON.stringify({ token:guest ? undefined : t, client:guest ? t : undefined, thread:S.thread, app:opts.appId, screen:String(call(opts.screen) || "").slice(0, 60), text:body, files:guest ? [] : files.map(function(f){ return f.id; }), view:guest ? [] : view() }) });
+      }).then(function(r){ if (r.status === 401){ S.token = ""; throw new Error("login_required"); } if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+        .then(function(j){ if (!j.ok) throw new Error(j.why || "error"); S.thread = j.thread; S.no = j.no; S.msgs.push({ id:j.reply.id, role:"ai", body:j.reply.body, actions:j.reply.actions || [], choices:j.reply.choices || [], done:{} }); })
+        .catch(function(e){ var last = S.msgs.pop(); S.draft = last ? last.body : ""; S.pending = files; fail(e); })
+        .then(function(){ S.busy = false; if (S.view === "chat" && panel.open) render(); });
+    }
+    function accept(btn){
+      var mid = Number(btn.dataset.m), i = Number(btn.dataset.i), m = S.msgs.find(function(x){ return x.id === mid; }); if (!m) return; btn.disabled = true;
+      withToken("aibou_accept", { p_msg:mid, p_index:i }).then(function(r){ m.done = m.done || {}; m.done[String(i)] = r.state; if (r.state === "applied") return loadTweaksNow(); })
+        .catch(function(e){ fail(e); }).then(function(){ render(); });
+    }
+    function loadTweaksNow(){ return withToken("aibou_tweaks", { p_app:opts.appId }).then(function(t){ S.tweaks = t || []; schedule(); }); }
+    function undo(id){ return withToken("aibou_undo", { p_tweak:id }).then(loadTweaksNow).catch(fail); }
+    function openThread(id){ withToken("aibou_thread", { p_thread:id }).then(function(t){ S.thread = t.id; S.no = t.no; S.msgs = t.msgs || []; S.pending = []; S.view = "chat"; render(); }).catch(function(e){ fail(e); S.view = "chat"; render(); }); }
+    function openFile(id){ withToken("aibou_file_url", { p_id:id }).then(function(t){ return root.fetch(api.url + "/storage/v1/object/" + t.bucket + "/" + t.path, { busy:false, headers:{ apikey:api.key } }); })
+      .then(function(r){ if (!r.ok) throw new Error("get"); return r.blob(); }).then(function(b){ root.open(URL.createObjectURL(b), "_blank"); }).catch(fail); }
+
+    panel.addEventListener("click", function(e){
+      var b = e.target.closest("[data-a]"); if (!b) return; var a = b.dataset.a; if (b.tagName === "A") e.preventDefault();
+      if (a === "close") panel.close();
+      else if (a === "send") send(panel.querySelector("#aib-text").value);
+      else if (a === "choice") send(b.textContent);
+      else if (a === "quick") { var ta = panel.querySelector("#aib-text"); ta.value = b.textContent + "："; S.draft = ta.value; ta.focus(); sendState(); }
+      else if (a === "clip") panel.querySelector("#aib-file").click();
+      else if (a === "unpend") { S.pending.splice(Number(b.dataset.i), 1); render(); }
+      else if (a === "accept") accept(b);
+      else if (a === "undo-by") { var w = S.tweaks.find(function(x){ return x.target === b.dataset.t && x.op === b.dataset.op; }); if (w) undo(w.id).then(render); }
+      else if (a === "undo") undo(Number(b.dataset.id)).then(function(){ return withToken("aibou_tweaks", { p_app:null }); }).then(tweakView).catch(fail);
+      else if (a === "props") { S.view = "props"; loadProps().catch(function(err){ fail(err); S.view = "chat"; render(); }); }
+      else if (a === "adopt" || a === "decline") { b.disabled = true; withToken("aibou_decide", { p_id:Number(b.dataset.id), p_adopt:a === "adopt" }).then(function(){ return loadTweaksNow(); }).then(loadProps).catch(function(err){ fail(err); b.disabled = false; }); }
+      else if (a === "new") { S.thread = null; S.no = null; S.msgs = []; S.pending = []; S.err = ""; render(); }
+      else if (a === "list") { S.view = "list"; withToken("aibou_threads").then(listView).catch(function(err){ fail(err); S.view = "chat"; render(); }); }
+      else if (a === "tweaks") { S.view = "tweaks"; withToken("aibou_tweaks", { p_app:null }).then(tweakView).catch(function(err){ fail(err); S.view = "chat"; render(); }); }
+      else if (a === "back") { S.view = "chat"; render(); }
+      else if (a === "open") openThread(b.dataset.id);
+      else if (a === "file") openFile(b.dataset.id);
+    });
+    panel.addEventListener("input", function(e){ if (e.target.id === "aib-text"){ S.draft = e.target.value; e.target.style.height = "auto"; e.target.style.height = Math.min(140, e.target.scrollHeight) + "px"; sendState(); } });
+    panel.addEventListener("change", function(e){ if (e.target.id === "aib-file"){ attach(e.target.files); e.target.value = ""; } });
+    panel.addEventListener("close", function(){ S.view = "chat"; });
+    tab.addEventListener("click", function(){ session(); S.view = "chat"; S.err = ""; render(); panel.showModal(); loadMe(); });
+
+    function sync(){ var v = call(opts.show) !== false; if (tab.hidden === v) tab.hidden = !v; if (!v && panel.open) panel.close(); session(); }
+    var timer = root.setInterval(sync, 1500); sync();
+    return { open:function(text){ if (text != null) S.draft = String(text); tab.click(); }, close:function(){ panel.close(); }, apply:schedule,
+      stop:function(){ observer.disconnect(); root.clearInterval(timer); tab.remove(); panel.remove(); style.remove(); } };
+  }
+  root.TenpoAibou = { mount: mount, _pure: pure };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
 <script>
 const startDesk = TenpoAsk.mount({
  store:"TENPO/START",storeKey:"tenpo-start",app:"テンポスタート",appId:"start",version:"20261126",
- clientKey:"tenpo.start.voice.client",news:false,api:ACC,help:guideSheet,compact:true,show:()=>true,/* 2026-11-26 松尾さん：右側の改善ボタンは、どの画面でも出す */
+ clientKey:"tenpo.start.voice.client",news:false,api:ACC,help:guideSheet,compact:true,show:()=>!window.TenpoAibou,/* 2026-11-26 松尾さん：右側の改善ボタンは、どの画面でも出す。11/28 からは「AIに相談」がその代わり */
  screen:()=>ivMode() ? "初回ヒアリング" : (TABS.find(([key])=>key===st().tab)?.[1] || (st().tab==="ask" ? "開業の相談" : "ホーム"))
 });
+/* 11/28：AIに相談（ログインなし＝端末の番号で分ける。なんでも相談と同じ番号を使う）。使い方の案内と、事務局への依頼書だけ */
+function startClient(){let v="";try{v=localStorage.getItem("tenpo.start.voice.client")||""}catch(e){}
+ if(!/^[0-9a-f-]{36}$/.test(v)){v=(crypto.randomUUID?crypto.randomUUID():"10000000-1000-4000-8000-100000000000".replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)));try{localStorage.setItem("tenpo.start.voice.client",v)}catch(e){}}return v}
+const startAi = window.TenpoAibou ? TenpoAibou.mount({ appId:"start", client:startClient, api:ACC, color:"#1f3a2a",
+ screen:()=>ivMode() ? "初回ヒアリング" : (TABS.find(([key])=>key===st().tab)?.[1] || (st().tab==="ask" ? "開業の相談" : "ホーム")),
+ show:()=>true, cards:"[data-aib-none]" }) : null;
 document.addEventListener("click",event=>{
  const button=event.target.closest("[data-report-error]");
- if(button){event.preventDefault();startDesk.reportError(button.dataset.reportError);}
- if(event.target.closest("[data-report-open]"))startDesk.open();
+ if(button){event.preventDefault();if(startAi)startAi.open("うまく動かない：「"+button.dataset.reportError+"」");else startDesk.reportError(button.dataset.reportError);}
+ if(event.target.closest("[data-report-open]")){if(startAi)startAi.open();else startDesk.open();}
 });
 </script>
 </body>
